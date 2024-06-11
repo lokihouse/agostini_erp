@@ -22,8 +22,8 @@ class Login extends LoginBase
     {
         return $form
             ->schema([
-                $this->getUsernameFormComponent()->default('root'),
-                $this->getPasswordFormComponent()->default('password'),
+                $this->getUsernameFormComponent()->default(env('APP_ENV') === 'local' ? 'root' : ''),
+                $this->getPasswordFormComponent()->default(env('APP_ENV') === 'local' ? 'root' : ''),
             ])
             ->statePath('data');
     }

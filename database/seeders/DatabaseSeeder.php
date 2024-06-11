@@ -77,6 +77,14 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'empresa_id' => 1,
+            'name' => 'Luiz',
+            'username' => 'luizcarlos',
+            'password' => Hash::make('password')
+        ])
+            ->syncRoles('super_admin');
+
+        User::create([
+            'empresa_id' => 1,
             'name' => 'Gerente',
             'username' => 'gerente1',
             'password' => Hash::make('password')

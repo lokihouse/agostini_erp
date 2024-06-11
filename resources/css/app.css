@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.user_reset_password_action {
+    background: #00bb00 !important;
+    margin: 10px;
+    padding-top: 2rem;
+}

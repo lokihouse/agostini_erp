@@ -35,7 +35,7 @@ class DepartamentoResource extends ResourceBase
                     MarkdownEditor::make('descricao')
                         ->columnSpan(7)
                         ->placeholder('Descrição do departamento')
-                ])
+                ])->columns(10)->columnSpanFull()
             ]);
     }
 

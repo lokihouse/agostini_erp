@@ -5,6 +5,7 @@ namespace App\Filament\Clusters\Vendas\Resources;
 use App\Filament\Clusters\Vendas;
 use App\Filament\Clusters\Vendas\Resources\ClienteResource\Pages;
 use App\Filament\ResourceBase;
+use App\Forms\Components\VendedoresPorClienteField;
 use App\Models\Cliente;
 use App\Utils\TextFormater;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
@@ -34,6 +35,7 @@ class ClienteResource extends ResourceBase
         return parent::form($form)
             ->schema([
                 Tabs::make('Tabs')
+                    ->activeTab(3)
                     ->tabs([
                         Tabs\Tab::make('Cadastro')
                             ->schema([
@@ -72,7 +74,8 @@ class ClienteResource extends ResourceBase
                                                 })
                                         )
                                         ->required(),
-                                ]),
+                                ])->columns(10)
+                                    ->columnSpanFull(),
                                 Forms\Components\Group::make([
                                     Forms\Components\TextInput::make('razao_social')
                                         ->label('Razão Social')
@@ -91,7 +94,8 @@ class ClienteResource extends ResourceBase
                                         JS))
                                         ->label('Telefone de contato')
                                         ->columnSpan(2),
-                                ]),
+                                ])->columns(10)
+                                    ->columnSpanFull(),
                             ]),
                         Tabs\Tab::make('Endereço')
                             ->schema([
@@ -159,7 +163,9 @@ class ClienteResource extends ResourceBase
                                         ])
                                         ->extraAttributes(['style' => 'padding-top: 2rem;'])
                                         ->fullWidth()
-                                ]),
+                                ])
+                                    ->columns(10)
+                                    ->columnSpanFull(),
                                 Forms\Components\Group::make([
                                     Forms\Components\TextInput::make('logradouro')
                                         ->label('Logradouro')
@@ -187,9 +193,12 @@ class ClienteResource extends ResourceBase
                                     Map::make('localizacao')
                                         ->label('Localização')
                                         ->columnSpanFull(),
-                                ]),
+                                ])
+                                    ->columns(10)
+                                    ->columnSpanFull(),
                             ]),
                         Tabs\Tab::make('Vendas')
+                            ->columns(10)
                             ->schema([
                                 Forms\Components\Group::make([
                                     Forms\Components\TextInput::make('recorrencia_de_visitas_dias')
@@ -197,11 +206,15 @@ class ClienteResource extends ResourceBase
                                         ->columnSpanFull()
                                         ->numeric()
                                         ->required(),
-                                ])->columnSpan(2),
-                                Forms\Components\Group::make([
                                 ])
-                                    ->hidden(fn () => $form->getOperation() === 'create')
-                                    ->columnSpan(3)
+                                    ->columnSpan(2),
+                                Forms\Components\Group::make([
+                                    VendedoresPorClienteField::make('vendedores')
+                                        ->label('Vendedores')
+                                        ->columnSpanFull(),
+                                ])
+                                    ->hidden($form->getOperation() === 'create')
+                                ->columnSpan(4)
                             ]),
                     ])->columnSpanFull(),
             ]);

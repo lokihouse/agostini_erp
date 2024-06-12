@@ -6,15 +6,10 @@ use App\Filament\Clusters\Vendas\Resources\VisitaResource;
 use App\Models\Visita;
 use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Contracts\Pagination\CursorPaginator;
-use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Collection;
 
 class ListVisitas extends ListRecords
 {

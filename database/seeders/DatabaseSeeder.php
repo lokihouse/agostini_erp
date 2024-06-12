@@ -107,7 +107,7 @@ class DatabaseSeeder extends Seeder
         ->syncRoles('usuarios_base');
 
         User::create([
-            'empresa_id' => 2,
+            'empresa_id' => 1,
             'name' => 'Vendedor 2',
             'username' => 'vendedor2',
             'password' => Hash::make('password')
@@ -130,10 +130,25 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Cliente::create([
-            'empresa_id' => 2,
+            'empresa_id' => 1,
             'cnpj' => '00000000000000',
             'razao_social' => 'Cliente de teste 2 ltda.',
             'nome_fantasia' => 'CliTest2',
+            'logradouro' => 'L',
+            'numero' => 'N',
+            'bairro' => 'B',
+            'municipio' => 'M',
+            'uf' => 'MG',
+            'cep' => '30000000',
+            'latitude' => '-19.816667',
+            'longitude' => '-43.833333',
+        ]);
+
+        Cliente::create([
+            'empresa_id' => 2,
+            'cnpj' => '00000000000000',
+            'razao_social' => 'Cliente de teste 3 ltda.',
+            'nome_fantasia' => 'CliTest3',
             'logradouro' => 'L',
             'numero' => 'N',
             'bairro' => 'B',
@@ -144,18 +159,45 @@ class DatabaseSeeder extends Seeder
             'longitude' => '-43.933333',
         ]);
 
-        Visita::create([
+        UserCliente::create([
             'empresa_id' => 1,
-            'cliente_id' => 1,
-            'data' => Carbon::make('today')->format('Y-m-d'),
-            'status' => 'agendada'
+            'user_id' => 5,
+            'cliente_id' => 1
         ]);
 
-        Visita::create([
-            'empresa_id' => 2,
-            'cliente_id' => 2,
-            'data' => Carbon::make('today')->add('1 day')->format('Y-m-d'),
-            'status' => 'agendada'
+        UserCliente::create([
+            'empresa_id' => 1,
+            'user_id' => 5,
+            'cliente_id' => 2
         ]);
+
+        UserCliente::create([
+            'empresa_id' => 1,
+            'user_id' => 6,
+            'cliente_id' => 1
+        ]);
+
+        for($i=0; $i<30; $i++){
+            Visita::create([
+                'empresa_id' => 1,
+                'cliente_id' => 1,
+                'data' => Carbon::make('today')->addDays($i)->format('Y-m-d'),
+                'status' => 'agendada'
+            ]);
+
+            Visita::create([
+                'empresa_id' => 1,
+                'cliente_id' => 2,
+                'data' => Carbon::make('today')->addDays($i)->format('Y-m-d'),
+                'status' => 'agendada'
+            ]);
+
+            Visita::create([
+                'empresa_id' => 2,
+                'cliente_id' => 3,
+                'data' => Carbon::make('today')->addDays($i)->format('Y-m-d'),
+                'status' => 'agendada'
+            ]);
+        }
     }
 }

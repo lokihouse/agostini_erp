@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Login;
+use Filament\FontProviders\GoogleFontProvider;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Http\Middleware\Authenticate;
@@ -34,6 +36,7 @@ class AppPanelProvider extends PanelProvider
             ->spa()
             ->login(Login::class)
             ->colors([])
+            ->font('Inter', provider: GoogleFontProvider::class)
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 \Rupadana\ApiService\ApiServicePlugin::make(),

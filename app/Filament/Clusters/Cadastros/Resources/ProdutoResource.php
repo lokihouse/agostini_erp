@@ -11,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,9 +44,19 @@ class ProdutoResource extends ResourceBase
                                         ->columnSpan(8),
                                 ])
                             ]),
-                        Tabs\Tab::make('Produção'),
-                        Tabs\Tab::make('Financeiro'),
+                        /*Tabs\Tab::make('Produção'),
+                        Tabs\Tab::make('Financeiro'),*/
                         Tabs\Tab::make('Vendas')
+                            ->schema([
+                                Forms\Components\Group::make([
+                                    Forms\Components\TextInput::make('valor_unitario')
+                                        ->label('Valor Unitário')
+                                        ->prefix('R$')
+                                        ->mask(RawJs::make('$money($input, \',\')'))
+                                        ->stripCharacters('.')
+                                        ->columnSpan(2),
+                                ])->columns(10)->columnSpanFull()
+                            ])
                     ])
             ]);
     }
@@ -59,7 +70,10 @@ class ProdutoResource extends ResourceBase
                     ->searchable()
                     ->extraHeaderAttributes(['style' => 'width: 200px']),
                 Tables\Columns\TextColumn::make('descricao')
-                    ->limit(90)
+                    ->limit(90),
+                Tables\Columns\TextColumn::make('valor_unitario')
+                    ->formatStateUsing(fn ($state) => 'R$ ' . number_format($state, 2, ',', '.'))
+                    ->extraHeaderAttributes(['style' => 'width: 100px']),
             ]);
     }
 

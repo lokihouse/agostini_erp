@@ -9,6 +9,8 @@ class Produto extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['nome', 'descricao', 'valor_unitario', 'tempo_producao', 'empresa_id'];
+
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);

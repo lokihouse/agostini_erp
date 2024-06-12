@@ -2,8 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Visita;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 
 class Home extends Page
 {

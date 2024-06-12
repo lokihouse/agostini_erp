@@ -14,6 +14,7 @@ class CreateProduto extends CreateRecord
     {
         $data = parent::mutateFormDataBeforeCreate($data);
 
+        $data['valor_unitario'] = str_replace(',', '.', $data['valor_unitario']);
         $data['empresa_id'] = auth()->user()->empresa_id;
 
         return $data;

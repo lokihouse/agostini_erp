@@ -2,6 +2,9 @@
 
 namespace App\Filament\Clusters\Vendas\Resources;
 
+use App\Filament\Actions\VisitaCancelada;
+use App\Filament\Actions\VisitaCheckIn;
+use App\Filament\Actions\VisitaRouteTo;
 use App\Filament\Clusters\Vendas;
 use App\Filament\Clusters\Vendas\Resources\VisitaResource\Pages;
 use App\Filament\Clusters\Vendas\Resources\VisitaResource\RelationManagers;
@@ -27,6 +30,7 @@ use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Redirect;
 
 class VisitaResource extends Resource // implements HasShieldPermissions
 {
@@ -87,7 +91,15 @@ class VisitaResource extends Resource // implements HasShieldPermissions
                     })
                     ->extraHeaderAttributes(['style' => 'width: 120px;']),
                 Tables\Columns\TextColumn::make('cliente.nome_fantasia'),
-
+                Tables\Columns\TextColumn::make('cliente.endereco_completo'),
+                Tables\Columns\TextColumn::make('user_id')
+            ])
+            ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
+            ->actions([
+                VisitaCheckIn::make('check_in'),
+                VisitaRouteTo::make('como_chegar'),
+                VisitaCancelada::make('cancelar')
+                    ->hidden(fn($record) => $record->status === 'cancelada'),
             ]);
     }
 

@@ -33,6 +33,7 @@ class Cliente extends Model
     ];
 
     protected $appends = [
+        'endereco_completo',
         'localizacao',
         'proxima_visita',
     ];
@@ -43,6 +44,11 @@ class Cliente extends Model
             "lat" => (float)$this->latitude,
             "lng" => (float)$this->longitude,
         ];
+    }
+
+    public function getEnderecoCompletoAttribute(): string
+    {
+        return "{$this->logradouro}, {$this->numero} - {$this->bairro}, {$this->municipio} - {$this->uf}, {$this->cep}";
     }
 
     public function getProximaVisitaAttribute(): ?string
@@ -80,10 +86,5 @@ class Cliente extends Model
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);
-    }
-
-    public function userClientes()
-    {
-        return $this->hasMany(UserCliente::class, 'cliente_id', 'id');
     }
 }

@@ -15,6 +15,7 @@
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_START, scopes: $livewire->getRenderHookScopes()) }}
 
         <meta charset="utf-8" />
+        <meta name="application-name" content="{{ config('app.name') }}">
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -53,7 +54,10 @@
             }
         </style>
 
+        @laravelPWA
+
         @filamentStyles
+        @vite('resources/css/app.css')
 
         {{ filament()->getTheme()->getHtml() }}
         {{ filament()->getFontHtml() }}

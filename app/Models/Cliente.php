@@ -12,6 +12,7 @@ class Cliente extends Model
 {
     use HasFactory;
 
+    protected $with = ['visitas'];
     protected $fillable = [
         'empresa_id',
         'cnpj',
@@ -86,5 +87,10 @@ class Cliente extends Model
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);
+    }
+
+    public function visitas()
+    {
+        return $this->hasMany(Visita::class);
     }
 }

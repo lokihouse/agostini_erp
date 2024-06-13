@@ -18,7 +18,11 @@ class Visita extends Model
         'user_id',
         'status',
         'data',
-        'relatorio',
+        'motivo',
+        'observacao_cancelamento',
+        'observacao_inicial',
+        'imagem_inicial',
+        'observacao_final',
     ];
 
     public function empresa()
@@ -28,7 +32,7 @@ class Visita extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class);
+        return $this->belongsTo(Cliente::class, 'cliente_id', 'id');
     }
 
     public function responsavel()

@@ -15,9 +15,19 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\Cliente::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\User::class)->nullable()->constrained()->cascadeOnDelete();
             $table->dateTime('data');
-            $table->enum('status', ['agendada', 'realizada', 'cancelada']);
+            $table->enum('status', ['agendada', 'iniciada', 'finalizada', 'cancelada']);
+            $table->string('motivo')->nullable();
+            $table->text('observacao_cancelamento')->nullable();
+            $table->text('observacao_inicial')->nullable();
+            $table->string('imagem_inicial')->nullable();
+            $table->text('observacao_final')->nullable();
             $table->timestamps();
+        });
+
+        Schema::table('visitas', function (Blueprint $table) {
+            $table->foreignIdFor(\App\Models\Visita::class)->nullable()->constrained()->cascadeOnDelete();
         });
     }
 

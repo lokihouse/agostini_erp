@@ -15,6 +15,19 @@ class Visitas extends Widget
 
     public $activeTab = "tab1";
 
+    protected function getVisitasIniciadas(): array
+    {
+        if(!Auth::user()->can('widget_Visitas')) return [];
+
+        $visitas_atrasadas = Visita::query()
+            ->with('cliente')
+            ->where('status', 'iniciada')
+            ->where('user_id', auth()->user()->id)
+            ->get()
+            ->toArray();
+
+        return $visitas_atrasadas;
+    }
     protected function getVisitasAtrasadas(): array
     {
         if(!Auth::user()->can('widget_Visitas')) return [];

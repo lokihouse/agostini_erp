@@ -208,13 +208,6 @@ class ClienteResource extends ResourceBase
                                         ->required(),
                                 ])
                                     ->columnSpan(2),
-                                Forms\Components\Group::make([
-                                    VendedoresPorClienteField::make('vendedores')
-                                        ->label('Vendedores')
-                                        ->columnSpanFull(),
-                                ])
-                                    ->hidden($form->getOperation() === 'create')
-                                ->columnSpan(4)
                             ]),
                     ])->columnSpanFull(),
             ]);

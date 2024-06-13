@@ -85,7 +85,7 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'empresa_id' => 1,
-            'name' => 'Gerente',
+            'name' => 'Gerente1',
             'username' => 'gerente1',
             'password' => Hash::make('password')
         ])
@@ -93,7 +93,7 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'empresa_id' => 2,
-            'name' => 'Gerente',
+            'name' => 'Gerente2',
             'username' => 'gerente2',
             'password' => Hash::make('password')
         ])->syncRoles('gerente');
@@ -159,25 +159,7 @@ class DatabaseSeeder extends Seeder
             'longitude' => '-43.933333',
         ]);
 
-        UserCliente::create([
-            'empresa_id' => 1,
-            'user_id' => 5,
-            'cliente_id' => 1
-        ]);
-
-        UserCliente::create([
-            'empresa_id' => 1,
-            'user_id' => 5,
-            'cliente_id' => 2
-        ]);
-
-        UserCliente::create([
-            'empresa_id' => 1,
-            'user_id' => 6,
-            'cliente_id' => 1
-        ]);
-
-        for($i=0; $i<30; $i++){
+        /*for($i=0; $i<30; $i++){
             Visita::create([
                 'empresa_id' => 1,
                 'cliente_id' => 1,
@@ -198,6 +180,6 @@ class DatabaseSeeder extends Seeder
                 'data' => Carbon::make('today')->addDays($i)->format('Y-m-d'),
                 'status' => 'agendada'
             ]);
-        }
+        }*/
     }
 }

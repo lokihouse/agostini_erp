@@ -21,6 +21,15 @@ class VisitasAtrasadasMapa extends MapWidget
             'lat' => -15.793889,
             'lng' => -47.882778,
         ];
+        $config['controls'] = [
+            'mapTypeControl'    => false,
+            'scaleControl'      => true,
+            'streetViewControl' => false,
+            'rotateControl'     => false,
+            'fullscreenControl' => true,
+            'searchBoxControl'  => false,
+            'zoomControl'       => false,
+        ];
         return json_encode($config);
     }
 

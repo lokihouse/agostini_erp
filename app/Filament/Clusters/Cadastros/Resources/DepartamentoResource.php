@@ -48,7 +48,7 @@ class DepartamentoResource extends ResourceBase
                     ->searchable()
                     ->extraHeaderAttributes(['style' => 'width: 200px']),
                 Tables\Columns\TextColumn::make('descricao')
-                    ->limit(90)
+                    ->limit(80)
             ]);
     }
 

@@ -8,31 +8,17 @@ use App\Filament\Actions\VisitaRouteTo;
 use App\Filament\Clusters\Vendas;
 use App\Filament\Clusters\Vendas\Resources\VisitaResource\Pages;
 use App\Filament\Clusters\Vendas\Resources\VisitaResource\RelationManagers;
-use App\Models\Cliente;
-use App\Models\Produto;
 use App\Models\Visita;
-use App\Utils\NumberFormater;
-use App\Utils\TextFormater;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Carbon\Carbon;
+use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Redirect;
 
-class VisitaResource extends Resource // implements HasShieldPermissions
+class VisitaResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Visita::class;
 
@@ -46,22 +32,59 @@ class VisitaResource extends Resource // implements HasShieldPermissions
             ->columns(10)
             ->schema([
                 Forms\Components\Group::make([
+                    Forms\Components\DatePicker::make('data')
+                        ->columnSpanFull()
+                        ->disabled(),
                     Forms\Components\Select::make('cliente_id')
                         ->relationship('cliente', 'nome_fantasia')
                         ->columnSpanFull()
                         ->disabled(),
-                    ])->columnSpan(2),
-                Forms\Components\Group::make([
                     Select::make('status')
                         ->disabled()
                         ->options([
                             'agendada' => 'Agendada',
-                            'realizada' => 'Realizada',
+                            'iniciada' => 'Iniciada',
+                            'finalizada' => 'Finalizada',
                             'cancelada' => 'Cancelada',
                         ])
                         ->columnSpanFull(),
-                ])->columnSpan(2),
+                    Forms\Components\Select::make('user_id')
+                        ->relationship('responsavel', 'name', function ($query) {
+                            $query->where('empresa_id', auth()->user()->empresa_id);
+                        })
+                        ->columnSpanFull()
+                        ->disabled(fn($record) => $record->user_id !== null),
+                    ])
+                    ->columnSpan(2),
                 Forms\Components\Group::make([
+                    Forms\Components\TextInput::make('motivo')
+                        ->label('Motivo do cancelamento')
+                        ->columnSpanFull()
+                        ->disabled(),
+                    Forms\Components\Textarea::make('observacao_cancelamento')
+                        ->label('Observações')
+                        ->rows(5)
+                        ->columnSpanFull()
+                        ->disabled(),
+                ])
+                    ->hidden(fn($record) => $record->status !== 'cancelada')
+                    ->columnSpan(2),
+                Forms\Components\Group::make([
+                    Map::make('localizacao')
+                        ->mapControls([
+                            'mapTypeControl'    => false,
+                            'scaleControl'      => false,
+                            'streetViewControl' => false,
+                            'rotateControl'     => false,
+                            'fullscreenControl' => false,
+                            'searchBoxControl'  => false, // creates geocomplete field inside map
+                            'zoomControl'       => false,
+                        ])
+                        ->height('304px')
+                        ->label('Localização')
+                        ->defaultLocation(fn ($record) => array_values($record->cliente->localizacao))
+                        ->draggable(false)
+                        ->columnSpanFull(),
                 ])->columnSpan(6),
             ]);
     }
@@ -84,15 +107,17 @@ class VisitaResource extends Resource // implements HasShieldPermissions
                     ->badge()
                     ->color(function($state) {
                         switch ($state) {
-                            case 'agendada': return 'info';
-                            case 'realizada': return 'success';
+                            case 'agendada': return 'gray';
+                            case 'iniciada': return 'info';
+                            case 'finalizada': return 'success';
                             case 'cancelada': return 'danger';
                         }
                     })
                     ->extraHeaderAttributes(['style' => 'width: 120px;']),
                 Tables\Columns\TextColumn::make('cliente.nome_fantasia'),
                 Tables\Columns\TextColumn::make('cliente.endereco_completo'),
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('responsavel.name')
+                    ->label('Responsável'),
             ])
             ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
             ->actions([
@@ -116,6 +141,16 @@ class VisitaResource extends Resource // implements HasShieldPermissions
             'index' => Pages\ListVisitas::route('/'),
             'create' => Pages\CreateVisita::route('/create'),
             'edit' => Pages\EditVisita::route('/{record}/edit'),
+            'check_in' => Pages\CheckInVisita::route('/{record}/check_in'),
         ];
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        $defaultPermissions = config('filament-shield.permission_prefixes.resource');
+        return array_merge($defaultPermissions, [
+            'check_in' => 'check_in',
+            'cancelar' => 'cancelar',
+        ]);
     }
 }

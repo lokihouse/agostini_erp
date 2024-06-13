@@ -1,5 +1,5 @@
 <x-filament-widgets::widget>
-    <x-filament::section icon="heroicon-o-map">
+    <x-filament::section icon="heroicon-o-map" compact>
         <x-slot name="heading">
             Mapa de Visitas
         </x-slot>
@@ -18,6 +18,7 @@
                 </x-filament::button>
             </div>
         </x-slot>
+
         @if($activeTab === 'tab1')
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

@@ -43,7 +43,7 @@ class VisitaAgendar extends Action
 
             $model->empresa_id = auth()->user()->empresa_id;
             $model->cliente_id = $data['cliente_id'];
-            $model->user_id = $data['cliente_id'];
+            $model->user_id = $data['user_id'];
             $model->status = 'agendada';
             $model->data = $data['proxima_data'];
 

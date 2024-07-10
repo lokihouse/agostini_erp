@@ -25,4 +25,13 @@ class TextFormater
     {
         return preg_replace('/[^0-9]/', '', $str);
     }
+
+    public static function toTelefone(string $str)
+    {
+        if(strlen($str) == 10){
+            return preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $str);
+        }else{
+            return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $str);
+        }
+    }
 }

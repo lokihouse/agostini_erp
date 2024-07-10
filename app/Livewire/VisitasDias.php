@@ -2,6 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Filament\Actions\VisitaCheckIn;
+use App\Filament\Actions\VisitaCheckOut;
+use App\Filament\Actions\VisitaRouteTo;
 use App\Http\Controllers\VisitaController;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -34,13 +37,12 @@ class VisitasDias extends BaseWidget
             ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('Check in')
-                        ->icon('heroicon-o-building-storefront'),
-                    Tables\Actions\Action::make('Como Chegar')
-                        ->icon('heroicon-o-map')
-                        ->action(function($record) {
-                            Redirect::away("https://www.google.com.br/maps/dir/" . $record->cliente->localizacao['lat'] . "," . $record->cliente->localizacao['lng']);
-                        })
+                    VisitaCheckOut::make('check-out')
+                        ->label('Check-Out'),
+                    VisitaCheckIn::make('check-in')
+                        ->label('Check-In'),
+                    VisitaRouteTo::make('como_chegar')
+                        ->label('Como Chegar')
                 ])->icon('heroicon-m-ellipsis-horizontal')
             ]);
     }

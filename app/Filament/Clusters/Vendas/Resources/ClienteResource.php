@@ -30,12 +30,12 @@ class ClienteResource extends ResourceBase
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $cluster = Vendas::class;
+    protected static ?int $navigationSort = 1;
     public static function form(Form $form): Form
     {
         return parent::form($form)
             ->schema([
                 Tabs::make('Tabs')
-                    ->activeTab(3)
                     ->tabs([
                         Tabs\Tab::make('Cadastro')
                             ->schema([

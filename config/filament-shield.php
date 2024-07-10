@@ -64,7 +64,8 @@ return [
     'exclude' => [
         'enabled' => true,
         'pages' => [
-            'Home'
+            'Home',
+            'HealthCheck',
         ],
         'widgets' => [],
         'resources' => [],

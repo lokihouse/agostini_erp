@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('registros_de_ponto', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\User::class);
+            $table->date('dia');
+            $table->time('hora');
+            $table->ipAddress('ip');
+            $table->float('latitude', 13, 10)->nullable();
+            $table->float('longitude', 13, 10)->nullable();
+            $table->string('status')->default('');
+            $table->string('motivo_status')->default('');
+            $table->text('justificativa')->nullable();
             $table->timestamps();
         });
     }

@@ -5,11 +5,15 @@
         </x-slot>
         <x-slot name="headerEnd">
             <div class="hidden md:block">
-                <x-filament::button color="danger" size="xs" wire:click="$set('activeTab', 'tab1')">
+                <x-filament::button color="info" size="xs" wire:click="$set('activeTab', 'tab1')">
+                    Iniciadas
+                </x-filament::button>
+
+                <x-filament::button color="danger" size="xs" wire:click="$set('activeTab', 'tab2')">
                     Atrasadas
                 </x-filament::button>
 
-                <x-filament::button size="xs" wire:click="$set('activeTab', 'tab2')">
+                <x-filament::button size="xs" wire:click="$set('activeTab', 'tab3')">
                     15 dias
                 </x-filament::button>
 

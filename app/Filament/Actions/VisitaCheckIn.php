@@ -13,8 +13,9 @@ use Illuminate\Contracts\Support\Htmlable;
 class VisitaCheckIn extends Action
 {
     protected string | Htmlable | Closure | null $label = '';
-    protected string | Closure | null $icon = 'heroicon-o-building-storefront';
-    protected string | Closure | null $tooltip = 'Check-in na loja do cliente';
+    protected string | Closure | null $icon = 'heroicon-o-arrow-right-end-on-rectangle';
+    protected string | Closure | null $tooltip = 'Check-in do cliente';
+    protected string | array | Closure | null $color = 'primary';
     protected MaxWidth | string | Closure | null $modalWidth = 'sm';
 
     protected function setUp(): void
@@ -26,6 +27,7 @@ class VisitaCheckIn extends Action
             FileUpload::make('imagem_inicial')
                 ->label('Entrada na loja')
                 ->image()
+                ->required()
                 ->imageEditor()
         ]);
 
@@ -34,6 +36,7 @@ class VisitaCheckIn extends Action
                 'status' => 'iniciada',
                 'observacao_inicial' => $data['observacao_inicial'],
                 'imagem_inicial' => $data['imagem_inicial'],
+                'hora_inicial' => now(),
                 'user_id' => auth()->user()->id,
             ]);
             Notification::make()

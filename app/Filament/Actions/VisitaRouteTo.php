@@ -12,11 +12,17 @@ class VisitaRouteTo extends Action
     protected string | Htmlable | Closure | null $label = '';
     protected string | Closure | null $icon = 'heroicon-o-map';
     protected string | Closure | null $tooltip = 'Rota até o cliente';
+    protected string | array | Closure | null $color = 'primary';
 
     protected function setUp(): void
     {
         $this->action(function ($record) {
             Redirect::away("https://www.google.com.br/maps/dir/" . $record->cliente->localizacao['lat'] . "," . $record->cliente->localizacao['lng']);
         });
+    }
+
+    function isHidden(): bool
+    {
+        return $this->getRecord()->status !== 'agendada';
     }
 }

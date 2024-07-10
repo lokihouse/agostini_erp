@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nome');
             $table->longText('descricao')->nullable();
             $table->decimal('valor_unitario', 10, 2)->nullable();
+            $table->longText('mapa_de_producao')->nullable();
             $table->integer('tempo_producao')->nullable();
             $table->timestamps();
         });

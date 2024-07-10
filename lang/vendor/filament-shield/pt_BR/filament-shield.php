@@ -62,18 +62,18 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    // 'resource_permission_prefixes_labels' => [
-    //     'view' => 'View',
-    //     'view_any' => 'View Any',
-    //     'create' => 'Create',
-    //     'update' => 'Update',
-    //     'delete' => 'Delete',
-    //     'delete_any' => 'Delete Any',
+    'resource_permission_prefixes_labels' => [
+        'view' => 'Visualizar',
+        'view_any' => 'Visualizar Qualquer',
+        'create' => 'Criar',
+        'update' => 'Atualizar',
+        'delete' => 'Apagar',
+        'delete_any' => 'Apagar Qualquer',
     //     'force_delete' => 'Force Delete',
     //     'force_delete_any' => 'Force Delete Any',
     //     'restore' => 'Restore',
     //     'reorder' => 'Reorder',
     //     'restore_any' => 'Restore Any',
     //     'replicate' => 'Replicate',
-    // ],
+    ],
 ];

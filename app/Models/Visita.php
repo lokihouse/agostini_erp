@@ -20,8 +20,10 @@ class Visita extends Model
         'data',
         'motivo',
         'observacao_cancelamento',
+        'hora_inicial',
         'observacao_inicial',
         'imagem_inicial',
+        'hora_final',
         'observacao_final',
     ];
 

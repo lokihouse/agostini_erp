@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('produtos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class);
             $table->string('nome');
             $table->longText('descricao')->nullable();
             $table->decimal('valor_unitario', 10, 2)->nullable();
+            $table->longText('mapa_de_producao')->nullable();
             $table->integer('tempo_producao')->nullable();
             $table->timestamps();
         });

@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +25,7 @@ class UserResource extends ResourceBase
     protected static ?string $label = 'Usuário';
     protected static ?string $pluralLabel = 'Usuários';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $cluster = Sistema::class;
 
@@ -33,7 +35,7 @@ class UserResource extends ResourceBase
             Group::make([
                 Select::make('empresa_id')
                     ->label('Empresa')
-                    ->relationship('empresa', 'nome')
+                    ->relationship('empresa', 'nome_fantasia')
                     ->preload()
                     ->required()
                     ->searchable()
@@ -112,11 +114,13 @@ class UserResource extends ResourceBase
         return parent::table($table)
             ->defaultSort('name', 'asc')
             ->columns([
-                TextColumn::make('empresa.nome')
+                TextColumn::make('empresa.nome_fantasia')
                     ->extraHeaderAttributes(['style' => 'width: 200px']),
                 TextColumn::make('name')
+                    ->label('Nome')
                     ->searchable(),
                 TextColumn::make('username')
+                    ->label('Usuário')
                     ->extraHeaderAttributes(['style' => 'width: 1px']),
                 TextColumn::make('roles.name')
                     ->label('Função')

@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 class DepartamentoResource extends ResourceBase
 {
     protected static ?string $model = Departamento::class;
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $cluster = Cadastros::class;

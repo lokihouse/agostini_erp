@@ -10,4 +10,9 @@ class RegistroDePonto extends Model
     use HasFactory;
 
     protected $table = 'registros_de_ponto';
+
+    public function funcionario()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

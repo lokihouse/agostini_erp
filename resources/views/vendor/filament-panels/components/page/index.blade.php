@@ -83,7 +83,7 @@
 
             <div
                 @class([
-                    'grid flex-1 auto-cols-fr gap-y-8',
+                    'grid flex-1 auto-cols-fr gap-y-2',
                     'h-full' => $fullHeight,
                 ])
             >

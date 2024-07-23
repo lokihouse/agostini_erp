@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Filament\Actions\VisitaCheckIn;
+use App\Filament\Actions\VisitaCheckOut;
 use App\Filament\Actions\VisitaRouteTo;
 use App\Http\Controllers\VisitaController;
 use Filament\Tables;
@@ -36,6 +37,8 @@ class VisitasAtrasadas extends BaseWidget
             ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
             ->actions([
                 Tables\Actions\ActionGroup::make([
+                    VisitaCheckOut::make('check-out')
+                        ->label('Check-Out'),
                     VisitaCheckIn::make('check-in')
                         ->label('Check-In'),
                     VisitaRouteTo::make('como_chegar')

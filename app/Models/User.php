@@ -19,6 +19,7 @@ class User extends Authenticatable implements FilamentUser
     use HasApiTokens, HasFactory, Notifiable, HasRoles, HasPanelShield;
 
     protected $fillable = [
+        'empresa_id',
         'name',
         'username',
         'password',

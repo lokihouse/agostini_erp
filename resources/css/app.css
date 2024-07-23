@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media screen and (min-width: 768px) {
+    .user_reset_password_action{
+        padding-top: 2rem;
+    }
+}

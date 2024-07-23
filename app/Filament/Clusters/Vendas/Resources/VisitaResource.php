@@ -4,6 +4,8 @@ namespace App\Filament\Clusters\Vendas\Resources;
 
 use App\Filament\Actions\VisitaCancelada;
 use App\Filament\Actions\VisitaCheckIn;
+use App\Filament\Actions\VisitaCheckOut;
+use App\Filament\Actions\VisitaPedido;
 use App\Filament\Actions\VisitaRouteTo;
 use App\Filament\Clusters\Vendas;
 use App\Filament\Clusters\Vendas\Resources\VisitaResource\Pages;
@@ -25,11 +27,12 @@ class VisitaResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $cluster = Vendas::class;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return parent::form($form)
-            ->columns(10)
+            ->columns(12)
             ->schema([
                 Forms\Components\Group::make([
                     Forms\Components\DatePicker::make('data')
@@ -55,7 +58,7 @@ class VisitaResource extends Resource implements HasShieldPermissions
                         ->columnSpanFull()
                         ->disabled(fn($record) => $record->user_id !== null),
                     ])
-                    ->columnSpan(2),
+                    ->columnSpan(3),
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('motivo')
                         ->label('Motivo do cancelamento')
@@ -68,7 +71,7 @@ class VisitaResource extends Resource implements HasShieldPermissions
                         ->disabled(),
                 ])
                     ->hidden(fn($record) => $record->status !== 'cancelada')
-                    ->columnSpan(2),
+                    ->columnSpan(3),
                 Forms\Components\Group::make([
                     Map::make('localizacao')
                         ->mapControls([
@@ -85,7 +88,21 @@ class VisitaResource extends Resource implements HasShieldPermissions
                         ->defaultLocation(fn ($record) => array_values($record->cliente->localizacao))
                         ->draggable(false)
                         ->columnSpanFull(),
-                ])->columnSpan(6),
+                ])
+                    ->hidden(fn($record) => $record->status === 'cancelada')
+                    ->columnSpan(3),
+                Forms\Components\Group::make([
+                    Forms\Components\Textarea::make('observacao_inicial')
+                        ->rows(3),
+                ])
+                    ->hidden(fn($record) => $record->status === 'cancelada')
+                    ->columnSpan(3),
+                Forms\Components\Group::make([
+                    Forms\Components\Textarea::make('observacao_final')
+                        ->rows(3),
+                ])
+                    ->hidden(fn($record) => $record->status === 'cancelada')
+                    ->columnSpan(3),
             ]);
     }
 
@@ -121,6 +138,8 @@ class VisitaResource extends Resource implements HasShieldPermissions
             ])
             ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
             ->actions([
+                VisitaCheckOut::make('check_out'),
+                VisitaPedido::make('realizar_pedido'),
                 VisitaCheckIn::make('check_in'),
                 VisitaRouteTo::make('como_chegar'),
                 VisitaCancelada::make('cancelar')
@@ -140,8 +159,7 @@ class VisitaResource extends Resource implements HasShieldPermissions
         return [
             'index' => Pages\ListVisitas::route('/'),
             'create' => Pages\CreateVisita::route('/create'),
-            'edit' => Pages\EditVisita::route('/{record}/edit'),
-            'check_in' => Pages\CheckInVisita::route('/{record}/check_in'),
+            //'edit' => Pages\EditVisita::route('/{record}/edit'),
         ];
     }
 

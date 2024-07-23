@@ -28,7 +28,7 @@ class VisitaPedido extends Action
         $this->action(function ($record) {
             $pedido = Pedido::query()->where('visita_id', $record->id)->first();
 
-            if(!!!$pedido){
+            if(!!!$pedido || $pedido->status === 'cancelado'){
                 $pedido = Pedido::create([
                     'visita_id' => $record->id,
                     'empresa_id' => $record->empresa_id,

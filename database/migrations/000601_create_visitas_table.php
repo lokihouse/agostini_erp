@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('visitas', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(\App\Models\Cliente::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(\App\Models\User::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class);
+            $table->foreignIdFor(\App\Models\Cliente::class);
+            $table->foreignIdFor(\App\Models\User::class)->nullable();
             $table->date('data');
             $table->enum('status', ['agendada', 'iniciada', 'finalizada', 'cancelada']);
             $table->string('motivo')->nullable();
@@ -30,7 +30,7 @@ return new class extends Migration
         });
 
         Schema::table('visitas', function (Blueprint $table) {
-            $table->foreignIdFor(\App\Models\Visita::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Visita::class)->nullable();
         });
     }
 

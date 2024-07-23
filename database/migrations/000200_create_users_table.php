@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class);
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');

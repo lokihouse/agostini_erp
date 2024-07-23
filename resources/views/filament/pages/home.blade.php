@@ -1,5 +1,4 @@
 <x-filament-panels::page>
-
     @can('widget_Producao', Auth::user())
         @livewire(\App\Filament\Widgets\Producao::class)
     @endcan

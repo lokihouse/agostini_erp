@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions;
 
+use App\Models\Pedido;
 use Closure;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
@@ -35,11 +36,21 @@ class VisitaCheckOut extends Action
         ]);
 
         $this->action(function ($record, $data) {
+            $pedido = Pedido::query()
+                ->where('visita_id', $record->id)
+                ->where('status', 'pendente')
+                ->first();
+
             $record->update([
                 'status' => 'finalizada',
                 'hora_final' => now(),
                 'observacao_final' => $data['observacao_final'],
             ]);
+            $pedido->update([
+                'status' => 'confirmado',
+                'confirmacao' => now()
+            ]);
+
             Notification::make()
                 ->title('Visita Finalizada')
                 ->success()

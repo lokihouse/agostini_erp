@@ -13,6 +13,11 @@ class ProdutoController extends Controller
     public static function generateMapaDeProducao(Produto $produto)
     {
         $etapas = $produto->etapas->toArray();
+        if(count($etapas) === 0) {
+            $produto->mapa_de_producao = null;
+            $produto->save();
+            return;
+        }
         $etapas_mapped = array_map(function($etapa) {
             return [$etapa["departamento_id_origem_nome"], $etapa["departamento_id_destino_nome"], $etapa["tempo_producao"]];
         }, $etapas);

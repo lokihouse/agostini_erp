@@ -24,11 +24,23 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissoesSeeder::class,
             EmpresasSeeder::class,
-            EventosSeeder::class,
-            DepartamentosSeeder::class,
             UsuariosSeeder::class,
-            ClientesSeeder::class,
+
+            EventosSeeder::class,
+
+            DepartamentosSeeder::class,
+
+            PlanoDeContaSeeder::class,
+            MovimentacaoFinanceiraSeeder::class,
+
+            //ClientesSeeder::class,
+
+            // OrdemDeExpedicaoSeeder::class,
+
+            // OrdemDeProducaoSeeder::class,
+
             // VisitasSeeder::class,
+
             // RegistroDePontoSeeder::class
         ]);
     }

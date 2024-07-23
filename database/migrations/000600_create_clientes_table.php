@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class);
             $table->string('cnpj', 14);
             $table->string('razao_social');
             $table->string('nome_fantasia');

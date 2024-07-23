@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('produto_etapas', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Produto::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Produto::class);
             // $table->integer('ordem');
-            $table->foreignIdFor(\App\Models\Departamento::class, 'departamento_id_origem')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Departamento::class, 'departamento_id_origem');
             $table->json('insumos')->nullable();
-            $table->foreignIdFor(\App\Models\Departamento::class, 'departamento_id_destino')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Departamento::class, 'departamento_id_destino');
             $table->json('producao')->nullable();
             $table->integer('tempo_producao')->nullable();
             $table->timestamps();

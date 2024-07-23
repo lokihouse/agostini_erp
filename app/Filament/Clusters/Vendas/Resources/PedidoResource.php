@@ -2,6 +2,8 @@
 
 namespace App\Filament\Clusters\Vendas\Resources;
 
+use App\Filament\Actions\PedidoCancelar;
+use App\Filament\Actions\PedidoGerarOrdemDeProducao;
 use App\Filament\Clusters\Vendas;
 use App\Filament\Clusters\Vendas\Resources\PedidoResource\Pages;
 use App\Filament\Clusters\Vendas\Resources\PedidoResource\RelationManagers;
@@ -131,24 +133,27 @@ class PedidoResource extends Resource
                     ->extraHeaderAttributes(['style' => 'width: 125px;'])
                     ->color(fn (Pedido $record) => match ($record->status) {
                         'pendente' => 'gray',
-                        'confirmado' => 'blue',
-                        'em producao' => 'yellow',
-                        'finalizado' => 'green',
-                        'cancelado' => 'red',
+                        'confirmado' => 'info',
+                        'em producao' => 'warning',
+                        'finalizado' => 'success',
+                        'cancelado' => 'danger',
                     }),
                 TextColumn::make('visita.cliente.nome_fantasia')
                     ->label('Cliente'),
                 TextColumn::make('confirmacao')
+                    ->date('d/m/Y')
                     ->extraHeaderAttributes(['style' => 'width: 125px', 'class' => 'justify-center'])
                     ->label('Confirmação'),
                 TextColumn::make('producao')
+                    ->date('d/m/Y')
                     ->extraHeaderAttributes(['style' => 'width: 125px', 'class' => 'justify-center'])
                     ->label('Produção'),
                 TextColumn::make('entrega')
+                    ->date('d/m/Y')
                     ->extraHeaderAttributes(['style' => 'width: 125px', 'class' => 'justify-center'])
                     ->label('Entrega'),
                 TextColumn::make('itens_de_pedido')
-                    ->label('Itens')
+                    ->label('Total Pedido')
                     ->extraHeaderAttributes(['style' => 'width: 125px', 'class' => 'justify-center'])
                     ->formatStateUsing(function($state){
                         $state = json_decode($state);
@@ -158,6 +163,11 @@ class PedidoResource extends Resource
                         }
                         return $total;
                     })
+            ])
+            ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
+            ->actions([
+                PedidoGerarOrdemDeProducao::make('gerar_ordem_de_producao'),
+                PedidoCancelar::make('cancelar_pedido')
             ]);
     }
 
@@ -172,8 +182,8 @@ class PedidoResource extends Resource
     {
         return [
             'index' => Pages\ListPedidos::route('/'),
-            'create' => Pages\CreatePedido::route('/create'),
-            'edit' => Pages\EditPedido::route('/{record}/edit'),
+            //'create' => Pages\CreatePedido::route('/create'),
+            //'edit' => Pages\EditPedido::route('/{record}/edit'),
             'preencher' => Pages\PreencherPedido::route('/{record}/preencher'),
         ];
     }

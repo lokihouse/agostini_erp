@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('departamentos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class);
             $table->string('nome');
             $table->longText('descricao')->nullable();
             $table->timestamps();

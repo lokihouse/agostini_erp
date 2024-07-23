@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(\App\Models\Visita::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class);
+            $table->foreignIdFor(\App\Models\Visita::class);
             $table->enum('status', ['pendente', 'confirmado', 'em producao', 'finalizado', 'cancelado']);
             $table->text('observacao_cancelamento')->nullable();
             $table->dateTime('confirmacao')->nullable();

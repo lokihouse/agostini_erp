@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('eventos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Empresa::class)->nullable();
             $table->string('nome');
             $table->longText('descricao')->nullable();
             $table->enum('tipo', ['producao', 'intervalo', 'tempo morto'])->nullable();

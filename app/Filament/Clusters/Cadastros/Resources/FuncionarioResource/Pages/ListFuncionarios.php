@@ -26,12 +26,14 @@ class ListFuncionarios extends ListRecords
     {
         return [
             Actions\ImportAction::make()
-                ->label('Importar usuários')
+                ->label('Importar Funcionários')
+                ->modalHeading('Importar Funcionários')
                 ->iconButton()
                 ->icon('heroicon-o-arrow-down-on-square')
                 ->importer(UserImporter::class),
             Actions\ExportAction::make()
-                ->label('Exportar usuários')
+                ->label('Exportar Funcionários')
+                ->modalHeading('Exportar Funcionários')
                 ->iconButton()
                 ->icon('heroicon-o-arrow-up-on-square')
                 ->exporter(UserExporter::class),

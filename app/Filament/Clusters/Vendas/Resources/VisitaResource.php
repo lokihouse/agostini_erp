@@ -159,7 +159,7 @@ class VisitaResource extends Resource implements HasShieldPermissions
         return [
             'index' => Pages\ListVisitas::route('/'),
             'create' => Pages\CreateVisita::route('/create'),
-            'edit' => Pages\EditVisita::route('/{record}/edit'),
+            //'edit' => Pages\EditVisita::route('/{record}/edit'),
         ];
     }
 

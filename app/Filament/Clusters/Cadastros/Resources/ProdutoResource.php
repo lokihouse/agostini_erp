@@ -115,25 +115,16 @@ class ProdutoResource extends ResourceBase
                                                             )
                                                     ]),
                                             ]),
-                                        Actions\Action::make('view_map')
-                                            ->label('Mapa de Produção')
-                                            ->color('gray')
-                                            ->modalSubmitAction(false)
-                                            ->modalCancelActionLabel('Fechar')
-                                            ->modalContent(function (Get $get, $record) {
-                                                return view(
-                                                    'forms.components.produto-mapa-field',
-                                                    [
-                                                        'etapas' => $record->etapas->toArray(),
-                                                    ]
-                                                );
-                                            })
                                     ]),
                                 ])
                                     ->columnSpanFull(),
                                 Forms\Components\Group::make([
                                     ProdutoEtapaField::make('etapas_tabela'),
                                     Placeholder::make('mapa_producao')
+                                        ->hidden(function($record) {
+                                            // dd($record->mapa_de_producao);
+                                            return empty($record->mapa_de_producao);
+                                        })
                                         ->content(fn ($record) => new HtmlString("<img src='" . $record->mapa_de_producao . "'/>"))
                                 ])->columnSpan(8),
                                 Forms\Components\Group::make([
@@ -141,7 +132,7 @@ class ProdutoResource extends ResourceBase
                                         ->label('Tempo de Produção'),
                                 ])->columnSpan(2),
                             ]),
-                        Tabs\Tab::make('Financeiro'),
+                        // Tabs\Tab::make('Financeiro'),
                         Tabs\Tab::make('Vendas')
                             ->schema([
                                 Forms\Components\Group::make([

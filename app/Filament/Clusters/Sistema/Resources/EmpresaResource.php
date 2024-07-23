@@ -148,6 +148,7 @@ class EmpresaResource extends ResourceBase
                                     ->required(),
                                 TextInput::make('uf')
                                     ->label('UF')
+                                    ->mask('aa')
                                     ->columnSpan(1)
                                     ->required(),
                             ])->columns(18)->columnSpanFull(),
@@ -251,8 +252,8 @@ class EmpresaResource extends ResourceBase
                                         ->label('Dias para Justificativa')
                                         ->numeric()
                                         ->mask('9999')
-                                ])->columns(2)->columnSpan(6)
-                            ])->columns(18)->columnSpanFull(),
+                                ])->columns(2)->columnSpan(4)
+                            ])->columns(12)->columnSpanFull(),
                         ]),
                 ]),
         ]);

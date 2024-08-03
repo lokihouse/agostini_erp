@@ -6,7 +6,7 @@ use App\Http\Controllers\PlanoDeContaController;
 use App\Models\MovimentacaoFinanceira;
 use App\Models\PlanoDeConta;
 use App\Models\Visita;
-use App\Utils\NumberFormater;
+use App\Utils\MyNumberFormater;
 use App\Utils\TextFormater;
 use Closure;
 use Filament\Forms\Components\DatePicker;
@@ -83,7 +83,7 @@ class PlanoDeContaCriarNovoSubitem extends Action
                     ->label('Valor Previsto')
                     ->mask(RawJs::make('$money($input, \',\', \'.\')'))
                     ->stripCharacters('.')
-                    ->dehydrateStateUsing(fn ($state) => NumberFormater::fromMoney('R$ ' . $state) ?? 0)
+                    ->dehydrateStateUsing(fn ($state) => MyNumberFormater::fromMoney('R$ ' . $state) ?? 0)
                     ->required()
                     ->visible(fn(Get $get, $state, $record) => $get('movimentacao')),
             ])->columns(2)

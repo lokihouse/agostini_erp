@@ -21,9 +21,11 @@ class EventoResource extends Resource
 {
     protected static ?string $model = Evento::class;
     protected static ?string $cluster = Sistema::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-bolt';
     protected static ?int $navigationSort = 3;
-    protected static ?string $navigationGroup = 'Produção';
+    protected static ?string $label = 'Evento';
+    protected static ?string $pluralLabel = 'Eventos';
+    protected static ?string $navigationGroup = 'Cadastros';
 
     public static function form(Form $form): Form
     {
@@ -67,11 +69,7 @@ class EventoResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nome')
-                    ->extraHeaderAttributes(['style' => 'width: 300px']),
-                TextColumn::make('descricao'),
-                TextColumn::make('empresa.nome_fantasia')
-                    ->extraHeaderAttributes(['style' => 'width: 200px']),
+                TextColumn::make('nome'),
                 TextColumn::make('tipo')
                     ->badge()
                     ->color(function($state) {

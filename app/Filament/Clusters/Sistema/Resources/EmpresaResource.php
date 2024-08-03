@@ -32,7 +32,10 @@ class EmpresaResource extends ResourceBase
 {
     protected static ?string $model = Empresa::class;
     protected static ?string $cluster = Sistema::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationGroup = 'Cadastros';
+    protected static ?string $label = 'Empresa';
+    protected static ?string $pluralLabel = 'Empresas';
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form

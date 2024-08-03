@@ -24,7 +24,8 @@ class UserResource extends ResourceBase
     protected static ?string $model = User::class;
     protected static ?string $label = 'Usuário';
     protected static ?string $pluralLabel = 'Usuários';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
+    protected static ?string $navigationGroup = 'Cadastros';
     protected static ?int $navigationSort = 2;
 
     protected static ?string $cluster = Sistema::class;

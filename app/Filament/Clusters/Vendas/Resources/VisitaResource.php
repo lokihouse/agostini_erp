@@ -23,11 +23,10 @@ use Filament\Tables\Table;
 class VisitaResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Visita::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-map';
     protected static ?string $cluster = Vendas::class;
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'Cadastros';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -131,10 +130,9 @@ class VisitaResource extends Resource implements HasShieldPermissions
                         }
                     })
                     ->extraHeaderAttributes(['style' => 'width: 120px;']),
-                Tables\Columns\TextColumn::make('cliente.nome_fantasia'),
-                Tables\Columns\TextColumn::make('cliente.endereco_completo'),
-                Tables\Columns\TextColumn::make('responsavel.name')
-                    ->label('Responsável'),
+                Tables\Columns\TextColumn::make('cliente.nome_fantasia')->label('Cliente'),
+                Tables\Columns\TextColumn::make('cliente.endereco_completo')->label('Endereço'),
+                Tables\Columns\TextColumn::make('responsavel.name')->label('Vendedor'),
             ])
             ->actionsPosition(Tables\Enums\ActionsPosition::BeforeCells)
             ->actions([

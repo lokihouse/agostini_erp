@@ -30,11 +30,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PedidoResource extends Resource
 {
     protected static ?string $model = Pedido::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-ticket';
     protected static ?string $cluster = Vendas::class;
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Cadastros';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

@@ -134,7 +134,7 @@ class PlanoDeContaController extends Controller
             'plano_de_conta_id' => $planoDeContas->id,
             'codigo' => self::getNextCodigo($planoDeContas),
             'movimentacao' => empty($subContas),
-            'valor_projetado' => empty($subContas) ? fake()->randomFloat(2,-999999, 999999) : null,
+            'valor_projetado' => empty($subContas) ? fake()->randomFloat(2,-299, 299) : null,
             'descricao' => $descricao,
         ]);
         $conta->save();

@@ -16,10 +16,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OrdemDeProducaoResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Ordem de Produção';
+    protected static ?string $pluralLabel = 'Ordens de Produção';
+    protected static ?string $label = 'Ordem de Produção';
     protected static ?string $model = OrdemDeProducao::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     protected static ?string $cluster = Producao::class;
 
     public static function form(Form $form): Form

@@ -26,10 +26,9 @@ use Filament\Notifications\Notification;
 class ClienteResource extends ResourceBase
 {
     protected static ?string $model = Cliente::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $cluster = Vendas::class;
+    protected static ?string $navigationGroup = 'Cadastros';
     protected static ?int $navigationSort = 1;
     public static function form(Form $form): Form
     {

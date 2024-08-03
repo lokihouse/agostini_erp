@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class MovimentacaoFinanceiraResource extends Resource
 {
     protected static ?string $model = MovimentacaoFinanceira::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
     protected static ?string $cluster = Financeiro::class;
+    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = "Cadastros";
 
     public static function form(Form $form): Form
     {

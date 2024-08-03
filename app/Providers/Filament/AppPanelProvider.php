@@ -11,6 +11,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Facades\FilamentAsset;
@@ -29,11 +30,13 @@ class AppPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         FilamentAsset::register([
-            Js::make('tailwindcsscdn', 'https://cdn.tailwindcss.com'),
-//            Js::make('highcharts-core', 'https://code.highcharts.com/highcharts.js'),
-//            Js::make('highcharts-network', 'https://code.highcharts.com/modules/networkgraph.js'),
-//            Js::make('highcharts-exporting', 'https://code.highcharts.com/modules/exporting.js'),
-//            Js::make('highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js'),
+            Css::make('leaflet', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
+            Js::make('leaflet', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
+
+            Js::make('highcharts-core', 'https://code.highcharts.com/highcharts.js'),
+            Js::make('highcharts-network', 'https://code.highcharts.com/modules/networkgraph.js'),
+            Js::make('highcharts-exporting', 'https://code.highcharts.com/modules/exporting.js'),
+            Js::make('highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js'),
         ]);
 
         return $panel
@@ -55,8 +58,6 @@ class AppPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
-            //->pages([])
-            //->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

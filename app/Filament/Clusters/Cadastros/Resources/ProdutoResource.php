@@ -34,7 +34,7 @@ class ProdutoResource extends ResourceBase
 {
     protected static ?string $model = Produto::class;
     protected static ?int $navigationSort = 4;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 
     protected static ?string $cluster = Cadastros::class;
 

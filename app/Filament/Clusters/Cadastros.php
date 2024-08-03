@@ -9,5 +9,5 @@ class Cadastros extends Cluster
 {
     //use HasPageShield;
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
 }

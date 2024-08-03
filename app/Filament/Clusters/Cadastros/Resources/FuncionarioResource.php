@@ -24,7 +24,7 @@ class FuncionarioResource extends Resource
     protected static ?string $model = User::class;
     protected static ?string $label = 'Funcionário';
     protected static ?string $pluralLabel = 'Funcionários';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
     protected static ?int $navigationSort = 2;
 
     protected static ?string $cluster = Cadastros::class;

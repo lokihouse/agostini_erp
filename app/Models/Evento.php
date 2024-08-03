@@ -12,10 +12,8 @@ class Evento extends Model
 
     protected $fillable = [
         'nome',
-        'descricao',
         'tipo',
         'credito_debito',
-        'empresa_id',
     ];
 
     public function empresa(): BelongsTo

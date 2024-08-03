@@ -18,7 +18,7 @@ class CadastrosEmpresa extends Page implements HasForms
 
     protected ?string $heading = 'Empresa';
     protected static ?string $navigationLabel = 'Empresa';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
     protected static string $view = 'filament.clusters.cadastros.pages.empresa';
     protected static ?string $cluster = Cadastros::class;
 

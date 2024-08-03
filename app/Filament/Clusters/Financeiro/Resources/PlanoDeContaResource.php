@@ -8,7 +8,7 @@ use App\Filament\Clusters\Financeiro;
 use App\Filament\Clusters\Financeiro\Resources\PlanoDeContaResource\Pages;
 use App\Filament\Clusters\Financeiro\Resources\PlanoDeContaResource\RelationManagers;
 use App\Models\PlanoDeConta;
-use App\Utils\NumberFormater;
+use App\Utils\MyNumberFormater;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -26,10 +26,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PlanoDeContaResource extends Resource
 {
     protected static ?string $model = PlanoDeConta::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $cluster = Financeiro::class;
+    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = "Cadastros";
 
     public static function form(Form $form): Form
     {
@@ -48,7 +48,7 @@ class PlanoDeContaResource extends Resource
                     ->columnSpan(2)
                     ->mask(RawJs::make('$money($input, \',\', \'.\')'))
                     ->stripCharacters('.')
-                    ->dehydrateStateUsing(fn ($state) => NumberFormater::fromMoney('R$ ' . $state) ?? 0)
+                    ->dehydrateStateUsing(fn ($state) => MyNumberFormater::fromMoney('R$ ' . $state) ?? 0)
                     ->required()
                     ->visible(fn(Get $get, $state, $record) => $get('movimentacao')),
             ]);

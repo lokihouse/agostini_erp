@@ -9,5 +9,5 @@ class Vendas extends Cluster
 {
     // use HasPageShield;
     protected static ?int $navigationSort = 5;
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 }

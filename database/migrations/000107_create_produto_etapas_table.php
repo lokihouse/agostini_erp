@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\Produto::class);
             // $table->integer('ordem');
-            $table->foreignIdFor(\App\Models\Departamento::class, 'departamento_id_origem');
+            $table->foreignIdFor(\App\Models\Equipamento::class, 'equipamento_id_origem');
             $table->json('insumos')->nullable();
-            $table->foreignIdFor(\App\Models\Departamento::class, 'departamento_id_destino');
+            $table->foreignIdFor(\App\Models\Equipamento::class, 'equipamento_id_destino');
             $table->json('producao')->nullable();
             $table->integer('tempo_producao')->nullable();
             $table->timestamps();

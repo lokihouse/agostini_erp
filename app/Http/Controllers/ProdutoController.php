@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
 
 class ProdutoController extends Controller
 {
-    public static function generateMapaDeProducao(Produto $produto)
+    public static function generateMapaDeProducao(Produto $produto) : void
     {
         $etapas = $produto->etapas->toArray();
         if(count($etapas) === 0) {
@@ -19,7 +19,7 @@ class ProdutoController extends Controller
             return;
         }
         $etapas_mapped = array_map(function($etapa) {
-            return [$etapa["departamento_id_origem_nome"], $etapa["departamento_id_destino_nome"], $etapa["tempo_producao"]];
+            return [$etapa["equipamento_id_origem_nome"], $etapa["equipamento_id_destino_nome"], $etapa["tempo_producao"]];
         }, $etapas);
 
         $digraph = "digraph Producao {  graph [splines=polyline, nodesep=0.75]; node [shape=box, fixedsize=true, width=4, height=0.5]; ";
@@ -40,6 +40,23 @@ class ProdutoController extends Controller
         $stringToSave = "data:image/png;base64," . base64_encode($response->body());
 
         $produto->mapa_de_producao = $stringToSave;
+        $produto->save();
+
+        self::updateTempoDeProducao($produto);
+    }
+
+    public static function updateTempoDeProducao(Produto $produto)
+    {
+        $etapas = $produto->etapas->toArray();
+
+        if(count($etapas) === 0) return;
+
+        $tempo_de_producao_total = array_reduce($etapas, function($acc, $etapa) use ($produto) {
+            $acc += $etapa["tempo_producao"];
+            return $acc;
+        }, 0);
+
+        $produto->tempo_producao = $tempo_de_producao_total;
         $produto->save();
     }
 }

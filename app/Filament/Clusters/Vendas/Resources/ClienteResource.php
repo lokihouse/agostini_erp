@@ -7,7 +7,7 @@ use App\Filament\Clusters\Vendas\Resources\ClienteResource\Pages;
 use App\Filament\ResourceBase;
 use App\Forms\Components\VendedoresPorClienteField;
 use App\Models\Cliente;
-use App\Utils\TextFormater;
+use App\Utils\MyTextFormater;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms;
 use Filament\Forms\Components\Actions;
@@ -48,7 +48,7 @@ class ClienteResource extends ResourceBase
                                             Action::make('receitaWsFind')
                                                 ->icon('heroicon-m-magnifying-glass')
                                                 ->action(function (Set $set, $state) {
-                                                    $state = TextFormater::clear($state);
+                                                    $state = MyTextFormater::clear($state);
                                                     if(empty($state)) return;
                                                     $response = Http::get("https://receitaws.com.br/v1/cnpj/{$state}");
 
@@ -63,7 +63,7 @@ class ClienteResource extends ResourceBase
                                                     $set('razao_social', $response->json()['nome']);
                                                     $set('nome_fantasia', $response->json()['fantasia']);
                                                     $set('email', $response->json()['email']);
-                                                    $set('telefone', TextFormater::clear($response->json()['telefone']));
+                                                    $set('telefone', MyTextFormater::clear($response->json()['telefone']));
                                                     $set('cep', $response->json()['cep']);
                                                     $set('logradouro', $response->json()['logradouro']);
                                                     $set('complemento', $response->json()['complemento']);
@@ -108,7 +108,7 @@ class ClienteResource extends ResourceBase
                                             Action::make('viaCepFind')
                                                 ->icon('heroicon-m-magnifying-glass')
                                                 ->action(function (Set $set, $state) {
-                                                    $state = TextFormater::clear($state);
+                                                    $state = MyTextFormater::clear($state);
                                                     $response = Http::get("https://viacep.com.br/ws/{$state}/json/");
 
                                                     if(isset($response->json()['erro']) && $response->json()['erro']){
@@ -220,7 +220,7 @@ class ClienteResource extends ResourceBase
                 Tables\Columns\TextColumn::make('cnpj')
                     ->searchable()
                     ->extraHeaderAttributes(['style' => 'width: 200px'])
-                    ->formatStateUsing(fn (string $state): string => "" . TextFormater::toCnpj($state)),
+                    ->formatStateUsing(fn (string $state): string => "" . MyTextFormater::toCnpj($state)),
                 Tables\Columns\TextColumn::make('razao_social')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nome_fantasia')
@@ -238,7 +238,7 @@ class ClienteResource extends ResourceBase
                         elseif (strtotime($state) < strtotime('+7 days')) return 'warning';
                         else return 'success';
                     })
-                    ->formatStateUsing(fn (string $state): string => "" . TextFormater::toDate($state)),
+                    ->formatStateUsing(fn (string $state): string => "" . MyTextFormater::toDate($state)),
         ]);
     }
 

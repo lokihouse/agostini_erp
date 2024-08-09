@@ -12,7 +12,14 @@ class Produto extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'descricao', 'valor_unitario', 'tempo_producao', 'empresa_id'];
+    protected $fillable = [
+        'nome',
+        'descricao',
+        'valor_minimo',
+        'valor_unitario',
+        'volumes',
+        'tempo_producao',
+        'empresa_id'];
     protected $with = ['etapas'];
 
     public function empresa()

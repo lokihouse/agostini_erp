@@ -9,7 +9,10 @@ use App\Models\OrdemDeProducao;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -20,7 +23,8 @@ class OrdemDeProducaoResource extends Resource
     protected static ?string $pluralLabel = 'Ordens de Produção';
     protected static ?string $label = 'Ordem de Produção';
     protected static ?string $model = OrdemDeProducao::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-bar';
+    protected static ?string $navigationGroup = 'Cadastros';
     protected static ?string $cluster = Producao::class;
 
     public static function form(Form $form): Form
@@ -35,18 +39,23 @@ class OrdemDeProducaoResource extends Resource
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                TextColumn::make('codigo')
+                    ->label('#'),
+                TextColumn::make('status')->badge()
+                    ->extraHeaderAttributes(['class' => 'w-1'])
+                    ->alignment(Alignment::Center),
+                TextColumn::make('data_inicio')
+                    ->extraHeaderAttributes(['class' => 'w-1'])
+                    ->alignment(Alignment::Center)
+                    ->date('d/m/Y'),
+                TextColumn::make('data_previsao')
+                    ->extraHeaderAttributes(['class' => 'w-1'])
+                    ->alignment(Alignment::Center)
+                    ->date('d/m/Y'),
+                TextColumn::make('data_final')
+                    ->extraHeaderAttributes(['class' => 'w-1'])
+                    ->alignment(Alignment::Center)
+                    ->date('d/m/Y'),
             ]);
     }
 

@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('ordens_de_producao', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Empresa::class);
+            $table->enum('status', ['rascunho', 'agendada', 'em_producao', 'finalizada', 'cancelada'])->default('rascunho');
+            $table->date('data_inicio')->nullable();
+            $table->date('data_previsao')->nullable();
+            $table->date('data_final')->nullable();
             $table->timestamps();
         });
     }

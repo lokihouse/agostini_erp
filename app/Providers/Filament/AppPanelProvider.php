@@ -13,6 +13,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -32,11 +33,6 @@ class AppPanelProvider extends PanelProvider
         FilamentAsset::register([
             Css::make('leaflet', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
             Js::make('leaflet', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
-
-            Js::make('highcharts-core', 'https://code.highcharts.com/highcharts.js'),
-            Js::make('highcharts-network', 'https://code.highcharts.com/modules/networkgraph.js'),
-            Js::make('highcharts-exporting', 'https://code.highcharts.com/modules/exporting.js'),
-            Js::make('highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js'),
         ]);
 
         return $panel
@@ -45,7 +41,9 @@ class AppPanelProvider extends PanelProvider
             ->path('')
             ->spa()
             ->login(Login::class)
-            ->colors([])
+            ->colors([
+                'primary' => Color::Blue,
+            ])
             ->font('Inter', provider: GoogleFontProvider::class)
             ->plugins([
                 FilamentShieldPlugin::make()

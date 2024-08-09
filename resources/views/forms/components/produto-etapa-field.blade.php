@@ -90,7 +90,7 @@ use Carbon\CarbonInterval;
                                                     <span
                                                         class="fi-ta-text-item-label text-sm leading-6 text-gray-950 dark:text-white  "
                                                         style="">
-                                                        {{ $etapa->departamento_id_origem_nome }}
+                                                        {{ $etapa->equipamento_id_origem_nome }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -130,7 +130,7 @@ use Carbon\CarbonInterval;
                                                     <span
                                                         class="fi-ta-text-item-label text-sm leading-6 text-gray-950 dark:text-white  "
                                                         style="">
-                                                        {{ $etapa->departamento_id_destino_nome }}
+                                                        {{ $etapa->equipamento_id_destino_nome }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -170,7 +170,7 @@ use Carbon\CarbonInterval;
                                                     <span
                                                         class="fi-ta-text-item-label text-sm leading-6 text-gray-950 dark:text-white  "
                                                         style="">
-                                                        {{ $etapa->tempo_producao > 0 ? CarbonInterval::seconds($etapa->tempo_producao)->cascade()->forHumans(['short' => true]) : '-' }}
+                                                        {{ \App\Utils\MyDateTimeFormater::secondsToClock($etapa->tempo_producao) }}
                                                     </span>
                                                 </div>
                                             </div>

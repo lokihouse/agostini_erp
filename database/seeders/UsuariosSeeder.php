@@ -28,5 +28,13 @@ class UsuariosSeeder extends Seeder
             'password' => Hash::make('password')
         ])
             ->syncRoles('gerente');
+
+        User::create([
+            'empresa_id' => 2,
+            'name' => 'Gerente2',
+            'username' => 'gerente2',
+            'password' => Hash::make('password')
+        ])
+            ->syncRoles('gerente');
     }
 }

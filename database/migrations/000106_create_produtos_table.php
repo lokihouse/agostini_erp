@@ -16,9 +16,11 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Empresa::class);
             $table->string('nome');
             $table->longText('descricao')->nullable();
+            $table->decimal('valor_minimo', 10, 2)->nullable();
             $table->decimal('valor_unitario', 10, 2)->nullable();
             $table->longText('mapa_de_producao')->nullable();
             $table->integer('tempo_producao')->nullable();
+            $table->json('volumes')->nullable();
             $table->timestamps();
         });
     }

@@ -4,7 +4,7 @@ namespace App\Utils;
 
 use Carbon\Carbon;
 
-class TextFormater
+class MyTextFormater
 {
     public static function toMoney($value){
         return "R$ " . number_format($value, 2, ',', '.');

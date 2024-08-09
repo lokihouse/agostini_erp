@@ -9,10 +9,13 @@ use App\Filament\ResourceBase;
 use App\Forms\Components\ProdutoEtapaField;
 use App\Forms\Components\ProdutoMapaField;
 use App\Models\Departamento;
+use App\Models\Equipamento;
 use App\Models\Produto;
 use App\Models\ProdutoEtapa;
+use App\Utils\MyDateTimeFormater;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
+use Carbon\CarbonInterval;
 use Filament\Forms;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Placeholder;
@@ -68,9 +71,9 @@ class ProdutoResource extends ResourceBase
                                             ->action(function (Get $get, Set $set, $state, $data, $record) use ($form) {
                                                 $etapa = new ProdutoEtapa();
                                                 $etapa->produto_id = $state['id'];
-                                                $etapa->departamento_id_origem = $data['departamento_de_origem'];
+                                                $etapa->equipamento_id_origem = $data['equipamento_de_origem'];
                                                 $etapa->insumos = json_encode($data['insumos']);
-                                                $etapa->departamento_id_destino = $data['departamento_de_trabalho'];
+                                                $etapa->equipamento_id_destino = $data['equipamento_de_trabalho'];
                                                 $etapa->producao = json_encode($data['producao']);
                                                 $etapa->save();
                                                 $record->refresh();
@@ -79,12 +82,16 @@ class ProdutoResource extends ResourceBase
                                                 Step::make('Origem')
                                                     ->schema([
                                                         Forms\Components\Group::make([
-                                                            Select::make('departamento_de_origem')
+                                                            Select::make('equipamento_de_origem')
                                                                 ->required()
                                                                 ->searchable()
                                                                 ->columnSpan(4)
                                                                 ->options(function () {
-                                                                    return Departamento::query()->pluck('nome', 'id')->toArray();
+                                                                    $equipamentos = Equipamento::query()->get();
+                                                                    foreach ($equipamentos as $equipamento) {
+                                                                        $equipamento->nome = $equipamento->departamento->nome . ' - ' . $equipamento->nome;
+                                                                    }
+                                                                    return $equipamentos->pluck('nome', 'id')->toArray();
                                                                 }),
                                                             Repeater::make('insumos')
                                                                 ->required()
@@ -98,12 +105,16 @@ class ProdutoResource extends ResourceBase
                                                 Step::make('Trabalho')
                                                     ->columns(10)
                                                     ->schema([
-                                                        Select::make('departamento_de_trabalho')
+                                                        Select::make('equipamento_de_trabalho')
                                                             ->required()
                                                             ->searchable()
                                                             ->columnSpan(4)
                                                             ->options(function () {
-                                                                return Departamento::query()->pluck('nome', 'id')->toArray();
+                                                                $equipamentos = Equipamento::query()->get();
+                                                                foreach ($equipamentos as $equipamento) {
+                                                                    $equipamento->nome = $equipamento->departamento->nome . ' - ' . $equipamento->nome;
+                                                                }
+                                                                return $equipamentos->pluck('nome', 'id')->toArray();
                                                             }),
                                                         Repeater::make('producao')
                                                             ->addActionLabel("Adicionar")
@@ -128,7 +139,13 @@ class ProdutoResource extends ResourceBase
                                         ->content(fn ($record) => new HtmlString("<img src='" . $record->mapa_de_producao . "'/>"))
                                 ])->columnSpan(8),
                                 Forms\Components\Group::make([
-                                    TextInput::make('tempo_de_producao')
+                                    TextInput::make('tempo_producao')
+                                        ->readOnly()
+                                        ->formatStateUsing(function ($state) {
+                                            $output = CarbonInterval::seconds($state)->cascade();
+                                            $output = MyDateTimeFormater::secondsToClock($state);
+                                            return $state > 0 ? $output : '-';
+                                        })
                                         ->label('Tempo de Produção'),
                                 ])->columnSpan(2),
                             ]),
@@ -136,6 +153,13 @@ class ProdutoResource extends ResourceBase
                         Tabs\Tab::make('Vendas')
                             ->schema([
                                 Forms\Components\Group::make([
+                                    Forms\Components\TextInput::make('valor_minimo')
+                                        ->label('Valor Mínimo')
+                                        ->prefix('R$')
+                                        ->mask(RawJs::make('$money($input, \',\', \'.\')'))
+                                        ->stripCharacters('.')
+                                        ->required()
+                                        ->columnSpan(2),
                                     Forms\Components\TextInput::make('valor_unitario')
                                         ->label('Valor Unitário')
                                         ->prefix('R$')
@@ -143,8 +167,41 @@ class ProdutoResource extends ResourceBase
                                         ->stripCharacters('.')
                                         ->required()
                                         ->columnSpan(2),
-                                ])->columns(10)->columnSpanFull()
-                            ])
+                                ])
+                                    ->columns(12)
+                                    ->columnSpanFull()
+                            ]),
+                        Tabs\Tab::make('Cargas')
+                            ->schema([
+                                Repeater::make('volumes')
+                                    ->columns(4)
+                                    ->grid(3)
+                                    ->collapsed()
+                                    ->defaultItems(0)
+                                    ->addActionLabel("Adicionar Volume")
+                                    ->itemLabel(fn (array $state): ?string => $state['descricao'] ?? null)
+                                    ->schema([
+                                        TextInput::make('descricao')->required()->columnSpan(4),
+                                        TextInput::make('largura')
+                                            ->label('Lar.')
+                                            ->required()
+                                            ->hint('cm')
+                                            ->numeric(),
+                                        TextInput::make('altura')
+                                            ->label('Alt.')
+                                            ->required()
+                                            ->hint('cm')
+                                            ->numeric(),
+                                        TextInput::make('comprimento')->required()
+                                            ->label('Cmp.')
+                                            ->hint('cm')
+                                            ->numeric(),
+                                        TextInput::make('peso')->required()
+                                            ->label('Peso')
+                                            ->hint('kg')
+                                            ->numeric(),
+                                    ])
+                            ]),
                     ])
             ]);
     }

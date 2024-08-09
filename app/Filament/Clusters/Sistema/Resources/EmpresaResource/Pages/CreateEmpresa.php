@@ -3,7 +3,7 @@
 namespace App\Filament\Clusters\Sistema\Resources\EmpresaResource\Pages;
 
 use App\Filament\Clusters\Sistema\Resources\EmpresaResource;
-use App\Utils\TextFormater;
+use App\Utils\MyTextFormater;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateEmpresa extends CreateRecord
@@ -14,9 +14,9 @@ class CreateEmpresa extends CreateRecord
     {
         $data = parent::mutateFormDataBeforeCreate($data);
 
-        $data['cnpj'] = TextFormater::clear($data['cnpj']);
-        $data['telefone'] = TextFormater::clear($data['telefone']);
-        $data['cep'] = TextFormater::clear($data['cep']);
+        $data['cnpj'] = MyTextFormater::clear($data['cnpj']);
+        $data['telefone'] = MyTextFormater::clear($data['telefone']);
+        $data['cep'] = MyTextFormater::clear($data['cep']);
 
         $data['latitude'] = (float) $data['localizacao']['lat'];
         $data['longitude'] = (float) $data['localizacao']['lng'];

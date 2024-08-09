@@ -12,16 +12,16 @@ class ProdutoEtapa extends Model
 
     protected $fillable = [
         'produto_id',
-        'departamento_id_origem',
+        'equipamento_id_origem',
         'insumos',
-        'departamento_id_destino',
+        'equipamento_id_destino',
         'producao',
         'tempo_producao',
     ];
 
     protected $appends = [
-        'departamento_id_origem_nome',
-        'departamento_id_destino_nome',
+        'equipamento_id_origem_nome',
+        'equipamento_id_destino_nome',
     ];
 
     public static function boot()
@@ -40,14 +40,14 @@ class ProdutoEtapa extends Model
         });
     }
 
-    public function getDepartamentoIdOrigemNomeAttribute()
+    public function getEquipamentoIdOrigemNomeAttribute()
     {
-        return $this->departamento_origem->nome ?? '-';
+        return $this->equipamento_origem->nome ?? '-';
     }
 
-    public function getDepartamentoIdDestinoNomeAttribute()
+    public function getEquipamentoIdDestinoNomeAttribute()
     {
-        return $this->departamento_destino->nome ?? '-';
+        return $this->equipamento_destino->nome ?? '-';
     }
 
     public function produto()
@@ -55,13 +55,13 @@ class ProdutoEtapa extends Model
         return $this->belongsTo(Produto::class);
     }
 
-    public function departamento_origem()
+    public function equipamento_origem()
     {
-        return $this->belongsTo(Departamento::class, 'departamento_id_origem');
+        return $this->belongsTo(Equipamento::class, 'equipamento_id_origem');
     }
 
-    public function departamento_destino()
+    public function equipamento_destino()
     {
-        return $this->belongsTo(Departamento::class, 'departamento_id_destino');
+        return $this->belongsTo(Equipamento::class, 'equipamento_id_destino');
     }
 }

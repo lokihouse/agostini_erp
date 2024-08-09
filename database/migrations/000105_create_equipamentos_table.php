@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('equipamentos', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Empresa::class);
+            $table->foreignIdFor(\App\Models\Departamento::class);
             $table->string('nome');
+            $table->integer('posicoes_de_trabalho')->default(1);
             $table->longText('descricao')->nullable();
             $table->timestamps();
         });

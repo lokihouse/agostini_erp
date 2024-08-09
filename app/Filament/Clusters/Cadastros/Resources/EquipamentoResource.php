@@ -7,6 +7,10 @@ use App\Filament\Clusters\Cadastros\Resources\EquipamentoResource\Pages;
 use App\Filament\Clusters\Cadastros\Resources\EquipamentoResource\RelationManagers;
 use App\Models\Equipamento;
 use Filament\Forms;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -25,7 +29,25 @@ class EquipamentoResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Group::make([
+                    Group::make([
+                        TextInput::make('nome')
+                            ->required()
+                            ->columnSpanFull()
+                            ->placeholder('Nome do equipamento'),
+                        Select::make('departamento_id')
+                            ->relationship('departamento', 'nome')
+                            ->columnSpanFull()
+                            ->required(),
+                        TextInput::make('posicoes_de_trabalho')
+                            ->numeric()
+                            ->required()
+                            ->default(1),
+                    ])->columns(2)->columnSpan(3),
+                    MarkdownEditor::make('descricao')
+                        ->columnSpan(7)
+                        ->placeholder('Descrição do departamento')
+                ])->columns(10)->columnSpanFull()
             ]);
     }
 
@@ -33,18 +55,14 @@ class EquipamentoResource extends Resource
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Columns\TextColumn::make('departamento.nome')
+                    ->searchable()
+                    ->extraHeaderAttributes(['style' => 'width: 200px']),
+                Tables\Columns\TextColumn::make('nome')
+                    ->searchable()
+                    ->extraHeaderAttributes(['style' => 'width: 200px']),
+                Tables\Columns\TextColumn::make('descricao')
+                    ->limit(80)
             ]);
     }
 

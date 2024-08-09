@@ -26,5 +26,19 @@ class EmpresasSeeder extends Seeder
             'latitude' => -21.0091567,
             'longitude' => -42.8417787,
         ]);
+
+        Empresa::create([
+            'cnpj' => '00000000000000',
+            'razao_social' => 'Empresa 2',
+            'nome_fantasia' => 'Emrpesa 2',
+            'logradouro' => 'Rua Teste',
+            'numero' => '2',
+            'bairro' => 'Centro',
+            'municipio' => 'Visconde do Rio Branco',
+            'uf' => 'MG',
+            'cep' => '36520000',
+            'latitude' => -21.0091567,
+            'longitude' => -42.8417787,
+        ]);
     }
 }

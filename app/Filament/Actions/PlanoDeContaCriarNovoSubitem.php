@@ -7,7 +7,7 @@ use App\Models\MovimentacaoFinanceira;
 use App\Models\PlanoDeConta;
 use App\Models\Visita;
 use App\Utils\MyNumberFormater;
-use App\Utils\TextFormater;
+use App\Utils\MyTextFormater;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;

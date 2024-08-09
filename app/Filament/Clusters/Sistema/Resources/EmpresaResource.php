@@ -9,7 +9,7 @@ use App\Filament\Clusters\Sistema\Resources\EmpresaResource\Pages\ListEmpresas;
 use App\Filament\ResourceBase;
 use App\Forms\Components\EmpresaRecursosHumanosHorarioField;
 use App\Models\Empresa;
-use App\Utils\TextFormater;
+use App\Utils\MyTextFormater;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
@@ -57,7 +57,7 @@ class EmpresaResource extends ResourceBase
                                         Action::make('receitaWsFind')
                                             ->icon('heroicon-m-magnifying-glass')
                                             ->action(function (Set $set, $state) {
-                                                $state = TextFormater::clear($state);
+                                                $state = MyTextFormater::clear($state);
                                                 if(empty($state)) return;
                                                 $response = Http::get("https://receitaws.com.br/v1/cnpj/{$state}");
 
@@ -72,7 +72,7 @@ class EmpresaResource extends ResourceBase
                                                 $set('razao_social', $response->json()['nome']);
                                                 $set('nome_fantasia', $response->json()['fantasia']);
                                                 $set('email', $response->json()['email']);
-                                                $set('telefone', TextFormater::toTelefone(TextFormater::clear($response->json()['telefone'])));
+                                                $set('telefone', MyTextFormater::toTelefone(MyTextFormater::clear($response->json()['telefone'])));
                                                 $set('cep', $response->json()['cep']);
                                                 $set('logradouro', $response->json()['logradouro']);
                                                 $set('complemento', $response->json()['complemento']);
@@ -110,7 +110,7 @@ class EmpresaResource extends ResourceBase
                                         Action::make('viaCepFind')
                                             ->icon('heroicon-m-magnifying-glass')
                                             ->action(function (Set $set, $state) {
-                                                $state = TextFormater::clear($state);
+                                                $state = MyTextFormater::clear($state);
                                                 $response = Http::get("https://viacep.com.br/ws/{$state}/json/");
 
                                                 if(isset($response->json()['erro']) && $response->json()['erro']){

@@ -6,7 +6,7 @@ use App\Filament\Clusters\Financeiro;
 use App\Filament\Clusters\Financeiro\Resources\MovimentacaoFinanceiraResource\Pages;
 use App\Filament\Clusters\Financeiro\Resources\MovimentacaoFinanceiraResource\RelationManagers;
 use App\Models\MovimentacaoFinanceira;
-use App\Utils\TextFormater;
+use App\Utils\MyTextFormater;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -54,7 +54,7 @@ class MovimentacaoFinanceiraResource extends Resource
                         'debito' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('valor')
-                    ->formatStateUsing(fn ($state) => TextFormater::toMoney($state))
+                    ->formatStateUsing(fn ($state) => MyTextFormater::toMoney($state))
                     ->extraHeaderAttributes(['class' => 'w-1']),
             ]);
     }

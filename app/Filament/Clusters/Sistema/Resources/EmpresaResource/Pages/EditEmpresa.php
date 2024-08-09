@@ -3,7 +3,7 @@
 namespace App\Filament\Clusters\Sistema\Resources\EmpresaResource\Pages;
 
 use App\Filament\Clusters\Sistema\Resources\EmpresaResource;
-use App\Utils\TextFormater;
+use App\Utils\MyTextFormater;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -31,9 +31,9 @@ class EditEmpresa extends EditRecord
     {
         $data = parent::mutateFormDataBeforeSave($data);
 
-        $data['cnpj'] = TextFormater::clear($data['cnpj']);
-        $data['telefone'] = TextFormater::clear($data['telefone']);
-        $data['cep'] = TextFormater::clear($data['cep']);
+        $data['cnpj'] = MyTextFormater::clear($data['cnpj']);
+        $data['telefone'] = MyTextFormater::clear($data['telefone']);
+        $data['cep'] = MyTextFormater::clear($data['cep']);
 
         $data['raio_cerca'] = (int) $data['raio_cerca'];
         $data['tolerancia_turno'] = (int) $data['tolerancia_turno'];

@@ -32,36 +32,34 @@ class EventoResource extends Resource
         return $form
             ->columns(12)
             ->schema([
-                Forms\Components\TextInput::make('nome')
-                    ->label('Nome')
-                    ->columnSpan(4)
-                    ->required(),
-                Forms\Components\Textarea::make('descricao')
+                Forms\Components\Group::make([
+                    Forms\Components\TextInput::make('nome')
+                        ->label('Nome')
+                        ->columnSpan(2)
+                        ->required(),
+                    Forms\Components\Select::make('tipo')
+                        ->label('Tipo')
+                        ->required()
+                        ->options([
+                            'producao' => 'Produção',
+                            'intervalo' => 'Intervalo',
+                            'tempo morto' => 'Tempo Morto',
+                        ]),
+                    Forms\Components\Select::make('credito_debito')
+                        ->label('Crédito/Debito')
+                        ->required()
+                        ->options([
+                            'credito' => 'Crédito',
+                            'debito' => 'Débito',
+                            'nulo' => 'Nulo',
+                        ]),
+
+                ])
+                    ->columns(2)
+                    ->columnSpan(4),
+                Forms\Components\RichEditor::make('descricao')
                     ->columnSpan(8)
-                    ->label('Descrição'),
-                Forms\Components\Select::make('empresa_id')
-                    ->label('Empresa')
-                    ->columnSpan(4)
-                    ->hint('É específico para uma empresa?')
-                    ->relationship('empresa', 'nome_fantasia'),
-                Forms\Components\Select::make('tipo')
-                    ->label('Tipo')
-                    ->columnSpan(4)
-                    ->required()
-                    ->options([
-                        'producao' => 'Produção',
-                        'intervalo' => 'Intervalo',
-                        'tempo morto' => 'Tempo Morto',
-                    ]),
-                Forms\Components\Select::make('credito_debito')
-                    ->columnSpan(4)
-                    ->label('Crédito/Debito')
-                    ->required()
-                    ->options([
-                        'credito' => 'Crédito',
-                        'debito' => 'Débito',
-                        'nulo' => 'Nulo',
-                    ]),
+                    ->label('Descrição')
             ]);
     }
 

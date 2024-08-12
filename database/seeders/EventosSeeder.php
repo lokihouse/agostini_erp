@@ -14,6 +14,7 @@ class EventosSeeder extends Seeder
 {
     public function run(): void
     {
+        /*
         Evento::create([
             'nome' => 'Produção',
             'tipo' => 'producao',
@@ -41,5 +42,6 @@ class EventosSeeder extends Seeder
             'tipo' => 'tempo morto',
             'credito_debito' => 'debito'
         ]);
+        */
     }
 }

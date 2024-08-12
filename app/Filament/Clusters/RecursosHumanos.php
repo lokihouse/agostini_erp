@@ -9,5 +9,5 @@ class RecursosHumanos extends Cluster
 {
     // use HasPageShield;
     protected static ?int $navigationSort = 6;
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
 }

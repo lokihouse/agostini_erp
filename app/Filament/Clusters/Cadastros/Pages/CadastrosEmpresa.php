@@ -22,6 +22,8 @@ class CadastrosEmpresa extends Page implements HasForms
     protected static string $view = 'filament.clusters.cadastros.pages.empresa';
     protected static ?string $cluster = Cadastros::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public ?array $data = [];
 
     public function mount(): void
@@ -44,8 +46,8 @@ class CadastrosEmpresa extends Page implements HasForms
 
     public function form(Form $form): Form
     {
-        $form = \App\Filament\Clusters\Sistema\Resources\EmpresaResource::form($form);
-        $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[0]->getChildComponents()[0]->columnSpan(4);
+        // $form = \App\Filament\Clusters\Sistema\Resources\EmpresaResource::form($form);
+        /*$form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[0]->getChildComponents()[0]->columnSpan(4);
         $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[1]->getChildComponents()[0]->columnSpan(5);
         $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[1]->getChildComponents()[1]->columnSpan(5);
         $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[1]->getChildComponents()[2]->columnSpan(5);
@@ -55,7 +57,7 @@ class CadastrosEmpresa extends Page implements HasForms
         $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[2]->getChildComponents()[3]->columnSpan(4);
         $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[2]->getChildComponents()[4]->columnSpan(4);
         $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[2]->getChildComponents()[5]->columnSpan(8);
-        $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[2]->getChildComponents()[6]->columnSpan(2);
+        $form->getComponents(true)[0]->getChildComponents()[0]->getChildComponents()[2]->getChildComponents()[6]->columnSpan(2);*/
         // dd();
         return $form
             ->disabled(fn() => !Auth::user()->can('update_empresa'))

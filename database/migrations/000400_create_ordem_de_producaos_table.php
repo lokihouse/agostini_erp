@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\Empresa::class);
             $table->enum('status', ['rascunho', 'agendada', 'em_producao', 'finalizada', 'cancelada'])->default('rascunho');
+            $table->decimal('completude', 5, 2)->default(0);
             $table->date('data_inicio')->nullable();
             $table->date('data_previsao')->nullable();
             $table->date('data_final')->nullable();
+            $table->json('produtos')->nullable();
             $table->timestamps();
         });
     }

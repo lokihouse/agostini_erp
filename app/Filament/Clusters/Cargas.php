@@ -9,5 +9,5 @@ class Cargas extends Cluster
 {
     // use HasPageShield;
     protected static ?int $navigationSort = 7;
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationIcon = 'heroicon-o-truck';
 }

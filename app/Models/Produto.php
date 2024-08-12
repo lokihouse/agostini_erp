@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\ProdutoEtapaController;
 use App\Models\Scopes\EmpresaScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

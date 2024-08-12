@@ -39,30 +39,12 @@ class OrdemDeProducaoResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('codigo')
-                    ->label('#'),
-                TextColumn::make('status')->badge()
-                    ->extraHeaderAttributes(['class' => 'w-1'])
-                    ->alignment(Alignment::Center),
-                TextColumn::make('data_inicio')
-                    ->extraHeaderAttributes(['class' => 'w-1'])
-                    ->alignment(Alignment::Center)
-                    ->date('d/m/Y'),
-                TextColumn::make('data_previsao')
-                    ->extraHeaderAttributes(['class' => 'w-1'])
-                    ->alignment(Alignment::Center)
-                    ->date('d/m/Y'),
-                TextColumn::make('data_final')
-                    ->extraHeaderAttributes(['class' => 'w-1'])
-                    ->alignment(Alignment::Center)
-                    ->date('d/m/Y'),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
         ];
     }
 

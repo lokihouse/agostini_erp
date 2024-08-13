@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             EquipamentosSeeder::class,
             ProdutosSeeder::class,
 
-            OrdemDeProducaoSeeder::class,
+            // OrdemDeProducaoSeeder::class,
 
             ClienteSeeder::class,
         ]);

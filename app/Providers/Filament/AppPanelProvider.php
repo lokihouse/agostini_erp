@@ -34,6 +34,13 @@ class AppPanelProvider extends PanelProvider
         FilamentAsset::register([
             Css::make('leaflet', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
             Js::make('leaflet', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
+
+            // Js::make('highcharts-core', 'https://code.highcharts.com/highcharts.js'),
+            Js::make('highcharts-gantt', 'https://code.highcharts.com/gantt/highcharts-gantt.js'),
+            // Js::make('highcharts-exporting', 'https://code.highcharts.com/gantt/modules/exporting.js'),
+            // Js::make('highcharts-export-data', 'https://code.highcharts.com/modules/export-data.js'),
+            Js::make('highcharts-accessibility', 'https://code.highcharts.com/gantt/modules/accessibility.js'),
+            Js::make('highcharts-ptBR', url('storage/highchart-pt-br.js')),
         ]);
 
         return $panel
@@ -43,7 +50,7 @@ class AppPanelProvider extends PanelProvider
             ->spa()
             ->login(Login::class)
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::Stone,
             ])
             ->font('Inter', provider: GoogleFontProvider::class)
             ->plugins([

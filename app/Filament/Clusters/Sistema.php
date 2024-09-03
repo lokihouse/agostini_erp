@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Filament\Clusters;
+
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Clusters\Cluster;
+
+class Sistema extends Cluster
+{
+    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+}

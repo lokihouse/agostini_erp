@@ -15,8 +15,6 @@ class OrdemDeProducao extends Model
 
     protected $table = 'ordens_de_producao';
 
-    protected $with = ['produtos_na_ordem', 'etapas_na_ordem'];
-
     protected $fillable = [
         'empresa_id',
         'status',
@@ -25,21 +23,14 @@ class OrdemDeProducao extends Model
         'data_inicio_producao',
         'data_final_producao',
         'data_cancelamento',
-        'motivo_cancelamento'
+        'motivo_cancelamento',
+        'mapa_de_processo',
+        'produtos',
+        'etapas',
     ];
 
     public function empresa()
     {
         return $this->belongsTo(Empresa::class);
-    }
-
-    public function produtos_na_ordem(): HasMany
-    {
-        return $this->hasMany(OrdemDeProducaoProduto::class);
-    }
-
-    public function etapas_na_ordem(): HasMany
-    {
-        return $this->hasMany(OrdemDeProducaoProdutoEtapa::class);
     }
 }

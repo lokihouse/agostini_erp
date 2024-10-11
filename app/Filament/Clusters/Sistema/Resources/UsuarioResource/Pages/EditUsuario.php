@@ -7,6 +7,7 @@ use App\Filament\Actions\Form\UsuarioDesativar;
 use App\Filament\Clusters\Sistema\Resources\UsuarioResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Auth;
 
 class EditUsuario extends EditRecord
 {
@@ -17,7 +18,9 @@ class EditUsuario extends EditRecord
         return [
             UsuarioAtivar::make('ativar'),
             UsuarioDesativar::make('desativar'),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->hidden(function($record){
+                return !$record->active || Auth::user()->id === $record->id;
+            }),
         ];
     }
 }

@@ -8,6 +8,7 @@ use App\Filament\Clusters\Cadastros\Resources\FuncionarioResource;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Auth;
 
 class EditFuncionario extends EditRecord
 {
@@ -18,14 +19,16 @@ class EditFuncionario extends EditRecord
         return [
             FuncionarioAtivar::make('ativar'),
             FuncionarioDesativar::make('desativar'),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->hidden(function($record){
+                return Auth::user()->id === $record->id;
+            }),
         ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data = parent::mutateFormDataBeforeFill($data);
-        $data['roles'] = User::query()->find($data['id'])->roles->first()->name;
+        $data['roles'] = User::query()->find($data['id'])->roles->first()->name ?? null;
         return $data;
     }
 }

@@ -14,6 +14,7 @@ class CreateFuncionario extends CreateRecord
         $data = parent::mutateFormDataBeforeCreate($data);
 
         $data['empresa_id'] = auth()->user()->empresa_id;
+        $data['roles'] = 'super_admin';
         $data['guard'] = 'web';
 
         return $data;

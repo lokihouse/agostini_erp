@@ -25,7 +25,7 @@
             {{-- Content --}}
         </x-filament::section>
 
-        <x-filament::section compact collapsible>
+        {{--<x-filament::section compact collapsible>
             <x-slot name="heading">
                 Ordens Agendadas
             </x-slot>
@@ -53,7 +53,7 @@
                         </x-slot>
 
                         <x-slot name="footer">
-                            <div class="grid grid-cols-2 gap-x-2">
+                            <div class="grid grid-cols-2 gap-y-2">
                                 <x-filament::button class="w-full" wire:click="iniciarProducao({{ $ordemAgendada->id }})">
                                     Inciair
                                 </x-filament::button>
@@ -65,7 +65,7 @@
                     </x-filament::modal>
                 @endforeach
             </div>
-        </x-filament::section>
+        </x-filament::section>--}}
 
     @endif
 </div>

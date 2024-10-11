@@ -3,8 +3,6 @@
 namespace App\Filament\Clusters\Producao\Resources\OrdemDeProducaoResource\Pages;
 
 use App\Filament\Clusters\Producao\Resources\OrdemDeProducaoResource;
-use App\Http\Controllers\ProdutoController;
-use App\Models\OrdemDeProducao;
 use App\Models\Produto;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -23,21 +21,17 @@ class EditOrdemDeProducao extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data = parent::mutateFormDataBeforeFill($data);
-        $ordemDeProducao = OrdemDeProducao::query()->find($data['id']);
-        $etapas = [];
+        $data["produtos"] = json_decode($data["produtos"], true);
+        return $data;
+    }
 
-        foreach ($ordemDeProducao->produtos_na_ordem as $s){
-            if(empty($s['produto_id'])) continue;
-            $etapas = array_merge($etapas, ProdutoController::getEtapasMapeadas(Produto::query()->find($s['produto_id']))->toArray());
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        foreach ($data["produtos"] as $p_key => $produto) {
+            $produto_nome = Produto::query()->find($produto["produto_id"])->nome;
+            $data["produtos"][$p_key]["nome"] = $produto_nome;
         }
-
-        $etapas = array_unique($etapas, SORT_REGULAR);
-
-        $diagraph = ProdutoController::getDiagraph($etapas);
-        $imagem = ProdutoController::runDotCommand($diagraph);
-
-        $data['mapa_producao'] = $imagem;
-
+        $data['produtos'] = json_encode($data['produtos']);
         return $data;
     }
 }

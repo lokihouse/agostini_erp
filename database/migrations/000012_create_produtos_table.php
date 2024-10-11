@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('valor_minimo', 10, 2)->nullable();
             $table->decimal('valor_venda', 10, 2)->nullable();
             $table->integer('tempo_de_producao')->default(0);
+            $table->integer('meta_de_producao')->default(0);
             $table->longText('mapa_de_producao')->nullable();
             $table->json('volumes')->nullable();
             $table->timestamps();

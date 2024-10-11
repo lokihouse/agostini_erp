@@ -5,39 +5,30 @@ namespace App\Filament\Clusters\Producao\Resources;
 use App\Filament\Actions\Table\OrdemDeProducaoAgendar;
 use App\Filament\Actions\Table\OrdemDeProducaoCancelar;
 use App\Filament\Actions\Table\OrdemDeProducaoImprimir;
+use App\Filament\Actions\Table\OrdemDeProducaoProduzir;
 use App\Filament\Clusters\Producao;
 use App\Filament\Clusters\Producao\Resources\OrdemDeProducaoResource\Pages;
 use App\Filament\Clusters\Producao\Resources\OrdemDeProducaoResource\RelationManagers;
-use App\Http\Controllers\ProdutoController;
 use App\Models\OrdemDeProducao;
 use App\Models\OrdemDeProducaoProduto;
 use App\Models\Produto;
 use App\Utils\DateHelper;
-use Carbon\Carbon;
-use Filament\Forms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ColumnGroup;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\HtmlString;
 
 class OrdemDeProducaoResource extends Resource
 {
@@ -52,92 +43,86 @@ class OrdemDeProducaoResource extends Resource
     {
         return $form
             ->columns(12)
-            ->disabled(function ($record) {
+            /*->disabled(function ($record) {
                 return !is_null($record) && ($record->status === 'finalizada' || $record->status === 'cancelada');
-            })
+            })*/
             ->schema([
                 Group::make([
                     Fieldset::make('Agendamento')
+                        ->columnSpan(3)
                         ->columns(2)
+                        ->visible(fn ($record): bool => !$record->data_cancelamento)
                         ->schema([
-                            DatePicker::make('data_inicio_agendamento')
-                                ->label('Início'),
-                            DatePicker::make('data_final_agendamento')
-                                ->label('Final'),
+                            Placeholder::make('data_inicio_agendamento')
+                                ->label('Início')
+                                ->content(fn ($record): string => DateHelper::fromYYYYMMDD2String($record->data_inicio_agendamento)),
+                            Placeholder::make('data_final_agendamento')
+                                ->label('Final')
+                                ->content(fn ($record): string => DateHelper::fromYYYYMMDD2String($record->data_final_agendamento)),
                         ]),
                     Fieldset::make('Produção')
+                        ->columnSpan(3)
                         ->columns(2)
+                        ->visible(fn ($record): bool => !$record->data_cancelamento)
                         ->schema([
-                            DatePicker::make('data_inicio_producao')
-                                ->label('Início'),
-                            DatePicker::make('data_final_producao')
-                                ->label('Final'),
+                            Placeholder::make('data_inicio_producao')
+                                ->label('Início')
+                                ->content(fn ($record): string => DateHelper::fromYYYYMMDD2String($record->data_inicio_producao)),
+                            Placeholder::make('data_final_producao')
+                                ->label('Final')
+                                ->content(fn ($record): string => DateHelper::fromYYYYMMDD2String($record->data_final_producao)),
                         ]),
                     Fieldset::make('Cancelamento')
-                        ->columns(1)
+                        ->columnSpan(12)
+                        ->columns(12)
+                        ->visible(fn ($record): bool => !!$record->data_cancelamento)
                         ->schema([
-                            DatePicker::make('data_cancelamento')
-                                ->label('Data'),
+                            Placeholder::make('data_cancelamento')
+                                ->label('data')
+                                ->content(fn ($record): string => DateHelper::fromYYYYMMDD2String($record->data_inicio_producao)),
                             MarkdownEditor::make('motivo_cancelamento')
+                                ->columnSpan(11)
                                 ->label('Motivo'),
                         ])
                 ])
                     ->disabled()
-                    ->columnSpan(4),
+                    ->columns(12)
+                    ->columnSpanFull()
+                    ->hidden(fn($record) => (is_null($record) || $record->status === 'rascunho')),
                 Group::make([
-                    Repeater::make('produtos_na_ordem')
-                        ->relationship('produtos_na_ordem')
+                    Repeater::make('produtos')
                         ->label('Produtos')
                         ->defaultItems(0)
                         ->required()
                         ->itemLabel(fn ($state) => (empty($state['quantidade']) || empty($state['produto_id']) ) ? null : ($state['quantidade'] . 'x ' . Produto::query()->find($state['produto_id'])->nome))
-                        ->live()
-                        ->afterStateUpdated(function (Set $set, $state) {
-                            if(empty($state) || array_values($state)[0]['produto_id'] === null) {
-                                $set('mapa_producao', '');
-                                return;
-                            }
-                            $etapas = [];
-
-                            foreach ($state as $s){
-                                if(empty($s['produto_id'])) continue;
-                                $etapas = array_merge($etapas, ProdutoController::getEtapasMapeadas(Produto::query()->find($s['produto_id']))->toArray());
-                            }
-
-                            $etapas = array_unique($etapas, SORT_REGULAR);
-                            $diagraph = ProdutoController::getDiagraph($etapas);
-                            $imagem = ProdutoController::runDotCommand($diagraph);
-
-                            $set('mapa_producao', $imagem);
-                        })
+                        ->columnSpanFull()
                         ->schema([
                             Group::make([
                                 TextInput::make('quantidade')
                                     ->label('Quantidade')
+                                    ->numeric()
                                     ->columnSpan(1),
                                 Select::make('produto_id')
                                     ->label('Produto')
-                                    ->relationship('produto', 'nome')
+                                    ->options(Produto::query()->pluck('nome', 'id'))
+                                    ->searchable()
+                                    ->preload()
                                     ->live()
                                     ->columnSpan(7),
                             ])
                             ->columns(8)
                         ]),
-                    Group::make([
-                        Placeholder::make('mapa_producao')
-                            ->columnSpan(1)
-                            ->label('Mapa de Produção')
-                            ->extraAttributes(['style' => 'margin: 0 auto'])
-                            ->content(fn ($state) => new HtmlString("<img src='" . $state . "'/>")),
-                        Placeholder::make('etapas_na_ordem')
-                            ->columnSpan(1)
-                            ->label('Etapas de Produção')
-                            ->extraAttributes(['style' => 'margin: 0 auto'])
-                            ->content(fn ($state) => new HtmlString("<img src='" . $state . "'/>")),
-                    ])
-                        ->columns(2),
                 ])
-                    ->columnSpan(8),
+                    ->hidden(fn($record) => !(is_null($record) || $record->status === 'rascunho' || $record->status === 'agendada'))
+                    ->columnSpanFull(),
+                Group::make([
+                    ViewField::make('produtos')
+                        ->view('forms.components.ordem_de_producao_produtos_tabela')
+                        ->columnSpan(6)
+                ])
+                    ->columns(12)
+                    ->hidden(fn($record) => (is_null($record) || $record->status === 'rascunho' || $record->status === 'agendada'))
+                    ->columnSpanFull()
             ]);
     }
 
@@ -179,27 +164,37 @@ class OrdemDeProducaoResource extends Resource
                 ColumnGroup::make('Agendamento', [
                     TextColumn::make('data_inicio_agendamento')
                         ->label('Início')
+                        ->alignCenter()
                         ->date('d/m/Y')
-                        ->extraHeaderAttributes(['style'=>'width: 1px']),
+                        ->extraHeaderAttributes(['style'=>'width: 125px']),
                     TextColumn::make('data_final_agendamento')
                         ->label('Final')
+                        ->alignCenter()
                         ->date('d/m/Y')
-                        ->extraHeaderAttributes(['style'=>'width: 1px']),
-                ]),
+                        ->extraHeaderAttributes(['style'=>'width: 125px']),
+                ])->alignCenter(),
                 ColumnGroup::make('Produção', [
                     TextColumn::make('data_inicio_producao')
                         ->label('Início')
+                        ->alignCenter()
                         ->date('d/m/Y')
-                        ->extraHeaderAttributes(['style'=>'width: 1px']),
+                        ->extraHeaderAttributes(['style'=>'width: 125px']),
                     TextColumn::make('data_final_producao')
                         ->label('Final')
+                        ->alignCenter()
                         ->date('d/m/Y')
-                        ->extraHeaderAttributes(['style'=>'width: 1px']),
-                ]),
+                        ->extraHeaderAttributes(['style'=>'width: 125px']),
+                ])->alignCenter(),
+                TextColumn::make('data_cancelamento')
+                    ->label('Cancel.')
+                    ->alignCenter()
+                    ->date('d/m/Y')
+                    ->extraHeaderAttributes(['style'=>'width: 125px']),
             ])
             ->actionsPosition(Tables\Enums\ActionsPosition::BeforeColumns)
             ->actions([
                 OrdemDeProducaoImprimir::make('imprimir'),
+                OrdemDeProducaoProduzir::make('produzir'),
                 OrdemDeProducaoAgendar::make('agendar'),
                 OrdemDeProducaoCancelar::make('cancelar')
             ]);

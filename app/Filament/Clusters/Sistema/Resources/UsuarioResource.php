@@ -78,7 +78,7 @@ class UsuarioResource extends Resource
                         ->verticalAlignment(VerticalAlignment::End)
                         ->visibleOn('edit')
                         ->fullWidth()
-                        ->columnSpan(2),
+                        ->columnSpan(3),
                 ])
                     ->columns(12)
                     ->columnSpanFull()

@@ -20,6 +20,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -31,6 +32,7 @@ use Filament\Forms\Set;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -54,8 +56,8 @@ class ProdutoResource extends Resource
             ->columns(12)
             ->schema([
                 Tabs::make('tabs')
-                    ->activeTab(2)
                     ->columnSpanFull()
+                    ->activeTab(2)
                     ->columns(12)
                     ->tabs([
                         Tab::make('Cadastro')
@@ -69,20 +71,25 @@ class ProdutoResource extends Resource
                                     ->label('Descrição'),
                             ]),
                         Tab::make('Produção')
-                            ->visible($form->getOperation() === 'edit')
                             ->schema([
                                 Group::make([
+                                    TextInput::make('meta_de_producao')
+                                        ->mask("99:99:99")
+                                        ->placeholder("HH:MM:SS")
+                                        ->extraInputAttributes(['class' => 'text-center'])
+                                        ->label('Meta de Produção'),
                                     Placeholder::make('tempo_de_producao')
-                                        ->label('Tempo Médio de Produção')
-                                        ->columnSpan(2)
+                                        ->label('Tempo de Produção')
+                                        ->extraAttributes(['class' => 'text-center'])
                                         ->content(fn ($record) => new HtmlString(DateHelper::fromSecondsToTime($record->tempo_de_producao ?? 0))),
                                 ])->columnSpan(2),
-                                Group::make([
-                                    Forms\Components\Actions::make([
+                                Fieldset::make('Etapas de Produção')
+                                ->schema([
+                                    /*Forms\Components\Actions::make([
                                         Action::make('generateMapa')
                                             ->color('gray')
                                             ->label('Adicionar Etapa')
-                                            ->modalWidth('xl')
+                                            ->modalWidth(MaxWidth::ThreeExtraLarge)
                                             ->action(function (Get $get, Set $set, $state, $data) use ($form) {
                                                 $etapa = new ProdutoEtapa();
                                                 $etapa->empresa_id = $state['empresa_id'];
@@ -91,6 +98,7 @@ class ProdutoResource extends Resource
                                                 $etapa->equipamento_origem_id = $data['equipamento_origem'];
                                                 $etapa->departamento_destino_id = $data['departamento_destino'];
                                                 $etapa->equipamento_destino_id = $data['equipamento_destino'];
+                                                $etapa->descricao = $data['descricao'];
                                                 $etapa->producao = json_encode($data['producao']);
 
                                                 $etapa->save();
@@ -101,6 +109,11 @@ class ProdutoResource extends Resource
                                                     ->send();
                                             })
                                             ->steps([
+                                                Step::make('Informações')
+                                                    ->schema([
+                                                        RichEditor::make('descricao')
+                                                            ->hint('O quê precisa ser feito nesse passo?')
+                                                    ]),
                                                 Step::make('Origem')
                                                     ->schema([
                                                         Group::make([
@@ -171,7 +184,7 @@ class ProdutoResource extends Resource
                                                                 }),
                                                         ])->columns(2),
                                                     ]),
-                                                ]),
+                                            ]),
                                     ])->fullWidth()->columnSpanFull(),
                                     Repeater::make('produto_etapas')
                                         ->grid(2)
@@ -194,29 +207,27 @@ class ProdutoResource extends Resource
 
                                             return new HtmlString("<span class='text-xs'>ORIGEM: " . $departamento_origem_nome . ($equipamento_origem_nome ? '.' . $equipamento_origem_nome : '') . '<br/>DESTINO: ' . $departamento_destino_nome . ($equipamento_destino_nome ? '.' . $equipamento_destino_nome : '') . "</span>");
                                         })
-                                        ->addable(false)
                                         ->schema([
+                                            Placeholder::make('descricao')
+                                                ->columnSpanFull()
+                                                ->visible(fn ($state) => $state !== null)
+                                                ->content(fn ($state) => new HtmlString($state)),
                                             Placeholder::make('producao')
                                                 ->label('')
                                                 ->columnSpanFull()
-                                                ->visible(fn ($state) => count(json_decode($state)) > 0)
+                                                ->visible(fn ($state) => count(json_decode($state) ?? []) > 0)
                                                 ->content(fn ($state) => new HtmlString(view('filament.clusters.cadastros.produto.card-producao', ['producao' => json_decode($state)]))),
                                             Placeholder::make('tempo')
                                                 ->label('Tempo médio da etapa')
                                                 ->content(fn ($state) => new HtmlString(DateHelper::fromSecondsToTime($state['tempo'] ?? 0)))
                                                 ->columnSpanFull()
-                                        ]),
+                                        ]),*/
                                 ])->columnSpan(6),
                                 Placeholder::make('mapa_producao')
                                     ->label('Mapa de Produção')
                                     ->columnSpan(3)
                                     ->extraAttributes(['style' => 'margin: 0 auto'])
-                                    ->content(fn ($record) => new HtmlString("<img src='" . $record->mapa_de_producao . "'/>")),
-                                /*Forms\Components\Actions::make([
-                                    Forms\Components\Actions\Action::make('generateMapa')
-                                        ->label('Gerar')
-                                        ->action(fn ($record) => \App\Http\Controllers\ProdutoController::updateMapaDeProducaoWithGraphviz($record, 'botao')),
-                            ]),*/
+                                    ->content(fn ($record) => new HtmlString("<img src='" . "" . "'/>")),
                         ]),
                         Tab::make('Vendas')
                             ->schema([

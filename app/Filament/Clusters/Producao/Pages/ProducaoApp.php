@@ -3,11 +3,13 @@
 namespace App\Filament\Clusters\Producao\Pages;
 
 use App\Filament\Clusters\Producao;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Filament\Support\RawJs;
 
 class ProducaoApp extends Page
 {
+    use HasPageShield;
     protected ?string $heading = 'App';
     protected static ?string $title = 'Produção - App';
     protected static ?string $navigationLabel = 'App';

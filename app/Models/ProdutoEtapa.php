@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\ProdutoController;
 use App\Models\Scopes\EmpresaScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,15 +22,12 @@ class ProdutoEtapa extends Model
         parent::boot();
         static::created(function ($produto_etapa) {
             self::setTempoDeProducao($produto_etapa);
-            ProdutoController::updateMapaDeProducaoWithGraphviz($produto_etapa->produto, 'created');
         });
         static::updated(function ($produto_etapa) {
             self::setTempoDeProducao($produto_etapa);
-            ProdutoController::updateMapaDeProducaoWithGraphviz($produto_etapa->produto, 'updated');
         });
         static::deleted(function ($produto_etapa) {
             self::setTempoDeProducao($produto_etapa);
-            ProdutoController::updateMapaDeProducaoWithGraphviz($produto_etapa->produto, 'deleted');
         });
     }
 
@@ -42,6 +38,7 @@ class ProdutoEtapa extends Model
         'equipamento_origem_id',
         'departamento_destino_id',
         'equipamento_destino_id',
+        'descricao',
         'producao',
         'tempo'
     ];

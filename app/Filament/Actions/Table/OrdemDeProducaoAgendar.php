@@ -39,8 +39,8 @@ class OrdemDeProducaoAgendar extends Action
                 'data_inicio_agendamento' => $data['data_inicio_agendamento'],
                 'data_final_agendamento' => $data['data_final_agendamento'],
             ]);
-            Notification::make('atualizada')
-                ->title('Ordem de Produção cancelada')
+            Notification::make('agendada')
+                ->title('Ordem de Produção agendada')
                 ->success()
                 ->send();
         });
@@ -48,6 +48,6 @@ class OrdemDeProducaoAgendar extends Action
 
     public function isVisible(): bool
     {
-        return $this->getRecord()->status === 'rascunho';
+        return $this->getRecord()->status === 'rascunho' || $this->getRecord()->status === 'agendada';
     }
 }

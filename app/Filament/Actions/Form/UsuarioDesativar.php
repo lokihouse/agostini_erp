@@ -6,6 +6,7 @@ use Closure;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 
 class UsuarioDesativar extends Action
 {
@@ -25,7 +26,7 @@ class UsuarioDesativar extends Action
                 ->send();
         });
         $this->hidden(function($record){
-            return !$record->active;
+            return !$record->active || Auth::user()->id === $record->id;
         });
     }
 }

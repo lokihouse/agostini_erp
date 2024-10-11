@@ -18,12 +18,15 @@ class OrdemDeProducaoImprimir extends Action
     {
         parent::setUp();
         $this->action(function ($record){
-            $pdf = Pdf::html(view('filament.clusters.producao.pages.pedido', ['ordem' => $record])->render())
+            $html = view('filament.clusters.producao.pages.pedido', ['ordem' => $record])->render();
+            $htmlFooter = view('filament.clusters.producao.pages.pedido-footer')->render();
+            $pdf = Pdf::html($html)
                 ->margins(4, 4, 4, 4)
+                ->format('a3')
                 ->download();
             return response()->streamDownload(function () use ($pdf) {
                 echo $pdf->getBrowsershot()->pdf();
-                }, 'name.pdf'
+                }, "ordem-de-producao-" . $record->id . ".pdf"
             );
         });
     }

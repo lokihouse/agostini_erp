@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignIdFor(Equipamento::class, 'equipamento_origem_id')->nullable();
             $table->foreignIdFor(Departamento::class, 'departamento_destino_id');
             $table->foreignIdFor(Equipamento::class, 'equipamento_destino_id')->nullable();
+            $table->text('descricao')->nullable();
             $table->json('producao')->nullable();
             $table->integer('tempo')->default(0);
             $table->timestamps();

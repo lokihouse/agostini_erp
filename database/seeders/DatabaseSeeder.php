@@ -2,13 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Http\Controllers\ProdutoController;
 use App\Models\Departamento;
 use App\Models\Empresa;
 use App\Models\Equipamento;
 use App\Models\Evento;
-use App\Models\OrdemDeProducao;
-use App\Models\OrdemDeProducaoProduto;
 use App\Models\Produto;
 use App\Models\ProdutoEtapa;
 use App\Models\User;
@@ -28,170 +25,114 @@ class DatabaseSeeder extends Seeder
         Artisan::call('shield:generate --all');
         Role::create(['name' => 'operador']);
 
-        Empresa::factory()
-            ->create([
-                'active' => true,
-            ]);
-
-        User::factory()
-            ->create([
-                'active' => true,
-                'name' => 'Root',
-                'username' => 'root'
-            ])
-            ->syncRoles('super_admin');
-
-        User::factory()
-            ->create([
-                'active' => true,
-                'name' => 'Operador 1',
-                'username' => 'op'
-            ])
-            ->syncRoles('operador');
-
         Evento::create([
-            'nome' => 'Produção',
+            'nome' => 'Produtivo',
             'categoria' => 'Produtivo',
         ]);
 
         Evento::create([
-            'nome' => 'Entre Jornadas',
+            'nome' => 'Intervalo',
             'categoria' => 'Intervalo',
         ]);
 
         Evento::create([
-            'nome' => 'Entre Turnos',
-            'categoria' => 'Intervalo',
-        ]);
-
-        Evento::create([
-            'nome' => 'Limpeza',
+            'nome' => 'Improdutivo',
             'categoria' => 'Improdutivo',
         ]);
 
-        Evento::create([
-            'nome' => 'Movimentação Interna',
-            'categoria' => 'Movimentação ',
-        ]);
+        /* PARA DESENVOLVIMENTO */
 
-        Departamento::create([
-            'empresa_id' => 1,
-            'nome' => 'Departamento 1',
-            'descricao' => 'Descrição do departamento 1'
-        ]);
+        for($e = 0; $e < 1; $e++) {
+            $empresa = Empresa::factory()
+                ->create([
+                    'active' => true,
+                ]);
 
-        Departamento::create([
-            'empresa_id' => 1,
-            'nome' => 'Departamento 2',
-            'descricao' => 'Descrição do departamento 2'
-        ]);
+            User::factory()
+                ->create([
+                    'empresa_id' => $empresa->id,
+                    'active' => true,
+                    'name' => 'Root',
+                    'username' => 'root' . $empresa->id
+                ])
+                ->syncRoles('super_admin');
 
-        Departamento::create([
-            'empresa_id' => 1,
-            'nome' => 'Departamento 3',
-            'descricao' => 'Descrição do departamento 3'
-        ]);
+            $numeroDeDepartamentos = fake()->randomDigitNotZero()+3;
 
-        Departamento::create([
-            'empresa_id' => 1,
-            'nome' => 'Departamento 4',
-            'descricao' => 'Descrição do departamento 4'
-        ]);
+            for ($i = 0; $i < $numeroDeDepartamentos; $i++) {
+                $departamento = Departamento::create([
+                    'empresa_id' => $empresa->id,
+                    'nome' => 'Departamento ' . $i,
+                    'descricao' => 'Descrição do departamento ' . $i
+                ]);
 
-        Departamento::create([
-            'empresa_id' => 1,
-            'nome' => 'Departamento 5',
-            'descricao' => 'Descrição do departamento 5'
-        ]);
+                $numeroDeEquipamentos = fake()->randomDigitNotZero()+3;
 
-        Equipamento::create([
-            'empresa_id' => 1,
-            'departamento_id' => 2,
-            'nome' => 'Máquina 1',
-            'descricao' => 'Descrição da máquina 1'
-        ]);
+                for ($j = 0; $j < $numeroDeEquipamentos; $j++) {
+                    Equipamento::create([
+                        'empresa_id' => $empresa->id,
+                        'departamento_id' => $departamento->id,
+                        'nome' => 'Máquina ' . $j,
+                        'descricao' => 'Descrição da máquina ' . $departamento->id . ".$j"
+                    ]);
+                }
+            }
 
-        Equipamento::create([
-            'empresa_id' => 1,
-            'departamento_id' => 3,
-            'nome' => 'Máquina 2',
-            'descricao' => 'Descrição da máquina 2'
-        ]);
+            $numeroDeProdutos = 0; // fake()->randomDigitNotZero();
 
-        Equipamento::create([
-            'empresa_id' => 1,
-            'departamento_id' => 4,
-            'nome' => 'Máquina 3',
-            'descricao' => 'Descrição da máquina 3'
-        ]);
+            for ($i = 0; $i < $numeroDeProdutos; $i++) {
+                $valor_venda = fake()->randomFloat(2, 50, 1000);
+                $numeroDeVolumes = fake()->randomDigitNotZero();
+                $volumes = [];
+                for ($j = 0; $j < $numeroDeVolumes; $j++) {
+                    $volumes[] = [
+                        'descricao' => 'Caixa ' . $j,
+                        'quantidade' => fake()->randomDigitNotZero(),
+                        'largura' => fake()->numberBetween(20,100),
+                        'altura' => fake()->numberBetween(20,100),
+                        'comprimento' => fake()->numberBetween(50,300),
+                        'peso' => fake()->numberBetween(100,1000),
+                    ];
+                }
 
-        $valor_venda = fake()->randomFloat(2, 50, 1000);
-        $produto = Produto::create([
-            'empresa_id' => 1,
-            'nome' => 'Produto 1',
-            'descricao' => 'Descrição do produto 1',
-            'valor_minimo' => $valor_venda * 0.75,
-            'valor_venda' => $valor_venda,
-            'volumes' => json_encode([
-                [
-                    'descricao' => 'Caixa 1',
-                    'largura' => fake()->numberBetween(20,100),
-                    'altura' => fake()->numberBetween(20,100),
-                    'comprimento' => fake()->numberBetween(50,300),
-                    'peso' => fake()->numberBetween(100,1000),
-                ],
-                [
-                    'descricao' => 'Caixa 2',
-                    'largura' => fake()->numberBetween(20,100),
-                    'altura' => fake()->numberBetween(20,100),
-                    'comprimento' => fake()->numberBetween(50,300),
-                    'peso' => fake()->numberBetween(100,1000),
-                ]
-            ])
-        ]);
-        ProdutoEtapa::create([
-            'empresa_id' => 1,
-            'produto_id' => $produto->id,
-            'departamento_origem_id' => 1,
-            'departamento_destino_id' => 2,
-            'equipamento_destino_id' => 1,
-            'tempo' => fake()->numberBetween(10,30),
-        ]);
-        ProdutoEtapa::create([
-            'empresa_id' => 1,
-            'produto_id' => $produto->id,
-            'departamento_origem_id' => 2,
-            'departamento_destino_id' => 3,
-            'equipamento_destino_id' => 2,
-            'tempo' => fake()->numberBetween(10,30),
-        ]);
-        ProdutoEtapa::create([
-            'empresa_id' => 1,
-            'produto_id' => $produto->id,
-            'departamento_origem_id' => 3,
-            'departamento_destino_id' => 4,
-            'equipamento_destino_id' => 3,
-            'tempo' => fake()->numberBetween(10,30),
-        ]);
-        ProdutoEtapa::create([
-            'empresa_id' => 1,
-            'produto_id' => $produto->id,
-            'departamento_origem_id' => 4,
-            'departamento_destino_id' => 5,
-            'tempo' => fake()->numberBetween(10,30),
-        ]);
+                $produto = Produto::create([
+                    'empresa_id' => $empresa->id,
+                    'nome' => 'Produto ' . $i,
+                    'descricao' => 'Descrição do produto ' . $i,
+                    'valor_minimo' => $valor_venda * 0.75,
+                    'valor_venda' => $valor_venda,
+                    'volumes' => json_encode($volumes)
+                ]);
 
-        $ordemDeProducao = OrdemDeProducao::create([
-            'empresa_id' => 1,
-            'status' => 'agendada',
-            'data_inicio_agendamento' => Carbon::today()->format('Y-m-d'),
-            'data_final_agendamento' => Carbon::today()->addDays(fake()->numberBetween(3,7))->format('Y-m-d'),
-        ]);
+                $numeroDeEtapasDeProduto = fake()->randomDigitNotZero()+5;
+                for($j = 0; $j < $numeroDeEtapasDeProduto; $j++) {
+                    $departamentoOrigem = fake()->numberBetween(1, $numeroDeDepartamentos);
+                    $equipamentoOrigem = Equipamento::query()->where('departamento_id', $departamentoOrigem)->inRandomOrder()->first()->id;
+                    $departamentoDestino = fake()->numberBetween(1, $numeroDeDepartamentos);
+                    $equipamentoDestino = Equipamento::query()->where('departamento_id', $departamentoDestino)->inRandomOrder()->first()->id;
 
-        OrdemDeProducaoProduto::create([
-            'ordem_de_producao_id' => $ordemDeProducao->id,
-            'produto_id' => $produto->id,
-            'quantidade' => 10,
-        ]);
+                    $producao = [];
+                    $numeroDeSubProdutos = fake()->randomDigitNotZero();
+                    for ($k = 0; $k < $numeroDeSubProdutos; $k++) {
+                        $producao[] = [
+                            "descricao" => "Subproduto " . $produto->id . ".$k",
+                            "quantidade" => fake()->randomDigitNotZero(),
+                        ];
+                    }
+
+                    ProdutoEtapa::create([
+                        'empresa_id' => $empresa->id,
+                        'produto_id' => $produto->id,
+                        'departamento_origem_id' => $departamentoOrigem,
+                        'departamento_destino_id' => $departamentoDestino,
+                        'equipamento_origem_id' => $equipamentoOrigem,
+                        'equipamento_destino_id' => $equipamentoDestino,
+                        'descricao' => "Você vai pegar os insumos em $departamentoOrigem.$equipamentoOrigem e levar para $departamentoDestino.$equipamentoDestino",
+                        'producao' => json_encode($producao),
+                        'tempo' => fake()->numberBetween(10,30),
+                    ]);
+                }
+            }
+        }
     }
 }

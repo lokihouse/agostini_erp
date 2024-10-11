@@ -21,8 +21,12 @@ return new class extends Migration
             $table->date('data_final_agendamento')->nullable();
             $table->date('data_inicio_producao')->nullable();
             $table->date('data_final_producao')->nullable();
+            $table->date('data_finalizacao')->nullable();
             $table->date('data_cancelamento')->nullable();
             $table->longText('motivo_cancelamento')->nullable();
+            $table->longText('mapa_de_processo')->nullable();
+            $table->json('produtos')->nullable();
+            $table->json('eventos')->nullable();
             $table->timestamps();
         });
     }

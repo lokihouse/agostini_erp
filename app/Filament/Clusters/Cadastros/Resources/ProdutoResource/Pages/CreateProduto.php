@@ -3,7 +3,6 @@
 namespace App\Filament\Clusters\Cadastros\Resources\ProdutoResource\Pages;
 
 use App\Filament\Clusters\Cadastros\Resources\ProdutoResource;
-use App\Http\Controllers\ProdutoController;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

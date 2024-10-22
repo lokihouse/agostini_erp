@@ -83,8 +83,8 @@ class ProdutoResource extends Resource
                                         ->extraAttributes(['class' => 'text-center'])
                                         ->content(fn ($record) => new HtmlString(DateHelper::fromSecondsToTime($record->tempo_de_producao ?? 0))),
                                 ])->columnSpan(2),
-                                Fieldset::make('Etapas de Produção')
-                                ->schema([
+                                Fieldset::make('Etapas de Produção')->schema([
+                                    \App\Forms\Components\ProdutoEtapa::make('')->columnSpanFull()
                                     /*Forms\Components\Actions::make([
                                         Action::make('generateMapa')
                                             ->color('gray')
@@ -222,12 +222,7 @@ class ProdutoResource extends Resource
                                                 ->content(fn ($state) => new HtmlString(DateHelper::fromSecondsToTime($state['tempo'] ?? 0)))
                                                 ->columnSpanFull()
                                         ]),*/
-                                ])->columnSpan(6),
-                                Placeholder::make('mapa_producao')
-                                    ->label('Mapa de Produção')
-                                    ->columnSpan(3)
-                                    ->extraAttributes(['style' => 'margin: 0 auto'])
-                                    ->content(fn ($record) => new HtmlString("<img src='" . "" . "'/>")),
+                                ])->columnSpan(10),
                         ]),
                         Tab::make('Vendas')
                             ->schema([

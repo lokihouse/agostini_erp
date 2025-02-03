@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('visitas', function (Blueprint $table) {
+        Schema::create('ordem_de_transportes', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\Empresa::class);
             $table->foreignIdFor(\App\Models\User::class);
-            $table->foreignIdFor(\App\Models\Cliente::class);
-            $table->foreignIdFor(\App\Models\PedidoDeVenda::class)->nullable();
-            $table->date('data');
-            $table->enum('status', ['agendada', 'em andamento', 'finalizada']);
-            $table->json('relatorio_de_visita')->nullable();
+            $table->text('placa_caminhao')->nullable();
+            $table->json('rota')->nullable();
+            $table->json('entregas')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('visitas');
+        Schema::dropIfExists('ordem_de_transportes');
     }
 };

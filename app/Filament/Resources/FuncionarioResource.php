@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Utils\Cpf;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -19,6 +20,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
 
 class FuncionarioResource extends ResourceBase
 {
@@ -37,36 +39,49 @@ class FuncionarioResource extends ResourceBase
     public static function form(Form $form): Form
     {
         return $form
-            ->columns(20)
             ->schema([
-                ToggleButtons::make('ativo')
-                    ->boolean()
-                    ->grouped()
-                    ->columnSpan(4),
-                Select::make('roles')
-                    ->label('Função')
-                    ->relationship('roles', 'name')
-                    ->required()
-                    ->preload()
-                    ->searchable()
-                    ->columnSpan(4),
-                TextInput::make('cpf')
-                    ->mask('***.***.***-**')
-                    ->required()
-                    ->columnStart(1)
-                    ->columnSpan(3),
-                TextInput::make('nome')
-                    ->required()
-                    ->columnSpan(6),
-                TextInput::make('username')
-                    ->required()
-                    ->label('Nome de Usuário')
-                    ->columnSpan(4),
-                TextInput::make('password')
-                    ->password()
-                    ->required(fn() => $form->getOperation() === 'create')
-                    ->label('Senha')
-                    ->columnSpan(4),
+                Tabs::make('')
+                    ->columnSpanFull()
+                    ->schema([
+                        Tabs\Tab::make('Cadastro')
+                            ->columns(20)
+                            ->schema([
+                                ToggleButtons::make('ativo')
+                                    ->boolean()
+                                    ->grouped()
+                                    ->columnSpan(4),
+                                Select::make('roles')
+                                    ->label('Função')
+                                    ->relationship('roles', 'name')
+                                    ->required()
+                                    ->preload()
+                                    ->searchable()
+                                    ->columnSpan(4),
+                                TextInput::make('cpf')
+                                    ->mask('***.***.***-**')
+                                    ->required()
+                                    ->columnStart(1)
+                                    ->columnSpan(3),
+                                TextInput::make('nome')
+                                    ->required()
+                                    ->columnSpan(6),
+                                TextInput::make('username')
+                                    ->required()
+                                    ->label('Nome de Usuário')
+                                    ->columnSpan(4),
+                                TextInput::make('password')
+                                    ->password()
+                                    ->required(fn() => $form->getOperation() === 'create')
+                                    ->label('Senha')
+                                    ->columnSpan(4),
+                            ]),
+                        Tabs\Tab::make('Vendas')
+                            ->columns(20)
+                            ->schema([
+                                MoneyInput::make('meta_mensal_de_venda')
+                                    ->columnSpan(3),
+                            ])
+                    ])
             ]);
     }
 

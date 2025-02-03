@@ -3,20 +3,34 @@
 namespace App\Filament\Pages;
 
 use App\Models\PedidoDeVenda;
+use App\Models\Produto;
 use App\Models\Visita;
 use App\Utils\Cnpj;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Number;
+use Illuminate\Support\Str;
+use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
 
 class RegistroDeVisita extends Page implements HasInfolists
 {
@@ -32,6 +46,8 @@ class RegistroDeVisita extends Page implements HasInfolists
     }
 
     public Visita $record;
+
+    public $produtos = [];
     public function mount($id): void
     {
         $this->record = (new Visita())->FindOrFail($id);
@@ -50,60 +66,71 @@ class RegistroDeVisita extends Page implements HasInfolists
             ]);
     }
 
-    public function cancelamentoInfolist(Infolist $infolist): Infolist
+    public function checkInVisitaAction(): Action
     {
-        return $infolist
-            ->record($this->record)
-            ->schema([
-                TextEntry::make('justificativa'),
-
-            ]);
-    }
-
-    public function checkInVisita()
-    {
-        $this->record->status = "em andamento";
-        $this->record->save();
-    }
-    public function goToPedido()
-    {
-        if(is_null($this->record->pedido_de_venda_id)){
-            $pedido = new PedidoDeVenda();
-            $pedido->user_id = auth()->user()->id;
-            $pedido->cliente_id = $this->record->cliente_id;
-            $pedido->visita_id = $this->record->id;
-            $pedido->save();
-
-            $this->record->pedido_de_venda_id = $pedido->id;
-            $this->record->save();
-        }
-
-        $this->redirect(route('filament.app.pages.pedido-de-venda.registro', $this->record->pedido_de_venda_id));
-    }
-
-    public function cancelarVisitaAction(): Action
-    {
-        return Action::make('test')
-            ->label('Cancelar Visita')
-            ->color('danger')
+        return Action::make('checkInVisita')
+            ->extraAttributes(['class' => 'w-full'])
             ->requiresConfirmation()
-            ->form([
-                Textarea::make('justificativa')->required(),
-                DatePicker::make('nova_data')
-                    ->minDate('tomorrow')
-            ])
-            ->action(function (array $arguments, $data) {
-                $this->record->status = "cancelada";
-                $this->record->justificativa = $data['justificativa'];
+            ->label('Informar Visita')
+            ->action(function () {
+                $this->record->status = "em andamento";
                 $this->record->save();
+            });
+    }
 
-                if(isset($data['nova_data'])){
-                    $novaVisita = $this->record->replicate();
-                    $novaVisita->status = "agendada";
-                    $novaVisita->justificativa = null;
-                    $novaVisita->data = $data['nova_data'];
-                    $novaVisita->save();
-                }
+    public function encerrarVisitaSemPedidoAction(): Action
+    {
+        return Action::make('encerrarVisitaSemPedido')
+            ->color('danger')
+            ->extraAttributes(['class' => 'w-full'])
+            ->requiresConfirmation()
+            ->icon('heroicon-o-no-symbol')
+            ->modalIcon('heroicon-o-no-symbol')
+            ->label('Encerrar visita sem pedido')
+            ->form([
+                RichEditor::make('descricao')
+                    ->required()
+                    ->label('Faça uma escrição detalhada da visita.'),
+                Repeater::make('plano_de_acoes')
+                    ->label('Plano de ações')
+                    ->defaultItems(0)
+                    ->addActionLabel('Adicionar ação')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        TextInput::make('o_que_fazer')->required(),
+                        TextInput::make('quem')->required(),
+                        DatePicker::make('prazo')->required()
+                    ])
+            ])
+            ->action(function ($data) {
+                $this->record->relatorio_de_visita = json_encode($data);
+                $this->record->status = 'finalizada';
+                $this->record->save();
+            });
+    }
+
+    public function finalizarPedidoAction(): Action
+    {
+        return Action::make('finalizarPedido')
+            ->color('success')
+            ->icon('heroicon-o-check-badge')
+            ->extraAttributes(['class' => 'w-full rounded-t-none'])
+            ->requiresConfirmation()
+            ->label('Finalizar pedido e visita')
+            ->action(function () {
+
+
+                $pedido_de_venda = new PedidoDeVenda();
+                $pedido_de_venda->user_id = auth()->user()->id;
+                $pedido_de_venda->cliente_id = $this->record->cliente_id;
+                $pedido_de_venda->visita_id = $this->record->id;
+                $pedido_de_venda->produtos = json_encode($this->produtos);
+                $pedido_de_venda->save();
+
+                $this->record->pedido_de_venda_id = $pedido_de_venda->id;
+                $this->record->status = 'finalizada';
+                $this->record->save();
             });
     }
 
@@ -114,10 +141,113 @@ class RegistroDeVisita extends Page implements HasInfolists
                 return 'p-2 border border-gray-600 bg-gray-200 text-gray-800';
             case 'em andamento':
                 return 'p-2 border border-amber-600 bg-amber-200 text-amber-800';
-            case 'realizada':
-                return 'p-2 border border-green-600 bg-green-200 text-green-800';
-            case 'cancelada':
-                return 'p-2 border border-red-600 bg-red-200 text-red-800';
+            case 'finalizada':
+                return 'p-2 border border-blue-600 bg-blue-200 text-blue-800';
         }
+    }
+
+    public function recalcularValores(Set $set, Get $get)
+    {
+        $quantidade = intval($get('quantidade')) ?? 0;
+        $produto =  Produto::query()->find($get('produto'));
+
+        if($produto) $produto = $produto->toArray();
+        else return;
+
+        $valor_nominal = (($produto['valor_nominal_venda'] ?? 0) / 100);
+        $valor_minimo = (($produto['valor_minimo_venda'] ?? 0) / 100);
+        $valor_final = $valor_nominal * ((100 - floatval($get('desconto') ?? 0)) / 100);
+        $subtotal = $valor_final * $quantidade;
+
+        $set('valor_original', $valor_nominal);
+
+        if($valor_minimo > $valor_final){
+            $set('error', 'Valor menor que mínimo autorizado!<br/><small>' . Number::currency($valor_minimo, 'BRL') . "</small>");
+            $set('subtotal', null);
+            $set('total', null);
+        }else{
+            $set('error', null);
+            $set('subtotal', Number::format($valor_final, 2));
+            $set('total', Number::format($subtotal,2));
+        }
+    }
+    public function removeById($id)
+    {
+        unset($this->produtos[$id]);
+    }
+    public function adicionarProdutoAction(): Action
+    {
+        return Action::make('adicionarProduto')
+            ->label('Adicionar produto ao pedido')
+            ->extraAttributes(['class' => 'w-full'])
+            ->icon('heroicon-o-plus')
+            ->requiresConfirmation()
+            ->modalHeading('')
+            ->modalDescription(null)
+            ->modalIcon(null)
+            ->steps([
+                Step::make('Adicionar Produto')
+                    ->icon('heroicon-o-gift')
+                    ->columns(['default' => 4])
+                    ->schema([
+                        TextInput::make('quantidade')
+                            ->label('Qnt.')
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $this->recalcularValores($set, $get);
+                            })
+                            ->numeric(),
+                        Select::make('produto')
+                            ->columnSpan(3)
+                            ->required()
+                            ->searchable()
+                            ->options(Produto::query()->pluck('nome', 'id'))
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $this->recalcularValores($set, $get);
+                            }),
+                        MoneyInput::make('valor_original')
+                            ->disabled()
+                            ->columnSpan(2),
+                        TextInput::make('desconto')
+                            ->default(0)
+                            ->columnSpan(2)
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $this->recalcularValores($set, $get);
+                            })
+                            ->suffix("%"),
+                        MoneyInput::make('subtotal')
+                            ->disabled()
+                            ->columnSpan(2),
+                        MoneyInput::make('total')
+                            ->disabled()
+                            ->columnSpan(2),
+                        Placeholder::make('error')
+                            ->label('')
+                            ->extraAttributes(['class' => 'w-full bg-red-200 border-2 rounded p-2 text-center'])
+                            ->columnSpan(4)
+                            ->visible(fn($state) => !!$state)
+                            ->content(fn($state) => new HtmlString($state))
+                    ])
+            ])
+            ->action(function(Get $get, $data) {
+                $produto = Produto::query()->find($data["produto"]);
+                $obj = [
+                    "produto_id" => $data["produto"],
+                    "produto_nome" => $produto->nome,
+                    "quantidade" => intval($data["quantidade"]),
+                    "valor_original" => ($produto->valor_nominal_venda ?? 0 ) / 100,
+                    "desconto" => Number::format(floatval($data["desconto"]), 2),
+                    "valor_final" => (($produto->valor_nominal_venda ?? 0 ) / 100) * ((100 - floatval($data["desconto"])) / 100),
+                    "subtotal" => intval($data["quantidade"]) * (($produto->valor_nominal_venda ?? 0 ) / 100) * ((100 - floatval($data["desconto"])) / 100),
+                ];
+
+                $this->produtos[(string)Str::uuid()] = $obj;
+            });
     }
 }

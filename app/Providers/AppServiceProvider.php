@@ -6,6 +6,7 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,9 +22,8 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
         // URL::forceScheme('https');
 
-        /*FilamentAsset::register([
-            Css::make('leaflet_css', asset('css/leaflet.css')),
-            Js::make('leaflet_js', asset('js/leaflet.js')),
-        ]);*/
+        Blade::directive('money', function ($money) {
+            return "<?php echo 'R$ ' . number_format($money, 2, ',', '.'); ?>";
+        });
     }
 }

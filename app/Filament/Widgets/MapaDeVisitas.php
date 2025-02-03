@@ -30,6 +30,7 @@ class MapaDeVisitas extends Widget implements HasForms, HasActions
     public function agendarVisitaAction(): Action
     {
         return Action::make('agendarVisita')
+            ->extraAttributes(['class' => 'rounded-b-none'])
             ->label('Agendar Nova Visita')
             ->requiresConfirmation()
             ->modalDescription(null)
@@ -37,6 +38,7 @@ class MapaDeVisitas extends Widget implements HasForms, HasActions
             ->form([
                 Select::make('cliente')
                     ->label('Cliente')
+                    ->required()
                     ->searchable()
                     ->options(
                         Cliente::query()
@@ -45,6 +47,7 @@ class MapaDeVisitas extends Widget implements HasForms, HasActions
                     ),
                 DatePicker::make('data')
                     ->minDate('today')
+                    ->required()
                     ->label('Data'),
             ])
             ->action(function($data) {

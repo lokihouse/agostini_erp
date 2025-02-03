@@ -28,12 +28,14 @@ class ListVisitas extends ListRecords
                 ->form([
                     Select::make('cliente')
                         ->label('Cliente')
+                        ->required()
                         ->searchable()
                         ->options(
                             Cliente::query()
                                 ->pluck('nome_fantasia', 'id')
                         ),
                     DatePicker::make('data')
+                        ->required()
                         ->minDate('today')
                         ->label('Data'),
                 ])

@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('cpf',11);
             $table->string('nome');
 
+            $table->float('meta_mensal_de_venda')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

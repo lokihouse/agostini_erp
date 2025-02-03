@@ -11,12 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ScopedBy([EmpresaScope::class])]
 class Cliente extends ModelBase
 {
-    protected $appends = ['proximas_visitas', 'localizacao'];
-
-    public function getProximasVisitasAttribute()
-    {
-        return $this->visitas()->where('data', '>=', 'today')->orderBy('data')->get()->toArray();
-    }
+    protected $appends = ['localizacao'];
 
     public function vendedor(): BelongsTo
     {

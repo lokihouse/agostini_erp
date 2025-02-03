@@ -10,7 +10,7 @@ class Visita extends ModelBase
 
     public function cliente(): BelongsTo
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
+        return $this->belongsTo(Cliente::class, );
     }
 
     public function vendedor(): BelongsTo
@@ -18,8 +18,8 @@ class Visita extends ModelBase
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function pedido(): HasOne
+    public function pedido_de_venda(): HasOne
     {
-        return $this->hasOne(PedidoDeVenda::class, 'pedido_de_venda_id');
+        return $this->hasOne(PedidoDeVenda::class);
     }
 }

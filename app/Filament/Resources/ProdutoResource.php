@@ -48,7 +48,7 @@ class ProdutoResource extends ResourceBase
                                     ->label('Valor Nominal de Venda')
                                     ->required(),
                             ]),
-                        Tabs\Tab::make('Cargas')
+                        // Tabs\Tab::make('Cargas')
                     ])
             ]);
     }

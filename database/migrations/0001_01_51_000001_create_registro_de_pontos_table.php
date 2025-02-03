@@ -16,7 +16,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class);
             $table->dateTime('data');
-            $table->enum('tipo', ['entrada', 'saida']);
             $table->string('ip');
             $table->string('device_id');
             $table->float('latitude');

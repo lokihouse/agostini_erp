@@ -43,10 +43,28 @@
         @endif
 
         @if($this->googleRequestStatus === 'OK')
-            <div class="text-center text-md font-bold">Você esta aqui:</div>
-            <div id="address" class="text-center text-md font-thin">{{ $this->address }}</div>
+            <div>
+                <span class="font-bold">Você esta aqui:</span>&nbsp;
+                <span id="address" class="font-thin">{{ $this->address }}</span>
+            </div>
+            <div class="text-xs grid grid-cols-2 gap-2">
+                <div>
+                    <div class="font-bold">Coordenadas:</div>
+                    <div class="font-thin">
+                        {{ \Illuminate\Support\Number::format($this->latitude,6) }}, {{ \Illuminate\Support\Number::format($this->longitude,6) }}
+                    </div>
+                </div>
+                <div>
+                    <div class="font-bold">Precisão:</div>
+                    <div class="font-thin">
+                        {{ \Illuminate\Support\Number::format($this->accuracy,0) }} m
+                    </div>
+                </div>
+            </div>
             <x-filament::button class="w-full mt-4"  wire:click="registrarPonto" >
-                Registrar Ponto
+                <div class="flex  items-center p-2 space-x-2">
+                    <div class="font-bold">Registrar Ponto</div>
+                </div>
             </x-filament::button>
         @endif
 

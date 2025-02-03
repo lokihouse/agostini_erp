@@ -11,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Form;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -22,19 +23,12 @@ class VisitaResource extends ResourceBase
     protected static ?int $navigationSort = 30;
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
-    protected static function canEditRecord(Model $record): bool
-    {
-        $user = auth()->user();
-
-        return $record->user_id === $user->id && $user->can(['view_visita', 'update_visita']);
-    }
-
     public static function form(Form $form): Form
     {
         return $form
             ->columns(3)
             ->schema([
-                Forms\Components\Section::make('Dados do Cliente')
+                /*Forms\Components\Section::make('Dados do Cliente')
                     ->collapsible()
                     ->compact()
                     ->columnSpan(1)
@@ -73,13 +67,16 @@ class VisitaResource extends ResourceBase
                     ->columnSpan(2),
                 Forms\Components\Section::make('Cancelamento')
                     ->visible(fn($state) => $state['status'] === 'cancelado')
-                    ->columnSpan(1)
+                    ->columnSpan(1)*/
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            // ->rowUrl(function ($record) {
+            //    return route('filament.app.pages.registro-de-visita', ['id' => $record->id]);
+            // })
             ->columns([
                 TextColumn::make('data')
                     ->width(300)
@@ -93,11 +90,10 @@ class VisitaResource extends ResourceBase
                     ->color(fn ($state): string => match ($state) {
                         default => 'gray',
                         'em andamento' => 'warning',
-                        'realizada' => 'success',
-                        'cancelada' => 'danger',
+                        'finalizada' => 'info',
 
                     })
-            ]);
+            ])->recordUrl(function ($record) { return route('filament.app.pages.registro-de-visita', ['id' => $record->id]); });
     }
 
     public static function getRelations(): array
@@ -112,7 +108,7 @@ class VisitaResource extends ResourceBase
         return [
             'index' => Pages\ListVisitas::route('/'),
             // 'create' => Pages\CreateVisita::route('/create'),
-            'edit' => Pages\EditVisita::route('/{record}/edit'),
+            // 'edit' => Pages\EditVisita::route('/{record}/edit'),
         ];
     }
 }

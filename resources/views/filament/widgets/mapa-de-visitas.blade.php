@@ -97,7 +97,7 @@ function translateStatusForColors($status): string {
                 map = new Map(document.getElementById("map"), {
                     center: { lat: -15.7801, lng: -47.9292 },
                     zoom: 8,
-                    mapId: '68c5e63e97cfdbec',
+                    mapId: @js(env('GOOGLE_MAPS_API_MAP_ID')),
                     disableDefaultUI: true,
                 });
 
@@ -133,31 +133,17 @@ function translateStatusForColors($status): string {
         </script>
         @endscript
 
-        <div class="flex flex-col">
+        <div class="flex flex-col -m-2">
 
             {{ $this->agendarVisitaAction() }}
 
-            <div class="text-[8px] grid grid-cols-4 gap-1 py-2">
-                <div class="py-1 rounded text-center bg-[{{ translateStatusForColors("agendada") }}]">
-                    Agendada
-                </div>
-                <div class="py-1 rounded text-center bg-[{{ translateStatusForColors("em andamento") }}]">
-                    Em Andamento
-                </div>
-                <div class="py-1 rounded text-center bg-[{{ translateStatusForColors("realizada") }}] text-white">
-                    Realizada
-                </div>
-                <div class="py-1 rounded text-center bg-[{{ translateStatusForColors("cancelada") }}] text-white">
-                    Cancelada
-                </div>
-            </div>
-
             <div id="map" class="w-full h-96 z-0"></div>
 
+            @if($dados)
             <div class="">
                 <div class="relative overflow-x-auto">
-                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                         <tr>
                             <th scope="col" class="w-1">
                                 &nbsp;
@@ -173,7 +159,6 @@ function translateStatusForColors($status): string {
                         <tbody>
 
                         @foreach($dados as $dado)
-
                             <tr wire:click="goToPage(@js($dado["rota"]))"
                                 class="cursor-pointer bg-white text-xs border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                                 <td class="ps-3">
@@ -192,10 +177,9 @@ function translateStatusForColors($status): string {
                         </tbody>
                     </table>
                 </div>
-
-                <x-filament-actions::modals id="modalVisita"/>
-
             </div>
+            @endif
+            <x-filament-actions::modals id="modalVisita"/>
         </div>
     </x-filament::section>
     @endif

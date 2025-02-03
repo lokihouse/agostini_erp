@@ -1,81 +1,42 @@
 <x-filament-panels::page>
     @script
     <script>
-        document.addEventListener('livewire:initialized', () => {
+        document.addEventListener('livewire:initialized', async () => {
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
             let record = @json($this->record) ?? {}
-            let map = null;
+            let map;
+            let markerCircle;
             let latitude = record.latitude ?? null;
             let longitude = record.longitude ?? null;
             let accuracy = record.accuracy ?? null;
 
-            let marker = [latitude ?? 0, longitude ?? 0]
-            let tileLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: false});
+            let pos = {lat: latitude, lng: longitude}
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: pos,
+                zoom: 1,
+                mapId: @js(env('GOOGLE_MAPS_API_MAP_ID')),
+                disableDefaultUI: true,
+            });
 
-            map = L.map('map',
-                {
-                    zoomControl: true,
-                    layers: [tileLayer],
-                    maxZoom: 18,
-                    minZoom: 6
-                }).setView(marker, 17);
+            new AdvancedMarkerElement({
+                map,
+                position: pos,
+            });
 
-            map.zoomControl.remove()
-            map.dragging.disable()
-            map.scrollWheelZoom.disable()
+            markerCircle = new google.maps.Circle({
+                strokeColor: "#FF0000",
+                strokeOpacity: 0.3,
+                strokeWeight: 1,
+                fillColor: "#FF0000",
+                fillOpacity: 0.05,
+                map,
+                center: pos,
+                radius: accuracy,
+            });
 
-            setTimeout(function () {
-                map.invalidateSize(true)
-            }, 100);
-
-            L.marker([latitude, longitude]).addTo(map);
-            L.circle([latitude, longitude], {
-                color: 'red',
-                fillColor: '#f03',
-                fillOpacity: 0.20,
-                radius: accuracy
-            }).addTo(map);
-            map.fitBounds(getCardinalPoints(accuracy + 500)).panBy([0, -250], {animate: true, duration: 1});
-
-            function getCardinalPoints(radius) {
-                const EARTH_RADIUS = 6371; // Raio da Terra em km
-                const radiusInKm = radius / 1000; // Converter o raio para km
-
-                // Converter graus para radianos
-                const toRadians = (degrees) => degrees * (Math.PI / 180);
-                // Converter radianos para graus
-                const toDegrees = (radians) => radians * (180 / Math.PI);
-
-                // Função para calcular deslocamentos
-                const calculatePoint = (lat, lng, bearing, distance) => {
-                    const latRad = toRadians(lat);
-                    const lngRad = toRadians(lng);
-
-                    const newLat = Math.asin(
-                        Math.sin(latRad) * Math.cos(distance / EARTH_RADIUS) +
-                        Math.cos(latRad) * Math.sin(distance / EARTH_RADIUS) * Math.cos(bearing)
-                    );
-
-                    const newLng = lngRad + Math.atan2(
-                        Math.sin(bearing) * Math.sin(distance / EARTH_RADIUS) * Math.cos(latRad),
-                        Math.cos(distance / EARTH_RADIUS) - Math.sin(latRad) * Math.sin(newLat)
-                    );
-
-                    return [
-                        toDegrees(newLat),
-                        toDegrees(newLng)
-                    ];
-                };
-
-                const bearings = {
-                    NE: 45,
-                    SW: 225,
-                };
-
-                return [
-                    calculatePoint(latitude, longitude, toRadians(bearings.NE), radiusInKm),
-                    calculatePoint(latitude, longitude, toRadians(bearings.SW), radiusInKm),
-                ];
-            }
+            map.fitBounds(markerCircle.getBounds());
 
         })
     </script>
@@ -86,19 +47,23 @@
 
         <div class="absolute top-14 w-full z-50 flex justify-center">
             <div class="bg-white rounded-xl border shadow-lg m-4 p-4 max-w-md w-full">
-                <div class="text-center text-xl font-bold">Registro #{{ $this->record->id }}</div>
                 <div class="text-center text-xl font-thin">Ponto registrado com sucesso</div>
-                <div class="text-center text-xl font-bold pt-4">{{ $this->record->usuario->nome }}</div>
-                <div id="timer" class="text-center text-3xl font-bold pt-4">{{ \Carbon\Carbon::parse($this->record->data)->translatedFormat('H:i:s') }}</div>
-                <div id="calendar" class="text-center text-md font-thin">{{ \Carbon\Carbon::parse($this->record->data)->translatedFormat('d \de F \de Y') }}</div>
-                <div id="calendar" class="text-center text-md font-thin pt-4">{{ $this->record->address }}</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex justify-center items-center text-center text-xl font-bold pt-4">
+                        {{ $this->record->usuario->nome }}
+                    </div>
+                    <div>
+                        <div id="timer" class="text-center text-3xl font-bold pt-4">{{ \Carbon\Carbon::parse($this->record->data)->translatedFormat('H:i:s') }}</div>
+                        <div id="calendar" class="text-center text-md font-thin">{{ \Carbon\Carbon::parse($this->record->data)->translatedFormat('d \de F \de Y') }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="absolute bottom-0 w-full z-50 flex justify-center">
             <div class="bg-white rounded-xl border shadow-lg m-4 p-4 max-w-md w-full">
                 @php
-                $hashGroupSize = 4;
+                $hashGroupSize = 3;
                 $hashChunkSize = 8;
 
                 $hashChunk = explode(".", chunk_split($this->record->hash, 8, '.'));
@@ -106,17 +71,39 @@
 
                 $pos = 0;
                 @endphp
-                <div id="calendar" class="text-center text-xs font-thin">
-                    Código validador:<br/>
-                    @while($pos < count($hashChunk))
-                        @for($i = 0; $i < $hashGroupSize; $i++)
-                            @if($pos < count($hashChunk))
-                                {{$hashChunk[$pos]}}.
-                            @endif
-                            @php($pos++)
-                        @endfor
-                        <br/>
-                    @endwhile
+                <div class="text-xs grid grid-cols-2 gap-2">
+                    <div class="col-span-full">
+                        <span class="font-bold">Você esta aqui:</span>&nbsp;
+                        <span id="address" class="font-thin">{{ $this->record->address }}</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="font-bold">Coordenadas:</div>
+                            <div class="font-thin">
+                                {{ \Illuminate\Support\Number::format($this->record->latitude,6) }}, {{ \Illuminate\Support\Number::format($this->record->longitude,6) }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="font-bold">Precisão:</div>
+                            <div class="font-thin">
+                                {{ \Illuminate\Support\Number::format($this->record->accuracy,0) }} m
+                            </div>
+                        </div>
+                    </div>
+                    <div id="calendar" class="text-center text-xs font-thin">
+                        <span class="font-bold">Código validador:</span><br/>
+                        @while($pos < count($hashChunk))
+                            @for($i = 0; $i < $hashGroupSize; $i++)
+                                @if($pos < count($hashChunk) - 1)
+                                    {{$hashChunk[$pos]}}.
+                                @elseif($pos < count($hashChunk))
+                                    {{$hashChunk[$pos]}}
+                                @endif
+                                @php($pos++)
+                            @endfor
+                            <br/>
+                        @endwhile
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,156 +1,98 @@
 <x-filament-panels::page>
     @script
-        <script>
-            document.addEventListener('livewire:initialized', () => {
-                let map = null;
-                let markerPin = null;
-                let markerCircle = null;
-                let latitude = null;
-                let longitude = null;
-                let accuracy = null;
+    <script>
+        document.addEventListener('livewire:initialized', async () => {
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-                function getCardinalPoints(latitude, longitude, radius, directions = ['NE', 'SE', 'SW', 'NW']) {
-                    const EARTH_RADIUS = 6371; // Raio da Terra em km
-                    const radiusInKm = radius / 1000; // Converter o raio para km
+            let map;
+            let markerPin;
+            let markerCircle;
 
-                    // Converter graus para radianos
-                    const toRadians = (degrees) => degrees * (Math.PI / 180);
-                    // Converter radianos para graus
-                    const toDegrees = (radians) => radians * (180 / Math.PI);
+            async function initMap() {
+                let pos = {lat: 0, lng: 0}
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: pos,
+                    zoom: 1,
+                    mapId: @js(env('GOOGLE_MAPS_API_MAP_ID')),
+                    disableDefaultUI: true,
+                });
 
-                    // Função para calcular deslocamentos
-                    const calculatePoint = (lat, lng, bearing, distance) => {
-                        const latRad = toRadians(lat);
-                        const lngRad = toRadians(lng);
+                markerPin = new AdvancedMarkerElement({
+                    map,
+                    position: pos,
+                });
 
-                        const newLat = Math.asin(
-                            Math.sin(latRad) * Math.cos(distance / EARTH_RADIUS) +
-                            Math.cos(latRad) * Math.sin(distance / EARTH_RADIUS) * Math.cos(bearing)
-                        );
+                markerCircle = new google.maps.Circle({
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.3,
+                    strokeWeight: 1,
+                    fillColor: "#FF0000",
+                    fillOpacity: 0.05,
+                    map,
+                    center: pos,
+                    radius: 1000,
+                });
+            }
 
-                        const newLng = lngRad + Math.atan2(
-                            Math.sin(bearing) * Math.sin(distance / EARTH_RADIUS) * Math.cos(latRad),
-                            Math.cos(distance / EARTH_RADIUS) - Math.sin(latRad) * Math.sin(newLat)
-                        );
+            function setData(latitude, longitude, accuracy) {
+                const livewireComponentEl = document.querySelector('.registro-de-ponto-registro-endereco');
+                const livewireComponent = Livewire.find(livewireComponentEl.getAttribute('wire:id'));
+                livewireComponent.set('latitude', latitude);
+                livewireComponent.set('longitude', longitude);
+                livewireComponent.set('accuracy', accuracy);
+            }
 
-                        return [
-                            toDegrees(newLat),
-                            toDegrees(newLng)
-                        ];
-                    };
+            async function callGeolocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                alt: 0
+                            };
 
-                    const bearings = {
-                        NE: 45,
-                        SE: 135,
-                        SW: 225,
-                        NW: 315
-                    };
+                            if( map.getCenter().lat() === pos.lat && map.getCenter().lng() === pos.lng){
+                                return;
+                            }
 
-                    return [
-                        directions.indexOf('NE') > -1 ? calculatePoint(latitude, longitude, toRadians(bearings.NE), radiusInKm) : null,
-                        directions.indexOf('SE') > -1 ? calculatePoint(latitude, longitude, toRadians(bearings.SE), radiusInKm) : null,
-                        directions.indexOf('SW') > -1 ? calculatePoint(latitude, longitude, toRadians(bearings.SW), radiusInKm) : null,
-                        directions.indexOf('NW') > -1 ? calculatePoint(latitude, longitude, toRadians(bearings.NW), radiusInKm) : null
-                    ].filter(n => n);
+                            setData(pos.lat, pos.lng, position.coords.accuracy);
+
+                            map.setCenter(pos);
+                            markerPin.position = pos
+                            markerCircle.setCenter(pos)
+                            markerCircle.setRadius(position.coords.accuracy)
+                            map.fitBounds(markerCircle.getBounds());
+                        }
+                    );
+                } else {
+                    handleLocationError(false, infoWindow, map.getCenter());
                 }
+            }
 
-                function makeMarkersOnMap() {
+            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+                infoWindow.setPosition(pos);
+                infoWindow.setContent(
+                    browserHasGeolocation
+                        ? "Error: The Geolocation service failed."
+                        : "Error: Your browser doesn't support geolocation.",
+                );
+                infoWindow.open(map);
+            }
 
-                    if(markerPin !== null && (markerPin._latlng.lat !== latitude || markerPin._latlng.lng !== longitude )) {
-                        markerPin.remove();
-                        markerPin = null;
-                    }
-                    if(markerPin === null) {
-                        markerPin = L.marker([latitude, longitude]).addTo(map);
-                    }
+            initMap();
 
-                    if(markerCircle !== null && (markerCircle._latlng.lat !== latitude || markerCircle._latlng.lng !== longitude )) {
-                        markerCircle.remove();
-                        markerCircle = null
-                    }
-                    if(markerCircle === null){
-                        markerCircle = L.circle([latitude, longitude], {
-                            color: 'red',
-                            fillColor: '#f03',
-                            fillOpacity: 0.20,
-                            radius: accuracy
-                        }).addTo(map);
-                    }
-                    map.fitBounds(getCardinalPoints(latitude, longitude, accuracy + 500, ['SW', 'NE']));
-                }
-
-                function callMap() {
-                    let marker = [latitude ?? 0, longitude ?? 0]
-                    let tileLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: false});
-                    map = L.map('map',
-                        {
-                            zoomControl: true,
-                            layers: [tileLayer],
-                            maxZoom: 18,
-                            minZoom: 6
-                        }).setView(marker, 17);
-
-                    map.zoomControl.remove()
-                    map.dragging.disable()
-                    map.scrollWheelZoom.disable()
-
-                    setTimeout(function () {
-                        map.invalidateSize(true)
-                    }, 100);
-                }
-
-                function setData() {
-                    const livewireComponentEl = document.querySelector('.registro-de-ponto-page-endereco');
-                    const livewireComponent = Livewire.find(livewireComponentEl.getAttribute('wire:id'));
-                    livewireComponent.set('latitude', latitude);
-                    livewireComponent.set('longitude', longitude);
-                    livewireComponent.set('accuracy', accuracy);
-                    livewireComponent.set('tipo', $wire.get('tipo'));
-                }
-
-                function getGeoLocaion() {
-                    if (!navigator.geolocation) {
-                        alert('O seu navegador não suporta a geolocalização. Entre em contato com o suporte.')
-                    } else {
-                        new Promise((resolve) => {
-                            navigator.geolocation.getCurrentPosition(
-                                (obj) => {
-                                    latitude = obj.coords.latitude
-                                    longitude = obj.coords.longitude
-                                    accuracy = obj.coords.accuracy
-                                    makeMarkersOnMap()
-                                    setData()
-                                },
-                                (err) => {
-                                    alert('O seu navegador não suporta a geolocalização. Entre em contato com o suporte.')
-                                },
-                                {
-                                    enableHighAccuracy: true,
-                                    timeout: 5000,
-                                    maximumAge: 0,
-                                }
-                            )
-                        })
-                    }
-                }
-
-                callMap(0, 0)
-
-                setTimeout(() => {
-                    getGeoLocaion();
-                    setInterval(() => {
-                        getGeoLocaion()
-                    }, 1*1000)
-                }, 100);
-            })
-        </script>
+            setInterval(callGeolocation, 1000)
+        })
+    </script>
     @endscript
 
     <div class="flex flex-grow absolute top-0 left-0 z-0">
         <div id="map" class="relative w-screen h-screen z-10"></div>
 
-        <livewire:registro-de-ponto-page-relogio tipo="{{$this->tipo}}"/>
+        <livewire:registro-de-ponto-registro-relogio />
 
-        <livewire:registro-de-ponto-page-endereco/>
+        <livewire:registro-de-ponto-registro-endereco/>
     </div>
 </x-filament-panels::page>

@@ -8,7 +8,6 @@ use Livewire\Component;
 
 class RegistroDePontoRegistroEndereco extends Component
 {
-    public $tipo = null;
     public $latitude = null;
     public $longitude = null;
     public $accuracy = null;
@@ -30,7 +29,6 @@ class RegistroDePontoRegistroEndereco extends Component
         $registroDePonto = new RegistroDePonto();
         $registroDePonto->user_id = auth()->user()->id;
         $registroDePonto->data = date('Y-m-d H:i:s');
-        $registroDePonto->tipo = $this->tipo;
         $registroDePonto->ip = request()->ip();
         $registroDePonto->device_id = request()->userAgent();
         $registroDePonto->latitude = $this->latitude;

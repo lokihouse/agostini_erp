@@ -13,6 +13,7 @@
         "icetalker/filament-table-repeater": "^1.3",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "malzariey/filament-daterangepicker-filter": "^3.2",
         "njxqlus/filament-relation-manager-component": "^1.0",
         "pelmered/filament-money-field": "^1.4",
         "pxlrbt/filament-excel": "^2.4",

@@ -16,6 +16,7 @@ class VendasRelatorioVendasPorCliente extends Page implements HasTable
 {
     use InteractsWithTable;
 
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $title = 'Relatório de Vendas por Cliente';
     protected ?string $heading = '';
     protected static ?string $navigationGroup = 'Vendas';

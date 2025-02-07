@@ -7,6 +7,8 @@ use App\Models\Cliente;
 use App\Models\Empresa;
 use App\Models\HorarioDeTrabalho;
 use App\Models\JornadaDeTrabalho;
+use App\Models\Movimentacao;
+use App\Models\PlanoDeConta;
 use App\Models\User;
 use App\Models\Visita;
 use Illuminate\Database\Seeder;
@@ -84,7 +86,7 @@ class DatabaseSeeder extends Seeder
 
         for($i=0; $i< 3; $i++){
             $coords = generateNearbyCoordinates(-21.1208,-42.943, 20);
-            $cliente = Cliente::create([
+            Cliente::create([
                 'empresa_id' => 1,
                 'user_id' => 1,
                 'cnpj' => fake()->numberBetween(10000000000000, 99999999999999),

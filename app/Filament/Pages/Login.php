@@ -13,6 +13,11 @@ class Login extends LoginBase
 {
     protected ?string $maxWidth = 'xs';
 
+    public function getView(): string
+    {
+        return 'filament.pages.login';
+    }
+
     public function getHeading(): string|Htmlable
     {
         return '';

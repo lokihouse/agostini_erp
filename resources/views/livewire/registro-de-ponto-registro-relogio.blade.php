@@ -23,7 +23,7 @@
 </script>
 @endscript
 
-<div class="absolute top-14 w-full z-50 flex justify-center">
+<div class="absolute top-14 w-full z-50 flex justify-center dark:text-gray-700">
     <div class="bg-white rounded-xl border shadow-lg m-4 p-4 max-w-md w-full">
         <div class="text-center text-xl font-bold">{{ auth()->user()->nome }}</div>
         <div class="text-center text-md font-thin">Deseja registrar seu ponto?</div>

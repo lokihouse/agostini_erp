@@ -31,6 +31,8 @@ class UsuarioResource extends ResourceBase
             ->columns(20)
             ->schema([
                 ToggleButtons::make('ativo')
+                    ->required()
+                    ->default(false)
                     ->boolean()
                     ->grouped()
                     ->columnSpan(4),

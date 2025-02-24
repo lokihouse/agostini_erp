@@ -1,0 +1,25 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.fi-logo{
+    height: 100% !important;
+}
+
+.fi-icon-btn-badge-ctn span.fi-badge{
+    position: relative;
+    top: 2rem;
+    right: 0 !important;
+}
+
+#login_page .fi-simple-header{
+    margin: -3rem -3rem -1rem -3rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#login_page .fi-simple-header .fi-logo{
+    margin-bottom: 0 !important;
+    height: 100% !important;
+}

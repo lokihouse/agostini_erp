@@ -34,8 +34,8 @@
                     </x-slot>
 
                     <div class="relative overflow-x-auto -mx-4 -mt-4">
-                        <table class="w-full text-xs">
-                            <thead class="uppercase">
+                        <table class="w-full text-xs text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr class="bg-gray-100">
                                     <th scope="col" class="p-2 w-1">&nbsp;</th>
                                     <th scope="col" class="border-s">
@@ -111,10 +111,10 @@
                         Pedido
                     </x-slot>
                     <div class="relative overflow-x-auto -m-4">
-                        <table class="w-full text-xs rounded-b-xl">
-                            <thead class="uppercase">
+                        <table class="w-full text-xs rounded-b-xl text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr class="bg-gray-100">
-                                <th scope="col" class="border-s w-full">
+                                <th scope="col" class="border-s w-full py-2">
                                     Produto
                                 </th>
                                 <th scope="col" class="border-s w-1 min-w-[70px]">
@@ -137,7 +137,7 @@
                                     $total += $produto['subtotal'];
                                 @endphp
                                 <tr class="border-b">
-                                    <td class="border-s ps-2">
+                                    <td class="p-2">
                                         {{ $produto['quantidade'] }}x {{ $produto['produto_nome'] }}
                                     </td>
                                     <td class="border-s text-center">
@@ -146,14 +146,14 @@
                                     <td class="border-s text-center">
                                         {{ \Illuminate\Support\Number::format($produto['desconto'], 2) }}
                                     </td>
-                                    <td class="border-s text-center">
+                                    <td class="border-s text-right">
                                         @money($produto['subtotal'])
                                     </td>
                                 </tr>
                             @endforeach
                             </tbody>
-                            <tfoot class=" rounded-b-xl">
-                            <tr class="bg-gray-200  rounded-b-xl">
+                            <tfoot class="rounded-b-xl">
+                            <tr class="bg-gray-200 rounded-b-xl">
                                 <th scope="col" class="p-2 w-1 rounded-bl-xl">
                                     Total
                                 </th>

@@ -38,6 +38,8 @@ class EmpresaResource extends ResourceBase
                 ToggleButtons::make('ativo')
                     ->boolean()
                     ->grouped()
+                    ->required()
+                    ->default(false)
                     ->columnSpan(4),
                 TextInput::make('cnpj')
                     ->required()

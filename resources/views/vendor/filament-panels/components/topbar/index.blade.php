@@ -50,10 +50,14 @@
             <div class="me-6 hidden lg:flex">
                 @if ($homeUrl = filament()->getHomeUrl())
                     <a {{ \Filament\Support\generate_href_html($homeUrl) }}>
-                        <x-filament-panels::logo />
+                        <div>
+                            <img style="width: 200px" src="{{asset('images/logo-agostini-full_color-1-horizontal.png')}}" alt="agostini_logo" />
+                        </div>
                     </a>
                 @else
-                    <x-filament-panels::logo />
+                    <div>
+                        <img  style="width: 200px" src="{{asset('images/logo-agostini-full_color-1-horizontal.png')}}" alt="agostini_logo" />
+                    </div>
                 @endif
             </div>
 

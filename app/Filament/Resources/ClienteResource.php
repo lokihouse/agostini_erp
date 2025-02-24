@@ -52,7 +52,6 @@ class ClienteResource extends ResourceBase
             ->columns(20)
             ->schema([
                 Tabs::make('')
-                    ->activeTab(2)
                     ->columnSpanFull()
                     ->schema([
                         Tabs\Tab::make('Cadastro')
@@ -206,6 +205,7 @@ class ClienteResource extends ResourceBase
                             ->schema([
                                 Select::make('user_id')
                                     ->relationship('vendedor', 'nome')
+                                    ->required()
                             ])
                     ]),
             ]);

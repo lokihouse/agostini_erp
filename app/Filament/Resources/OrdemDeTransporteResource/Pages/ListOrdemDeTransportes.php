@@ -45,11 +45,14 @@ class ListOrdemDeTransportes extends ListRecords
                                 Select::make('cliente')
                                     ->relationship('cliente', 'nome_fantasia'),
                                 TableRepeater::make('produtos')
+                                    ->reorderable(false)
                                     ->defaultItems(0)
                                     ->columns(3)
                                     ->schema([
-                                        TextInput::make('quantidade'),
+                                        TextInput::make('quantidade')
+                                            ->label('Quant.'),
                                         Select::make('produto')
+                                            ->columnSpan(2)
                                             ->relationship('produto', 'nome'),
                                     ])
                             ])

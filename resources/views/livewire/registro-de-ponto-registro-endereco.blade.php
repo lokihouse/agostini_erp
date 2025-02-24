@@ -34,7 +34,7 @@
     });
 </script>
 @endscript
-<div class="registro-de-ponto-registro-endereco absolute bottom-0 w-full z-50 flex justify-center">
+<div class="registro-de-ponto-registro-endereco absolute bottom-0 w-full z-50 flex justify-center dark:text-gray-700">
     <div class="bg-white rounded-xl border shadow-lg m-4 p-4 max-w-md w-full">
         @if($this->googleRequestStatus === null)
             <div class="flex items-center justify-center">

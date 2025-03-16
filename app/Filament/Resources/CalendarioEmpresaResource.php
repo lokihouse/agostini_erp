@@ -17,7 +17,7 @@ use Filament\Tables\Table;
 class CalendarioEmpresaResource extends ResourceBase
 {
     protected static ?string $model = Calendario::class;
-    protected static ?string $navigationGroup = 'Recursos Humanos';
+    protected static ?string $navigationGroup = 'R.H.';
     protected static ?int $navigationSort = 50;
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 

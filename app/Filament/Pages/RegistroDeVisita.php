@@ -4,8 +4,10 @@ namespace App\Filament\Pages;
 
 use App\Models\PedidoDeVenda;
 use App\Models\Produto;
+use App\Models\ProdutosPorPedidoDeVenda;
 use App\Models\Visita;
 use App\Utils\Cnpj;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -72,6 +74,7 @@ class RegistroDeVisita extends Page implements HasInfolists
             ->extraAttributes(['class' => 'w-full'])
             ->requiresConfirmation()
             ->label('Informar Visita')
+            ->color('success')
             ->action(function () {
                 $this->record->status = "em andamento";
                 $this->record->save();
@@ -117,6 +120,7 @@ class RegistroDeVisita extends Page implements HasInfolists
             ->icon('heroicon-o-check-badge')
             ->extraAttributes(['class' => 'w-full rounded-t-none'])
             ->requiresConfirmation()
+            ->hidden(empty($this->produtos))
             ->label('Finalizar pedido e visita')
             ->action(function () {
 
@@ -125,8 +129,18 @@ class RegistroDeVisita extends Page implements HasInfolists
                 $pedido_de_venda->user_id = auth()->user()->id;
                 $pedido_de_venda->cliente_id = $this->record->cliente_id;
                 $pedido_de_venda->visita_id = $this->record->id;
-                $pedido_de_venda->produtos = json_encode($this->produtos);
                 $pedido_de_venda->save();
+
+                foreach ($this->produtos as $produto) {
+                    $produtoPorPedidoDeVenda = new ProdutosPorPedidoDeVenda();
+                    $produtoPorPedidoDeVenda->pedido_de_venda_id = $pedido_de_venda->id;
+                    /*$produtoPorPedidoDeVenda->produto_id = intval($produto['produto_id']);
+                    $produtoPorPedidoDeVenda->quantidade = $produto['quantidade'];
+                    $produtoPorPedidoDeVenda->desconto = floatval($produto['desconto']);*/
+                    unset($produto['produto_nome']);
+                    $produtoPorPedidoDeVenda->fill($produto);
+                    $produtoPorPedidoDeVenda->save();
+                }
 
                 $this->record->pedido_de_venda_id = $pedido_de_venda->id;
                 $this->record->status = 'finalizada';

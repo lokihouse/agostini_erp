@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Number;
 
 class PedidoDeVenda extends ModelBase
@@ -31,5 +32,10 @@ class PedidoDeVenda extends ModelBase
     public function produto(): BelongsTo
     {
         return $this->belongsTo(Produto::class);
+    }
+
+    public function produtos()
+    {
+        return $this->hasMany(ProdutosPorPedidoDeVenda::class, 'pedido_de_venda_id')->withTrashed();
     }
 }

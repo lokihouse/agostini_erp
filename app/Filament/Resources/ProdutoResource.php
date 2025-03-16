@@ -4,12 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProdutoResource\Pages;
 use App\Filament\Resources\ProdutoResource\RelationManagers;
+use App\Forms\Components\Produto_EtapasDeProducao_Form;
 use App\Models\Produto;
+use App\Models\ProdutoEtapa;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-
+use Filament\Forms\Set;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
@@ -36,6 +40,15 @@ class ProdutoResource extends ResourceBase
                 Tabs::make('')
                     ->columnSpan(3)
                     ->schema([
+                        Tabs\Tab::make('Produção')
+                            ->hidden($form->getOperation() === 'create')
+                            ->columns(4)
+                            ->schema([
+                                Produto_EtapasDeProducao_Form::make('produto_etapas')
+                                    ->live()
+                                    ->label('Etapas de Produção')
+                                    ->columnSpanFull()
+                            ]),
                         Tabs\Tab::make('Vendas')
                             ->columns(4)
                             ->schema([

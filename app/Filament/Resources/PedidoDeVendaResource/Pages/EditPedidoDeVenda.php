@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\PedidoResource\Pages;
 
 use App\Filament\Resources\PedidoDeVendaResource;
+use App\Models\OrdemDeProducao;
+use App\Models\PedidoDeVenda;
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Pages\EditRecord;
@@ -14,10 +17,23 @@ class EditPedidoDeVenda extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\Action::make('Enviar para Produção')
+                ->visible(fn($record) => $record->status === 'novo')
+                ->requiresConfirmation()
+                ->action(function ($data) {
+                    $ordemDeProducao = new OrdemDeProducao();
+                    $ordemDeProducao->empresa_id = auth()->user()->empresa_id;
+                    $ordemDeProducao->cliente_id = $this->record->cliente_id;
+                    $ordemDeProducao->status = 'novo';
+                    $ordemDeProducao->data_programacao = Carbon::now();
+                    $ordemDeProducao->save();
+
+                    $this->record->status = 'processado';
+                    // $this->record->save();
+                }),
             Actions\Action::make('Cancelar Pedido')
-                ->hidden(fn($record) => $record->status === 'cancelado')
-                ->color('warning')
+                ->visible(fn($record) => $record->status === 'novo')
+                ->color('danger')
                 ->requiresConfirmation()
                 ->form([
                     Textarea::make('justificativa')
@@ -27,20 +43,5 @@ class EditPedidoDeVenda extends EditRecord
                     $this->record->save();
                 })
         ];
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        dd($data);
-        $data['quantidade'] = intval($data['quantidade']);
-        $data['desconto'] = floatval($data['desconto']);
-        $data['produtos'] = json_encode($data['produtos']);
-        return parent::mutateFormDataBeforeSave($data);
-    }
-
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $data['produtos'] = json_decode($data['produtos'], true);
-        return parent::mutateFormDataBeforeFill($data);
     }
 }

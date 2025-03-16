@@ -7,11 +7,10 @@
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_START, scopes: $this->getRenderHookScopes()) }}
 
     <section class="grid auto-cols-fr gap-y-6">
-        <x-filament-panels::header.simple
-            :heading="$heading ??= $this->getHeading()"
-            :logo="$this->hasLogo()"
-            :subheading="$subheading ??= $this->getSubHeading()"
-        />
+        <div class="flex justify-center flex-1">
+            <img src="{{asset('images/logo-agostini-full_color-1.png')}}" alt="agostini_logo" />
+        </div>
+
 
         {{ $slot }}
     </section>

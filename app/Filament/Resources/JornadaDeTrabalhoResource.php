@@ -23,7 +23,7 @@ use Njxqlus\Filament\Components\Forms\RelationManager;
 class JornadaDeTrabalhoResource extends ResourceBase
 {
     protected static ?string $model = JornadaDeTrabalho::class;
-    protected static ?string $navigationGroup = 'Recursos Humanos';
+    protected static ?string $navigationGroup = 'R.H.';
     protected static ?string $navigationIcon = 'heroicon-o-square-3-stack-3d';
     protected static ?int $navigationSort = 51;
 

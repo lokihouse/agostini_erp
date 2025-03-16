@@ -9,6 +9,8 @@ use App\Models\HorarioDeTrabalho;
 use App\Models\JornadaDeTrabalho;
 use App\Models\Movimentacao;
 use App\Models\PlanoDeConta;
+use App\Models\Produto;
+use App\Models\ProdutoEtapa;
 use App\Models\User;
 use App\Models\Visita;
 use Illuminate\Database\Seeder;
@@ -95,6 +97,25 @@ class DatabaseSeeder extends Seeder
                 'latitude' => $coords['latitude'],
                 'longitude' => $coords['longitude']
             ]);
+        }
+
+        for($i=0; $i< 3; $i++){
+            $valor = fake()->randomFloat(2, 10000, 100000);
+            $produto = Produto::create([
+                'empresa_id' => 1,
+                'nome' => 'Produto' . $i,
+                'valor_minimo_venda' => $valor,
+                'valor_nominal_venda' => $valor * 1.5,
+            ]);
+
+            if(fake()->boolean()){
+                for($j=1; $j<=4; $j++) {
+                    ProdutoEtapa::create([
+                        'produto_id' => $produto->id,
+                        'nome' => 'Produto' . $i . 'Etapa' . $j,
+                    ]);
+                }
+            }
         }
     }
 }

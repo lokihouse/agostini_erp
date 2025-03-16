@@ -45,23 +45,6 @@
         <header
             class="fi-sidebar-header flex h-16 items-center bg-white px-6 ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 lg:shadow-sm"
         >
-            <div
-                @if (filament()->isSidebarCollapsibleOnDesktop())
-                    x-show="$store.sidebar.isOpen"
-                    x-transition:enter="lg:transition lg:delay-100"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                @endif
-            >
-                @if ($homeUrl = filament()->getHomeUrl())
-                    <a {{ \Filament\Support\generate_href_html($homeUrl) }}>
-                        <x-filament-panels::logo />
-                    </a>
-                @else
-                    <x-filament-panels::logo />
-                @endif
-            </div>
-
             @if (filament()->isSidebarCollapsibleOnDesktop())
                 <x-filament::icon-button
                     color="gray"

@@ -97,9 +97,11 @@
                         </table>
                     </div>
 
+                    @if(!empty($this->produtos))
                     <div class="-mx-4 -mb-4">
                         {{ $this->finalizarPedidoAction() }}
                     </div>
+                    @endif
                 </x-filament::section>
             </div>
         @endif
@@ -117,13 +119,13 @@
                                 <th scope="col" class="border-s w-full py-2">
                                     Produto
                                 </th>
-                                <th scope="col" class="border-s w-1 min-w-[70px]">
+                                <th scope="col" class="border-s w-1 min-w-[100px]">
                                     Un.
                                 </th>
-                                <th scope="col" class="border-s w-1 min-w-[40px]">
+                                <th scope="col" class="border-s w-1 min-w-[50px]">
                                     %
                                 </th>
-                                <th scope="col" class="border-s w-1 min-w-[80px]">
+                                <th scope="col" class="border-s w-1 min-w-[100px]">
                                     R$
                                 </th>
                             </tr>
@@ -132,21 +134,21 @@
                             @php
                                 $total = 0;
                             @endphp
-                            @foreach(json_decode($this->record->pedido_de_venda->produtos, true) as $id => $produto)
+                            @foreach($this->record->pedido_de_venda->produtos as $id => $produto)
                                 @php
                                     $total += $produto['subtotal'];
                                 @endphp
                                 <tr class="border-b">
-                                    <td class="p-2">
-                                        {{ $produto['quantidade'] }}x {{ $produto['produto_nome'] }}
+                                    <td class="px-2">
+                                        {{ $produto['quantidade'] }}x {{ $produto->produto->nome }}
                                     </td>
-                                    <td class="border-s text-center">
+                                    <td class="border-s text-right px-2">
                                         @money($produto['valor_original'])
                                     </td>
-                                    <td class="border-s text-center">
+                                    <td class="border-s text-center px-2">
                                         {{ \Illuminate\Support\Number::format($produto['desconto'], 2) }}
                                     </td>
-                                    <td class="border-s text-right">
+                                    <td class="border-s text-right px-2">
                                         @money($produto['subtotal'])
                                     </td>
                                 </tr>

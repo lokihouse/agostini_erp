@@ -8,6 +8,7 @@ use App\Models\Cliente;
 use App\Utils\Cep;
 use App\Utils\Cnpj;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
+use Closure;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
@@ -62,6 +63,15 @@ class ClienteResource extends ResourceBase
                                     ->label('CNPJ')
                                     ->mask("**.***.***/9999-99")
                                     ->columnSpan(4)
+                                    ->rules([
+                                        fn (): Closure => function (string $attribute, $value, Closure $fail) {
+                                            $cleannedCNPJ = Cnpj::clear($value);
+                                            $existeCliente = Cliente::query()->where("cnpj", $cleannedCNPJ)->exists();
+                                            if ($existeCliente) {
+                                                $fail('CNPJ já em uso.');
+                                            }
+                                        },
+                                    ])
                                     ->suffixAction(
                                         Action::make('getCnpjInfos')
                                             ->icon('heroicon-o-magnifying-glass')

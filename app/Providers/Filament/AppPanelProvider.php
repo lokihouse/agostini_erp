@@ -38,8 +38,7 @@ class AppPanelProvider extends PanelProvider
                 'primary' => Color::Cyan,
             ])
             ->viteTheme('resources/css/filament/app/theme.css')
-            ->brandLogo(fn () => view('filament.custom-logo'))
-            // ->darkMode(true, true)
+            // ->brandLogo(fn () => view('filament.custom-logo'))
 
             ->topNavigation()
             ->maxContentWidth(MaxWidth::Full)

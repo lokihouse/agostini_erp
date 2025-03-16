@@ -8,6 +8,7 @@ use App\Models\Pedido;
 use App\Models\PedidoDeVenda;
 use App\Models\Produto;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +19,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
+use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Illuminate\Support\Number;
 
@@ -31,8 +34,8 @@ class PedidoDeVendaResource extends ResourceBase
     public static function form(Form $form): Form
     {
         return $form
-            ->columns(4)
-            ->disabled(fn($record) => $record && $record->status !== 'novo')
+            ->columns(6)
+            ->disabled(true)
             ->schema([
                 Group::make([
                     Select::make('cliente_id')
@@ -40,45 +43,46 @@ class PedidoDeVendaResource extends ResourceBase
                     Select::make('user_id')
                         ->relationship('vendedor', 'nome')
                 ]),
-                Repeater::make('produtos')
-                    ->grid(3)
-                    ->addable(false)
-                    ->deletable(false)
-                    ->disabled(fn($record) => $record && $record->status !== 'novo')
-                    ->columns(3)
-                    ->schema([
-                        TextInput::make('quantidade')
-                            ->label('Qnt.')
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(fn($set, $get) => PedidoDeVendaResource::recalcularValores($get, $set))
-                            ->required()
-                            ->numeric(),
-                        Select::make('produto_id')
-                            ->columnSpan(2)
-                            ->searchable()
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(fn($set, $get) => PedidoDeVendaResource::recalcularValores($get, $set))
-                            ->preload()
-                            ->required()
-                            ->relationship('produto', 'nome'),
-                        TextInput::make('valor_original')
-                            ->label('Un')
-                            ->disabled()
-                            ->numeric(),
-                        TextInput::make('desconto')
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(fn($set, $get) => PedidoDeVendaResource::recalcularValores($get, $set))
-                            ->numeric()
-                            ->default(Number::format(0,2)),
-                        TextInput::make('subtotal')
-                            ->label('Subtotal')
-                            ->disabled()
-                            ->numeric(),
-                    ])
-                    ->reorderable(false)
-                    ->cloneable(false)
-                    ->collapsible(false)
-                    ->columnSpan(3),
+                Group::make([
+                    Placeholder::make('')
+                        ->visible(fn($record) => $record->status === 'cancelado')
+                        ->content(new HtmlString('<div class="bg-red-500 rounded-xl p-4 text-6xl text-center text-white">PEDIDO CANCELADO</div>')),
+                    Placeholder::make('')
+                        ->visible(fn($record) => $record->status === 'processado')
+                        ->content(new HtmlString('<div class="bg-primary-500 rounded-xl p-4 text-6xl text-center text-white">PEDIDO EM PRODUÇÃO</div>')),
+                    Repeater::make('produtos')
+                        ->relationship('produtos')
+                        ->grid(3)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->disabled(fn($record) => $record && $record->status !== 'novo')
+                        ->columns(8)
+                        ->reorderable(false)
+                        ->cloneable(false)
+                        ->collapsible(false)
+                        ->schema([
+                            Placeholder::make('quantidade')
+                                ->columnSpan(2)
+                                ->label('Qnt.')
+                                ->content(fn ($state) => $state),
+                            Placeholder::make('produto_id')
+                                ->columnSpan(6)
+                                ->label('Nome')
+                                ->content(fn ($state, $record) => Produto::query()->where('id', $state)->withTrashed()->first()->nome),
+                            Placeholder::make('valor_original')
+                                ->columnSpan(3)
+                                ->label('R$ Un.')
+                                ->content(fn ($state, $record) => "R$ " . number_format($state, 2, ',','.')),
+                            Placeholder::make('desconto')
+                                ->columnSpan(2)
+                                ->label('Desc.')
+                                ->content(fn ($state, $record) => number_format($state, 2, ',','.') . " %"),
+                            Placeholder::make('subtotal')
+                                ->columnSpan(3)
+                                ->label('R$ Subtotal')
+                                ->content(fn ($state, $record) => "R$ " . number_format($state, 2, ',','.')),
+                        ]),
+                ])->columnSpan(5)
             ]);
     }
 
@@ -90,6 +94,11 @@ class PedidoDeVendaResource extends ResourceBase
                     ->width(50),
                 TextColumn::make('status')
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'novo' => 'gray',
+                        'processado' => 'primary',
+                        'cancelado' => 'danger',
+                    })
                     ->width(100),
                 TextColumn::make('cliente.nome_fantasia')
                     ->width(300),
@@ -100,17 +109,26 @@ class PedidoDeVendaResource extends ResourceBase
                     ->hidden(),
                 TextColumn::make('produtos')
                     ->label('Num de Produtos')
-                    ->formatStateUsing(fn ($state) => is_array($decoded = json_decode($state, true)) ? count($decoded) : 0)
+                    ->formatStateUsing(function ($state) {
+                        $produtos = json_decode("[" . $state . "]");
+                        return array_reduce($produtos, fn ($carry, $item) => $carry + $item->quantidade, 0);
+                    })
                     ->width(1),
                 TextColumn::make('valor_de_produtos')
                     ->label('Total')
+                    ->formatStateUsing(fn ($state) => "R$ " . number_format(floatval($state), 2, ',','.'))
                     ->alignCenter()
                     ->width(1),
             ])
             ->filters([
+                SelectFilter::make('status')
+                    ->multiple()
+                    ->options(['novo' => 'Novo', 'processado' => 'Processado', 'cancelado' => 'Cancelado']),
                 SelectFilter::make('cliente_id')
+                    ->label('Cliente')
                     ->relationship('cliente', 'nome_fantasia'),
                 SelectFilter::make('user_id')
+                    ->label('Vendedor')
                     ->relationship('vendedor', 'nome'),
             ])
             ->bulkActions([
@@ -129,37 +147,7 @@ class PedidoDeVendaResource extends ResourceBase
     {
         return [
             'index' => Pages\ListPedidosDeVenda::route('/'),
-            'create' => Pages\CreatePedidoDeVenda::route('/create'),
             'edit' => Pages\EditPedidoDeVenda::route('/{record}/edit'),
         ];
-    }
-
-    public static function recalcularValores(Get $get, Set $set)
-    {
-        $quantidade = intval($get('quantidade')) ?? 0;
-        $produto =  Produto::query()->find($get('produto'));
-
-        if($produto) $produto = $produto->toArray();
-        else return;
-
-        dd($quantidade, $produto);
-
-
-        $valor_nominal = (($produto['valor_nominal_venda'] ?? 0) / 100);
-        $valor_minimo = (($produto['valor_minimo_venda'] ?? 0) / 100);
-        $valor_final = $valor_nominal * ((100 - floatval($get('desconto') ?? 0)) / 100);
-        $subtotal = $valor_final * $quantidade;
-
-        $set('valor_original', $valor_nominal);
-
-        if($valor_minimo > $valor_final){
-            $set('error', 'Valor menor que mínimo autorizado!<br/><small>' . Number::currency($valor_minimo, 'BRL') . "</small>");
-            $set('subtotal', null);
-            $set('total', null);
-        }else{
-            $set('error', null);
-            $set('subtotal', Number::format($valor_final, 2));
-            $set('total', Number::format($subtotal,2));
-        }
     }
 }

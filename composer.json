@@ -23,6 +23,7 @@
         "spatie/laravel-activitylog": "^4.9"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15",
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.68",
         "laravel/pail": "^1.1",

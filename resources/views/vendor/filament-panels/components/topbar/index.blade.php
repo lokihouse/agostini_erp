@@ -11,7 +11,7 @@
     }}
 >
     <nav
-        class="flex h-16 items-center gap-x-4 bg-white px-4 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 md:px-6 lg:px-8"
+        class="flex h-16 items-center gap-x-1 bg-white px-4 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
     >
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TOPBAR_START) }}
 
@@ -44,6 +44,9 @@
                 x-show="$store.sidebar.isOpen"
                 class="fi-topbar-close-sidebar-btn lg:hidden"
             />
+            <div class="visible md:hidden flex justify-center flex-1">
+                <img style="width: 200px" src="{{asset('images/logo-agostini-full_color-1-horizontal.png')}}" alt="agostini_logo" />
+            </div>
         @endif
 
         @if (filament()->hasTopNavigation() || (! filament()->hasNavigation()))
@@ -56,7 +59,7 @@
                     </a>
                 @else
                     <div>
-                        <img  style="width: 200px" src="{{asset('images/logo-agostini-full_color-1-horizontal.png')}}" alt="agostini_logo" />
+                        <img  style="width: 100px" src="{{asset('images/logo-agostini-full_color-1-horizontal.png')}}" alt="agostini_logo" />
                     </div>
                 @endif
             </div>
@@ -66,7 +69,7 @@
             @endif
 
             @if (filament()->hasNavigation())
-                <ul class="me-4 hidden items-center gap-x-4 lg:flex">
+                <ul class="me-4 hidden items-center gap-x-1 lg:flex">
                     @foreach ($navigation as $group)
                         @if ($groupLabel = $group->getLabel())
                             <x-filament::dropdown

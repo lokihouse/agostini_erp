@@ -45,6 +45,8 @@ if ($state !== null) {
             ];
         }
     }
+}else {
+    $state = [];
 }
 @endphp
 
@@ -100,7 +102,7 @@ if ($state !== null) {
                                                 </tr>
                                                 </thead>
                                                 <tbody class="border">
-                                                @foreach(json_decode($st['insumos'], true) as $ins)
+                                                @foreach(json_decode($st['insumos'] ?? '[]', true) as $ins)
                                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                                                         <td class="p-2 border-e">{{ $ins['quantidade'] }}</td>
                                                         <td class="p-2">{{ $ins['descricao'] }}</td>
@@ -129,7 +131,7 @@ if ($state !== null) {
                                                 </tr>
                                                 </thead>
                                                 <tbody class="border">
-                                                @foreach(json_decode($st['producao'], true) as $ins)
+                                                @foreach(json_decode($st['producao'] ?? '[]', true) as $ins)
                                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                                                         <td class="p-2 border-e">{{ $ins['quantidade'] }}</td>
                                                         <td class="p-2">{{ $ins['descricao'] }}</td>

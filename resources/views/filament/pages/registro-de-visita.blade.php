@@ -134,7 +134,7 @@
                             @php
                                 $total = 0;
                             @endphp
-                            @foreach($this->record->pedido_de_venda->produtos as $id => $produto)
+                            @foreach($this->record->produtos_no_pedido_de_venda as $id => $produto)
                                 @php
                                     $total += $produto['subtotal'];
                                 @endphp

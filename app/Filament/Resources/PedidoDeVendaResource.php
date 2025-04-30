@@ -116,7 +116,7 @@ class PedidoDeVendaResource extends ResourceBase
                     ->width(1),
                 TextColumn::make('valor_de_produtos')
                     ->label('Total')
-                    ->formatStateUsing(fn ($state) => "R$ " . number_format(floatval($state), 2, ',','.'))
+                    ->formatStateUsing(fn ($state) => "R$ " . str_replace(',', '', $state))
                     ->alignCenter()
                     ->width(1),
             ])
@@ -132,7 +132,7 @@ class PedidoDeVendaResource extends ResourceBase
                     ->relationship('vendedor', 'nome'),
             ])
             ->bulkActions([
-                ExportBulkAction::make()
+                // ExportBulkAction::make()
             ]);
     }
 

@@ -23,10 +23,10 @@
                 var options = {
                     interaction: { hover: true },
                     layout: {
-                        hierarchical: {
-                            direction: "LR",
-                            sortMethod: "directed",
-                        },
+                        // hierarchical: {
+                        //     direction: "LR",
+                        //     sortMethod: "directed",
+                        // },
                     },
                     physics: {
                         enabled: true,

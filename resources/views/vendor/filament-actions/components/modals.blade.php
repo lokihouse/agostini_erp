@@ -5,28 +5,28 @@
         @endphp
 
         <x-filament::modal
-            :alignment="$action?->getModalAlignment()"
-            :autofocus="$action?->isModalAutofocused()"
-            :close-button="$action?->hasModalCloseButton()"
-            :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
-            :close-by-escaping="$action?->isModalClosedByEscaping()"
-            :description="$action?->getModalDescription()"
-            display-classes="block"
-            :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
-            :footer-actions="$action?->getVisibleModalFooterActions()"
-            :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
-            :heading="$action?->getModalHeading()"
-            :icon="$action?->getModalIcon()"
-            :icon-color="$action?->getModalIconColor()"
-            :id="$this->getId() . '-action'"
-            :slide-over="$action?->isModalSlideOver()"
-            :sticky-footer="$action?->isModalFooterSticky()"
-            :sticky-header="$action?->isModalHeaderSticky()"
-            :visible="filled($action)"
-            :width="$action?->getModalWidth()"
-            :wire:key="$action ? $this->getId() . '.actions.' . $action->getName() . '.modal' : null"
-            x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedActions.length) open()"
-            x-on:modal-closed.stop="
+                :alignment="$action?->getModalAlignment()"
+                :autofocus="$action?->isModalAutofocused()"
+                :close-button="$action?->hasModalCloseButton()"
+                :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
+                :close-by-escaping="$action?->isModalClosedByEscaping()"
+                :description="$action?->getModalDescription()"
+                display-classes="block"
+                :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
+                :footer-actions="$action?->getVisibleModalFooterActions()"
+                :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
+                :heading="$action?->getModalHeading()"
+                :icon="$action?->getModalIcon()"
+                :icon-color="$action?->getModalIconColor()"
+                :id="$this->getId() . '-action'"
+                :slide-over="$action?->isModalSlideOver()"
+                :sticky-footer="$action?->isModalFooterSticky()"
+                :sticky-header="$action?->isModalHeaderSticky()"
+                :visible="filled($action)"
+                :width="$action?->getModalWidth()"
+                :wire:key="$action ? $this->getId() . '.actions.' . $action->getName() . '.modal' : null"
+                x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedActions.length) open()"
+                x-on:modal-closed.stop="
                 const mountedActionShouldOpenModal = {{ \Illuminate\Support\Js::from($action && $this->mountedActionShouldOpenModal(mountedAction: $action)) }}
 
                 if (! mountedActionShouldOpenModal) {
@@ -39,7 +39,7 @@
 
                 $wire.unmountAction(false, false)
             "
-            x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
+                x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
         >
             @if ($action)
                 {{ $action->getModalContent() }}
@@ -67,28 +67,28 @@
         @endphp
 
         <x-filament::modal
-            :alignment="$action?->getModalAlignment()"
-            :autofocus="$action?->isModalAutofocused()"
-            :close-button="$action?->hasModalCloseButton()"
-            :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
-            :close-by-escaping="$action?->isModalClosedByEscaping()"
-            :description="$action?->getModalDescription()"
-            display-classes="block"
-            :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
-            :footer-actions="$action?->getVisibleModalFooterActions()"
-            :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
-            :heading="$action?->getModalHeading()"
-            :icon="$action?->getModalIcon()"
-            :icon-color="$action?->getModalIconColor()"
-            :id="$this->getId() . '-table-action'"
-            :slide-over="$action?->isModalSlideOver()"
-            :sticky-footer="$action?->isModalFooterSticky()"
-            :sticky-header="$action?->isModalHeaderSticky()"
-            :visible="filled($action)"
-            :width="$action?->getModalWidth()"
-            :wire:key="$action ? $this->getId() . '.table.actions.' . $action->getName() . '.modal' : null"
-            x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedTableActions.length) open()"
-            x-on:modal-closed.stop="
+                :alignment="$action?->getModalAlignment()"
+                :autofocus="$action?->isModalAutofocused()"
+                :close-button="$action?->hasModalCloseButton()"
+                :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
+                :close-by-escaping="$action?->isModalClosedByEscaping()"
+                :description="$action?->getModalDescription()"
+                display-classes="block"
+                :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
+                :footer-actions="$action?->getVisibleModalFooterActions()"
+                :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
+                :heading="$action?->getModalHeading()"
+                :icon="$action?->getModalIcon()"
+                :icon-color="$action?->getModalIconColor()"
+                :id="$this->getId() . '-table-action'"
+                :slide-over="$action?->isModalSlideOver()"
+                :sticky-footer="$action?->isModalFooterSticky()"
+                :sticky-header="$action?->isModalHeaderSticky()"
+                :visible="filled($action)"
+                :width="$action?->getModalWidth()"
+                :wire:key="$action ? $this->getId() . '.table.actions.' . $action->getName() . '.modal' : null"
+                x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedTableActions.length) open()"
+                x-on:modal-closed.stop="
                 const mountedTableActionShouldOpenModal = {{ \Illuminate\Support\Js::from($action && $this->mountedTableActionShouldOpenModal(mountedAction: $action)) }}
 
                 if (! mountedTableActionShouldOpenModal) {
@@ -101,7 +101,7 @@
 
                 $wire.unmountTableAction(false, false)
             "
-            x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
+                x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
         >
             @if ($action)
                 {{ $action->getModalContent() }}
@@ -123,28 +123,28 @@
         @endphp
 
         <x-filament::modal
-            :alignment="$action?->getModalAlignment()"
-            :autofocus="$action?->isModalAutofocused()"
-            :close-button="$action?->hasModalCloseButton()"
-            :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
-            :close-by-escaping="$action?->isModalClosedByEscaping()"
-            :description="$action?->getModalDescription()"
-            display-classes="block"
-            :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
-            :footer-actions="$action?->getVisibleModalFooterActions()"
-            :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
-            :heading="$action?->getModalHeading()"
-            :icon="$action?->getModalIcon()"
-            :icon-color="$action?->getModalIconColor()"
-            :id="$this->getId() . '-table-bulk-action'"
-            :slide-over="$action?->isModalSlideOver()"
-            :sticky-footer="$action?->isModalFooterSticky()"
-            :sticky-header="$action?->isModalHeaderSticky()"
-            :visible="filled($action)"
-            :width="$action?->getModalWidth()"
-            :wire:key="$action ? $this->getId() . '.table.bulk-actions.' . $action->getName() . '.modal' : null"
-            x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedTableBulkAction) open()"
-            x-on:modal-closed.stop="
+                :alignment="$action?->getModalAlignment()"
+                :autofocus="$action?->isModalAutofocused()"
+                :close-button="$action?->hasModalCloseButton()"
+                :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
+                :close-by-escaping="$action?->isModalClosedByEscaping()"
+                :description="$action?->getModalDescription()"
+                display-classes="block"
+                :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
+                :footer-actions="$action?->getVisibleModalFooterActions()"
+                :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
+                :heading="$action?->getModalHeading()"
+                :icon="$action?->getModalIcon()"
+                :icon-color="$action?->getModalIconColor()"
+                :id="$this->getId() . '-table-bulk-action'"
+                :slide-over="$action?->isModalSlideOver()"
+                :sticky-footer="$action?->isModalFooterSticky()"
+                :sticky-header="$action?->isModalHeaderSticky()"
+                :visible="filled($action)"
+                :width="$action?->getModalWidth()"
+                :wire:key="$action ? $this->getId() . '.table.bulk-actions.' . $action->getName() . '.modal' : null"
+                x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedTableBulkAction) open()"
+                x-on:modal-closed.stop="
                 const mountedTableBulkActionShouldOpenModal = {{ \Illuminate\Support\Js::from($action && $this->mountedTableBulkActionShouldOpenModal(mountedBulkAction: $action)) }}
 
                 if (! mountedTableBulkActionShouldOpenModal) {
@@ -157,7 +157,7 @@
 
                 $wire.unmountTableBulkAction(false)
             "
-            x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
+                x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
         >
             @if ($action)
                 {{ $action->getModalContent() }}
@@ -185,28 +185,28 @@
         @endphp
 
         <x-filament::modal
-            :alignment="$action?->getModalAlignment()"
-            :autofocus="$action?->isModalAutofocused()"
-            :close-button="$action?->hasModalCloseButton()"
-            :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
-            :close-by-escaping="$action?->isModalClosedByEscaping()"
-            :description="$action?->getModalDescription()"
-            display-classes="block"
-            :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
-            :footer-actions="$action?->getVisibleModalFooterActions()"
-            :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
-            :heading="$action?->getModalHeading()"
-            :icon="$action?->getModalIcon()"
-            :icon-color="$action?->getModalIconColor()"
-            :id="$this->getId() . '-infolist-action'"
-            :slide-over="$action?->isModalSlideOver()"
-            :sticky-footer="$action?->isModalFooterSticky()"
-            :sticky-header="$action?->isModalHeaderSticky()"
-            :visible="filled($action)"
-            :width="$action?->getModalWidth()"
-            :wire:key="$action ? $this->getId() . '.infolist.actions.' . $action->getName() . '.modal' : null"
-            x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedInfolistActions.length) open()"
-            x-on:modal-closed.stop="
+                :alignment="$action?->getModalAlignment()"
+                :autofocus="$action?->isModalAutofocused()"
+                :close-button="$action?->hasModalCloseButton()"
+                :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
+                :close-by-escaping="$action?->isModalClosedByEscaping()"
+                :description="$action?->getModalDescription()"
+                display-classes="block"
+                :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
+                :footer-actions="$action?->getVisibleModalFooterActions()"
+                :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
+                :heading="$action?->getModalHeading()"
+                :icon="$action?->getModalIcon()"
+                :icon-color="$action?->getModalIconColor()"
+                :id="$this->getId() . '-infolist-action'"
+                :slide-over="$action?->isModalSlideOver()"
+                :sticky-footer="$action?->isModalFooterSticky()"
+                :sticky-header="$action?->isModalHeaderSticky()"
+                :visible="filled($action)"
+                :width="$action?->getModalWidth()"
+                :wire:key="$action ? $this->getId() . '.infolist.actions.' . $action->getName() . '.modal' : null"
+                x-on:closed-form-component-action-modal.window="if (($event.detail.id === '{{ $this->getId() }}') && $wire.mountedInfolistActions.length) open()"
+                x-on:modal-closed.stop="
                 const mountedInfolistActionShouldOpenModal = {{ \Illuminate\Support\Js::from($action && $this->mountedInfolistActionShouldOpenModal(mountedAction: $action)) }}
 
                 if (! mountedInfolistActionShouldOpenModal) {
@@ -219,7 +219,7 @@
 
                 $wire.unmountInfolistAction(false, false)
             "
-            x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
+                x-on:opened-form-component-action-modal.window="if ($event.detail.id === '{{ $this->getId() }}') close()"
         >
             @if ($action)
                 {{ $action->getModalContent() }}
@@ -247,27 +247,27 @@
 
     <form wire:submit.prevent="callMountedFormComponentAction">
         <x-filament::modal
-            :alignment="$action?->getModalAlignment()"
-            :autofocus="$action?->isModalAutofocused()"
-            :close-button="$action?->hasModalCloseButton()"
-            :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
-            :close-by-escaping="$action?->isModalClosedByEscaping()"
-            :description="$action?->getModalDescription()"
-            display-classes="block"
-            :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
-            :footer-actions="$action?->getVisibleModalFooterActions()"
-            :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
-            :heading="$action?->getModalHeading()"
-            :icon="$action?->getModalIcon()"
-            :icon-color="$action?->getModalIconColor()"
-            :id="$this->getId() . '-form-component-action'"
-            :slide-over="$action?->isModalSlideOver()"
-            :sticky-footer="$action?->isModalFooterSticky()"
-            :sticky-header="$action?->isModalHeaderSticky()"
-            :visible="filled($action)"
-            :width="$action?->getModalWidth()"
-            :wire:key="$action ? $this->getId() . '.' . $action->getComponent()->getStatePath() . '.actions.' . $action->getName() . '.modal' : null"
-            x-on:modal-closed.stop="
+                :alignment="$action?->getModalAlignment()"
+                :autofocus="$action?->isModalAutofocused()"
+                :close-button="$action?->hasModalCloseButton()"
+                :close-by-clicking-away="$action?->isModalClosedByClickingAway()"
+                :close-by-escaping="$action?->isModalClosedByEscaping()"
+                :description="$action?->getModalDescription()"
+                display-classes="block"
+                :extra-modal-window-attribute-bag="$action?->getExtraModalWindowAttributeBag()"
+                :footer-actions="$action?->getVisibleModalFooterActions()"
+                :footer-actions-alignment="$action?->getModalFooterActionsAlignment()"
+                :heading="$action?->getModalHeading()"
+                :icon="$action?->getModalIcon()"
+                :icon-color="$action?->getModalIconColor()"
+                :id="$this->getId() . '-form-component-action'"
+                :slide-over="$action?->isModalSlideOver()"
+                :sticky-footer="$action?->isModalFooterSticky()"
+                :sticky-header="$action?->isModalHeaderSticky()"
+                :visible="filled($action)"
+                :width="$action?->getModalWidth()"
+                :wire:key="$action ? $this->getId() . '.' . $action->getComponent()->getStatePath() . '.actions.' . $action->getName() . '.modal' : null"
+                x-on:modal-closed.stop="
                 const mountedFormComponentActionShouldOpenModal = {{ \Illuminate\Support\Js::from($action && $this->mountedFormComponentActionShouldOpenModal()) }}
 
                 if (mountedFormComponentActionShouldOpenModal) {

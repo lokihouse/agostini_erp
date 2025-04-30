@@ -94,22 +94,22 @@
     @endphp
 
     <x-filament::dropdown
-        :max-height="$group->getDropdownMaxHeight()"
-        :offset="$group->getDropdownOffset()"
-        :placement="$group->getDropdownPlacement() ?? 'bottom-start'"
-        :width="$group->getDropdownWidth()"
-        teleport
+            :max-height="$group->getDropdownMaxHeight()"
+            :offset="$group->getDropdownOffset()"
+            :placement="$group->getDropdownPlacement() ?? 'bottom-start'"
+            :width="$group->getDropdownWidth()"
+            teleport
     >
         <x-slot name="trigger">
             <x-dynamic-component
-                :color="$group->getColor()"
-                :component="$dynamicComponent"
-                :icon="$group->getIcon()"
-                :icon-size="$group->getIconSize()"
-                :label-sr-only="$group->isLabelHidden()"
-                :size="$group->getSize()"
-                :tooltip="$group->getTooltip()"
-                :attributes="\Filament\Support\prepare_inherited_attributes($attributes)->merge($group->getExtraAttributes(), escape: false)"
+                    :color="$group->getColor()"
+                    :component="$dynamicComponent"
+                    :icon="$group->getIcon()"
+                    :icon-size="$group->getIconSize()"
+                    :label-sr-only="$group->isLabelHidden()"
+                    :size="$group->getSize()"
+                    :tooltip="$group->getTooltip()"
+                    :attributes="\Filament\Support\prepare_inherited_attributes($attributes)->merge($group->getExtraAttributes(), escape: false)"
             >
                 {{ $slot }}
             </x-dynamic-component>

@@ -134,9 +134,6 @@ class RegistroDeVisita extends Page implements HasInfolists
                 foreach ($this->produtos as $produto) {
                     $produtoPorPedidoDeVenda = new ProdutosPorPedidoDeVenda();
                     $produtoPorPedidoDeVenda->pedido_de_venda_id = $pedido_de_venda->id;
-                    /*$produtoPorPedidoDeVenda->produto_id = intval($produto['produto_id']);
-                    $produtoPorPedidoDeVenda->quantidade = $produto['quantidade'];
-                    $produtoPorPedidoDeVenda->desconto = floatval($produto['desconto']);*/
                     unset($produto['produto_nome']);
                     $produtoPorPedidoDeVenda->fill($produto);
                     $produtoPorPedidoDeVenda->save();
@@ -168,12 +165,15 @@ class RegistroDeVisita extends Page implements HasInfolists
         if($produto) $produto = $produto->toArray();
         else return;
 
-        $valor_nominal = (($produto['valor_nominal_venda'] ?? 0) / 100);
-        $valor_minimo = (($produto['valor_minimo_venda'] ?? 0) / 100);
-        $valor_final = $valor_nominal * ((100 - floatval($get('desconto') ?? 0)) / 100);
-        $subtotal = $valor_final * $quantidade;
+        $valor_minimo = $produto['valor_minimo_venda'] ?? 0;
+        $valor_nominal = $produto['valor_nominal_venda'] ?? 0;
+        $desconto = (100 - floatval($get('desconto') ?? 0)) / 100;
 
         $set('valor_original', $valor_nominal);
+
+        $valor_final = $valor_nominal * $desconto;
+
+        $subtotal = $valor_final * $quantidade;
 
         if($valor_minimo > $valor_final){
             $set('error', 'Valor menor que mínimo autorizado!<br/><small>' . Number::currency($valor_minimo, 'BRL') . "</small>");
@@ -181,8 +181,8 @@ class RegistroDeVisita extends Page implements HasInfolists
             $set('total', null);
         }else{
             $set('error', null);
-            $set('subtotal', Number::format($valor_final, 2));
-            $set('total', Number::format($subtotal,2));
+            $set('subtotal', $valor_final);
+            $set('total', $subtotal);
         }
     }
     public function removeById($id)
@@ -221,9 +221,12 @@ class RegistroDeVisita extends Page implements HasInfolists
                             ->afterStateUpdated(function (Set $set, Get $get) {
                                 $this->recalcularValores($set, $get);
                             }),
-                        MoneyInput::make('valor_original')
-                            ->disabled()
-                            ->columnSpan(2),
+                        Placeholder::make('valor_original')
+                            ->columnSpan(2)
+                            ->live()
+                            ->label('R$ Original')
+                            ->extraAttributes(['class' => 'w-full border bg-gray-200 rounded-xl p-1.5 text-center'])
+                            ->content(fn ($state): string => Number::currency($state ?? 0, "BRL")),
                         TextInput::make('desconto')
                             ->default(0)
                             ->columnSpan(2)
@@ -235,12 +238,18 @@ class RegistroDeVisita extends Page implements HasInfolists
                                 $this->recalcularValores($set, $get);
                             })
                             ->suffix("%"),
-                        MoneyInput::make('subtotal')
-                            ->disabled()
-                            ->columnSpan(2),
-                        MoneyInput::make('total')
-                            ->disabled()
-                            ->columnSpan(2),
+                        Placeholder::make('subtotal')
+                            ->columnSpan(2)
+                            ->live()
+                            ->label('R$ Subtotal')
+                            ->extraAttributes(['class' => 'w-full border bg-gray-200 rounded-xl p-1.5 text-center'])
+                            ->content(fn ($state): string => Number::currency($state ?? 0, "BRL")),
+                        Placeholder::make('total')
+                            ->columnSpan(2)
+                            ->live()
+                            ->label('R$ Total')
+                            ->extraAttributes(['class' => 'w-full border bg-gray-200 rounded-xl p-1.5 text-center'])
+                            ->content(fn ($state): string => Number::currency($state ?? 0, "BRL")),
                         Placeholder::make('error')
                             ->label('')
                             ->extraAttributes(['class' => 'w-full bg-red-200 border-2 rounded p-2 text-center'])
@@ -255,10 +264,10 @@ class RegistroDeVisita extends Page implements HasInfolists
                     "produto_id" => $data["produto"],
                     "produto_nome" => $produto->nome,
                     "quantidade" => intval($data["quantidade"]),
-                    "valor_original" => ($produto->valor_nominal_venda ?? 0 ) / 100,
+                    "valor_original" => ($produto->valor_nominal_venda ?? 0 ),
                     "desconto" => Number::format(floatval($data["desconto"]), 2),
-                    "valor_final" => (($produto->valor_nominal_venda ?? 0 ) / 100) * ((100 - floatval($data["desconto"])) / 100),
-                    "subtotal" => intval($data["quantidade"]) * (($produto->valor_nominal_venda ?? 0 ) / 100) * ((100 - floatval($data["desconto"])) / 100),
+                    "valor_final" => ($produto->valor_nominal_venda ?? 0 ) * ((100 - floatval($data["desconto"])) / 100),
+                    "subtotal" => intval($data["quantidade"]) * ($produto->valor_nominal_venda ?? 0 ) * ((100 - floatval($data["desconto"])) / 100),
                 ];
 
                 $this->produtos[(string)Str::uuid()] = $obj;

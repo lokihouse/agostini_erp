@@ -14,15 +14,12 @@
                 const apiKey = "{{ env('GOOGLE_MAPS_API_KEY') }}";
                 const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
-                console.log(url);
-
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === "OK") {
                             $wire.set('googleRequestStatus', 'OK');
                             const address = data.results[0]?.formatted_address;
-                            console.log("Endereço:", address);
                             $wire.set("address", address);
                         } else {
                             console.error("Erro:", data.status);

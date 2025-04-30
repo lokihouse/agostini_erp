@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ordens_de_producao', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Empresa::class);
-            $table->foreignIdFor(\App\Models\Cliente::class);
+            $table->foreignIdFor(\App\Models\Cliente::class)->nullable();
             $table->enum('status', ['novo', 'em fila', 'producao', 'finalizado', 'cancelado'])->default('novo');
             $table->date('data_programacao')->nullable();
             $table->date('data_producao')->nullable();

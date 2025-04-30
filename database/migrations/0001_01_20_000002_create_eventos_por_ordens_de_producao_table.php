@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ordem_de_transportes', function (Blueprint $table) {
+        Schema::create('eventos_por_ordem_de_producao', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Empresa::class);
+            $table->foreignIdFor(\App\Models\OrdemDeProducao::class);
             $table->foreignIdFor(\App\Models\User::class);
-            $table->text('placa_caminhao')->nullable();
-            $table->json('rota')->nullable();
-            // $table->json('entregas')->nullable();
+            $table->string('nome');
+            $table->text('descricao')->nullable();
+            $table->boolean('soma_tempo_de_producao')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ordem_de_transportes');
+        Schema::dropIfExists('eventos_por_ordem_de_producao');
     }
 };

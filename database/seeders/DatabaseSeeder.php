@@ -8,9 +8,11 @@ use App\Models\Empresa;
 use App\Models\HorarioDeTrabalho;
 use App\Models\JornadaDeTrabalho;
 use App\Models\Movimentacao;
+use App\Models\PedidoDeVenda;
 use App\Models\PlanoDeConta;
 use App\Models\Produto;
 use App\Models\ProdutoEtapa;
+use App\Models\ProdutosPorPedidoDeVenda;
 use App\Models\User;
 use App\Models\Visita;
 use Illuminate\Database\Seeder;
@@ -99,7 +101,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        for($i=0; $i< 3; $i++){
+        for($i=0; $i < 3; $i++){
             $valor = fake()->randomFloat(2, 10000, 100000);
             $produto = Produto::create([
                 'empresa_id' => 1,
@@ -117,5 +119,28 @@ class DatabaseSeeder extends Seeder
                 }
             }
         }
+
+        $pedidoDeVenda = PedidoDeVenda::create([
+            'user_id' => 1,
+            'cliente_id' => 1,
+        ]);
+
+        ProdutosPorPedidoDeVenda::create([
+            'pedido_de_venda_id' => $pedidoDeVenda->id,
+            'produto_id' => 1,
+            'quantidade' => 1,
+            'desconto' => 0,
+            'valor_original' => 1000,
+            'valor_final' => 1000,
+            'subtotal' => 1000,
+        ]);
+
+        Visita::create([
+            'user_id' => 1,
+            'cliente_id' => 1,
+            'pedido_de_venda_id' => $pedidoDeVenda->id,
+            'data' => date('Y-m-d'),
+            'status' => 'finalizada'
+        ]);
     }
 }

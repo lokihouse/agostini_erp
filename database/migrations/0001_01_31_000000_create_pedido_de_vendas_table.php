@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\User::class);
             $table->foreignIdFor(\App\Models\Cliente::class);
-            $table->foreignIdFor(\App\Models\Visita::class)->nullable();
             $table->enum('status', ['novo', 'processado', 'cancelado'])->default('novo');
             $table->longText('justificativa')->nullable();
             $table->timestamps();

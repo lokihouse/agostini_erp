@@ -19,6 +19,8 @@ return new class extends Migration
             $table->float('valor_minimo_venda');
             $table->float('valor_nominal_venda');
 
+            $table->json('volumes')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

@@ -18,6 +18,11 @@ return new class extends Migration
                 ->constrained(table: 'companies', column: 'uuid')
                 ->cascadeOnDelete();
 
+            $table->foreignUuid('work_shift_id')
+                ->nullable()
+                ->constrained('work_shifts', 'uuid') // Assumindo que a PK de work_shifts é uuid
+                ->nullOnDelete();
+
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');

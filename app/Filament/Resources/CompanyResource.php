@@ -23,7 +23,7 @@ class CompanyResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     protected static ?string $navigationGroup = 'Sistema';
     protected static ?string $navigationLabel = 'Empresas'; // Tradução para o menu
-    protected static ?int $navigationSort = 2; // Ordem no menu (opcional, ajuste conforme necessário)
+    protected static ?int $navigationSort = 11;
 
 
     public static function form(Form $form): Form

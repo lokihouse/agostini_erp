@@ -29,7 +29,7 @@ class ProductionOrderResource extends Resource
     protected static ?string $modelLabel = 'Ordem de Produção';
     protected static ?string $pluralModelLabel = 'Ordens de Produção';
     protected static ?string $navigationGroup = 'Produção';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 25;
 
     protected static ?string $recordTitleAttribute = 'order_number';
 

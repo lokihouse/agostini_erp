@@ -12,7 +12,7 @@ class DashboardProduction extends \Filament\Pages\Page
     protected static string $view = 'filament.pages.dashboard-production';
     protected static ?string $navigationGroup = 'Produção'; // Grupo onde vai aparecer
     protected static ?string $navigationLabel = 'Dashboard'; // Nome no menu
-    protected static ?int $navigationSort = 0; // Ordem dentro do grupo (0 = primeiro)
+    protected static ?int $navigationSort = 20; // Ordem dentro do grupo (0 = primeiro)
     protected static ?string $title = 'Dashboard de Produção'; // Título da página
     // --- Fim das propriedades adicionadas ---
 

@@ -24,7 +24,7 @@ class ProductionStepResource extends Resource
     protected static ?string $modelLabel = 'Etapa de Produção'; // Nome singular
     protected static ?string $pluralModelLabel = 'Etapas de Produção'; // Nome plural
     protected static ?string $navigationGroup = 'Produção';
-    protected static ?int $navigationSort = 2; // Ordem na navegação (depois de Produtos)
+    protected static ?int $navigationSort = 21; // Ordem na navegação (depois de Produtos)
 
     // Configuração para busca global
     protected static ?string $recordTitleAttribute = 'name';

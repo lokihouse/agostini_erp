@@ -36,7 +36,7 @@ class ProductResource extends Resource
     protected static ?string $modelLabel = 'Produto'; // Nome singular
     protected static ?string $pluralModelLabel = 'Produtos'; // Nome plural
     protected static ?string $navigationGroup = 'Produção';
-    protected static ?int $navigationSort = 1; // Ordem na navegação
+    protected static ?int $navigationSort = 24; // Ordem na navegação
 
     // Configuração para busca global (opcional)
     protected static ?string $recordTitleAttribute = 'name'; // Campo usado na busca global

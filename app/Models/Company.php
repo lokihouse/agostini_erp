@@ -41,4 +41,14 @@ class Company extends Model
     {
         return $this->hasMany(User::class, 'company_id', 'uuid');
     }
+
+    public function workShifts(): HasMany
+    {
+        return $this->hasMany(WorkShift::class, 'company_id', 'uuid');
+    }
+
+    public function holidays(): HasMany
+    {
+        return $this->hasMany(Holiday::class, 'company_id', 'uuid');
+    }
 }

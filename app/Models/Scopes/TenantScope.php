@@ -16,19 +16,9 @@ class TenantScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        // Verifica se há um usuário autenticado e se ele tem um company_id
         if (Auth::check() && Auth::user()->company_id) {
-            // Adiciona a cláusula WHERE para filtrar pela company_id do usuário
             $builder->where($model->getTable().'.company_id', Auth::user()->company_id);
         }
-        // Adicione aqui a lógica 'else' se precisar lidar com console/super-admins
-        // Exemplo: impedir retorno de dados em contexto web sem usuário/empresa
-        // else {
-        //     if (!app()->runningInConsole() && Auth::guest()) { // Verifica se não está no console E não há usuário logado
-        //          $builder->whereRaw('1 = 0'); // Nunca retorna resultados
-        //     }
-        //     // Ou: if (Auth::check() && Auth::user()->hasRole('Super Admin')) { /* não aplica filtro */ }
-        // }
     }
 
     /**

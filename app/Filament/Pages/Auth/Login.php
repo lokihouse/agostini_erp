@@ -17,6 +17,11 @@ class Login extends BaseLogin
         return '';
     }
 
+    public function getView(): string
+    {
+        return 'filament.pages.login';
+    }
+
     public function form(Form $form): Form
     {
         return $form

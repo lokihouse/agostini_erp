@@ -3,10 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CompanyResource\Pages;
-use App\Filament\Resources\CompanyResource\RelationManagers;
-use App\Filament\Resources\CompanyResource\RelationManagers\UsersRelationManager; // Importar
 use App\Models\Company;
-use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,38 +11,69 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope; // Importar
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CompanyResource extends Resource
 {
     protected static ?string $model = Company::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2'; // Ícone de exemplo
+    protected static ?string $modelLabel = 'Empresa'; // Tradução
+    protected static ?string $pluralModelLabel = 'Empresas'; // Tradução
+
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     protected static ?string $navigationGroup = 'Sistema';
+    protected static ?string $navigationLabel = 'Empresas'; // Tradução para o menu
+    protected static ?int $navigationSort = 2; // Ordem no menu (opcional, ajuste conforme necessário)
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('name')
+                    ->label('Nome Fantasia')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('socialName')
+                    ->label('Razão Social')
                     ->maxLength(255),
                 TextInput::make('taxNumber')
-                    ->label('CNPJ') // Rótulo mais amigável
+                    ->label('CNPJ')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(14)
-                    // ->mask('99.999.999/9999-99') // Opcional: Máscara para CNPJ
-                    ->numeric(),
+                    ->mask('99.999.999/9999-99')
+                    ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? preg_replace('/[^0-9]/', '', $state) : null)
+                    ->rule(static function () {
+                        return static function (string $attribute, $value, \Closure $fail) {
+                            if (empty($value)) {
+                                return;
+                            }
+                            $cleaned = preg_replace('/[^0-9]/', '', $value);
+                            if (strlen($cleaned) !== 14) {
+                                $fail('O campo CNPJ deve conter 14 dígitos.');
+                            }
+                        };
+                    }),
                 TextInput::make('address')
+                    ->label('Endereço')
                     ->maxLength(255),
                 TextInput::make('telephone')
                     ->label('Telefone')
                     ->tel()
-                    // ->mask('(99) 99999-9999')
-                    ->maxLength(20),
+                    ->dehydrateStateUsing(static fn (string $state): string => preg_replace('/[^0-9]/', '', $state))
+                    ->mask('(99) 99999-9999')
+                    ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? preg_replace('/[^0-9]/', '', $state) : null)
+                    ->rule(static function () {
+                        return static function (string $attribute, $value, \Closure $fail) {
+                            if (empty($value)) {
+                                return;
+                            }
+                            $cleaned = preg_replace('/[^0-9]/', '', $value);
+                            if (strlen($cleaned) !== 11) {
+                                $fail('O campo Telefone deve conter 11 dígitos.');
+                            }
+                        };
+                    }),
             ]);
     }
 
@@ -54,55 +82,71 @@ class CompanyResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nome Fantasia') // Tradução
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('socialName')
                     ->label('Razão Social')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true), // Oculto por padrão
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('taxNumber')
                     ->label('CNPJ')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(function (?string $state): string {
+                        if (empty($state)) {
+                            return '';
+                        }
+                        $cleanedState = preg_replace('/[^0-9]/', '', $state);
+                        if (strlen($cleanedState) === 14) {
+                            return sprintf('%s.%s.%s/%s-%s',
+                                substr($cleanedState, 0, 2),
+                                substr($cleanedState, 2, 3),
+                                substr($cleanedState, 5, 3),
+                                substr($cleanedState, 8, 4),
+                                substr($cleanedState, 12, 2)
+                            );
+                        }
+                        return $state; // Retorna o estado original se não for um CNPJ válido
+                    }),
                 TextColumn::make('telephone')
                     ->label('Telefone')
-                    ->toggleable(isToggledHiddenByDefault: true), // Oculto por padrão
+                    ->searchable() // Adicionado searchable para telefone
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Criado em') // Tradução
+                    ->dateTime('d/m/Y H:i') // Formato de data
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Atualizado em') // Tradução
+                    ->dateTime('d/m/Y H:i') // Formato de data
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at') // Para SoftDeletes
-                ->dateTime()
+                TextColumn::make('deleted_at')
+                    ->label('Excluído em') // Tradução
+                    ->dateTime('d/m/Y H:i') // Formato de data
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()
+                    ->label('Mostrar Excluídos'), // Tradução
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\EditAction::make()->label('Editar'),
+                Tables\Actions\DeleteAction::make()->label('Excluir'),
+                Tables\Actions\ForceDeleteAction::make()->label('Excluir Permanentemente'),
+                Tables\Actions\RestoreAction::make()->label('Restaurar'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Excluir Selecionados'), // Tradução
+                    Tables\Actions\ForceDeleteBulkAction::make()->label('Excluir Perm. Selecionados'), // Tradução
+                    Tables\Actions\RestoreBulkAction::make()->label('Restaurar Selecionados'), // Tradução
                 ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            UsersRelationManager::class,
-        ];
+            ])
+            ->emptyStateHeading('Nenhuma empresa encontrada') // Tradução
+            ->emptyStateDescription('Crie uma empresa para começar.'); // Tradução
     }
 
     public static function getPages(): array
@@ -110,9 +154,11 @@ class CompanyResource extends Resource
         return [
             'index' => Pages\ListCompanies::route('/'),
             'create' => Pages\CreateCompany::route('/create'),
+            // 'view' => Pages\ViewCompany::route('/{record}'), // Se você tiver uma página de visualização separada
             'edit' => Pages\EditCompany::route('/{record}/edit'),
         ];
     }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

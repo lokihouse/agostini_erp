@@ -11,18 +11,9 @@ use Illuminate\Support\Facades\Log; // Garanta que este import existe
 
 class HomePage extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
     protected static string $view = 'filament.pages.home-page';
-    protected static ?string $title = 'Página Inicial';
+    protected static ?string $title = 'Início';
 
-    public function mount(): void
-    {
-        Log::info('HomePage MOUNT() foi chamado'); // Manter Log
-    }
-
-    /**
-     * @return string|\Illuminate\Contracts\Support\Htmlable
-     */
     public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
     {
         return '';

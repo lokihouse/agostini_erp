@@ -126,13 +126,6 @@ class HolidayResource extends Resource
                 Tables\Actions\DeleteAction::make()
                     ->hidden(fn (Holiday $record): bool => $record->is_global),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                ]),
-            ])
             ->emptyStateHeading('Nenhum evento encontrado')
             ->emptyStateDescription('Crie um evento para começar.');
     }

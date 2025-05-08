@@ -13,7 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Get; // Para lógica condicional no formulário
+use Filament\Forms\Get;
 
 class TimeClockEntryResource extends Resource
 {
@@ -209,13 +209,12 @@ class TimeClockEntryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+//                    Tables\Actions\DeleteBulkAction::make(),
+//                    Tables\Actions\ForceDeleteBulkAction::make(),
+//                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
             ->defaultSort('recorded_at', 'desc')

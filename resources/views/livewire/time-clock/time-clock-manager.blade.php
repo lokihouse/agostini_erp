@@ -3,32 +3,41 @@
         Olá, {{ $userName }}!
     </h4>
 
-    <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-        @if($workShiftName)
-            <p>Sua jornada: <strong class="font-medium text-gray-900 dark:text-white">{{ $workShiftName }}</strong></p>
-        @else
-            <p>Nenhuma jornada de trabalho atribuída.</p>
-        @endif
+{{--    <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">--}}
+{{--        @if($workShiftName)--}}
+{{--            <p>Sua jornada: <strong class="font-medium text-gray-900 dark:text-white">{{ $workShiftName }}</strong></p>--}}
+{{--        @else--}}
+{{--            <p>Nenhuma jornada de trabalho atribuída.</p>--}}
+{{--        @endif--}}
 
-        <p>Horas programadas para hoje: <strong class="font-medium text-gray-900 dark:text-white">{{ $scheduledHoursToday ?? 'N/D' }}</strong></p>
-        <p>Horas trabalhadas hoje: <strong class="font-medium text-gray-900 dark:text-white">{{ $workedHoursToday ?? '00:00' }}</strong></p>
-    </div>
+{{--        <p>Horas programadas para hoje: <strong class="font-medium text-gray-900 dark:text-white">{{ $scheduledHoursToday ?? 'N/D' }}</strong></p>--}}
+{{--        <p>Horas trabalhadas hoje: <strong class="font-medium text-gray-900 dark:text-white">{{ $workedHoursToday ?? '00:00' }}</strong></p>--}}
+{{--    </div>--}}
 
-    <div class="mt-6">
+    <div class="mt-6 space-y-2">
+        <x-filament::button
+            tag="a"
+            href="{{ route('filament.app.pages.registro-de-ponto.cartao-de-ponto') }}"
+            outlined
+            class="w-full">
+            Meu cartão de ponto
+        </x-filament::button>
+
         {{-- Botão agora é dinâmico --}}
         <button wire:click="redirectToRegisterPointMap('{{ $nextActionType }}')"
                 class="w-full px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 focus:outline-none dark:bg-primary-500 dark:hover:bg-primary-600 dark:focus:ring-primary-800">
-            {{ $nextActionLabel }}
+{{--            {{ $nextActionLabel }}--}}
+            Bater ponto
         </button>
 
         {{-- Se o usuário já bateu entrada e não saiu, pode ser útil ter um botão de saída rápido também --}}
         {{-- Ou se a próxima ação é "Iniciar Pausa", também poderia ter "Bater Saída" --}}
-        @if($hasActiveSession && $nextActionType === 'start_break')
-            <button wire:click="redirectToRegisterPointMap('clock_out')"
-                    class="w-full mt-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
-                Bater Saída Direto
-            </button>
-        @endif
+{{--        @if($hasActiveSession && $nextActionType === 'start_break')--}}
+{{--            <button wire:click="redirectToRegisterPointMap('clock_out')"--}}
+{{--                    class="w-full mt-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">--}}
+{{--                Bater Saída Direto--}}
+{{--            </button>--}}
+{{--        @endif--}}
     </div>
 
     {{-- Comentário sobre a última batida pode ser útil para o usuário --}}
@@ -39,9 +48,9 @@
             ->first();
     @endphp
     @if($lastEntryForDisplay)
-        <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">
-            Última batida: {{ $lastEntryForDisplay->entry_type_label }} às {{ $lastEntryForDisplay->recorded_at->format('H:i') }}
-        </p>
+{{--        <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">--}}
+{{--            Última batida: {{ $lastEntryForDisplay->entry_type_label }} às {{ $lastEntryForDisplay->recorded_at->format('H:i') }}--}}
+{{--        </p>--}}
     @endif
 
 

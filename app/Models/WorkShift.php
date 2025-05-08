@@ -45,7 +45,6 @@ class WorkShift extends Model
         return $this->hasMany(User::class, 'work_shift_id', 'uuid');
     }
 
-
     public function workShiftDays(): HasMany
     {
         return $this->hasMany(WorkShiftDay::class, 'work_shift_uuid', 'uuid');

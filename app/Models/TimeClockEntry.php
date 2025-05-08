@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class TimeClockEntry extends Model
 {
@@ -15,13 +16,6 @@ class TimeClockEntry extends Model
     protected $primaryKey = 'uuid';
     public $incrementing = false;
     protected $keyType = 'string';
-
-    // Definindo constantes para os status
-    public const STATUS_NORMAL = 'normal';
-    public const STATUS_ALERT = 'alert';
-    public const STATUS_JUSTIFIED = 'justified';
-    public const STATUS_APPROVED = 'approved';
-    public const STATUS_ACCOUNTED = 'accounted';
 
     protected $fillable = [
         'user_id',
@@ -45,10 +39,20 @@ class TimeClockEntry extends Model
         'longitude' => 'decimal:7',
     ];
 
-    // Adicionar o status ao $attributes default para garantir que tenha um valor ao criar
-    protected $attributes = [
-        'status' => self::STATUS_NORMAL,
-    ];
+    // Constantes para os tipos de batida
+    public const TYPE_CLOCK_IN = 'clock_in';
+    public const TYPE_CLOCK_OUT = 'clock_out';
+    public const TYPE_START_BREAK = 'start_break';
+    public const TYPE_END_BREAK = 'end_break';
+    public const TYPE_MANUAL_ENTRY = 'manual_entry'; // <<<---- ADICIONADO AQUI
+
+    // Constantes para os status da batida
+    public const STATUS_NORMAL = 'normal';
+    public const STATUS_ALERT = 'alert';
+    public const STATUS_JUSTIFIED = 'justified';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_ACCOUNTED = 'accounted';
+
 
     public function user(): BelongsTo
     {
@@ -65,23 +69,23 @@ class TimeClockEntry extends Model
         return $this->belongsTo(User::class, 'approved_by', 'uuid');
     }
 
+    /**
+     * Retorna um array com as opções de tipo de batida para selects.
+     */
     public static function getEntryTypeOptions(): array
     {
         return [
-            'clock_in' => 'Entrada',
-            'clock_out' => 'Saída',
-            'start_break' => 'Início Pausa',
-            'end_break' => 'Fim Pausa',
-            'manual_entry' => 'Entrada Manual',
+            self::TYPE_CLOCK_IN => 'Entrada',
+            self::TYPE_CLOCK_OUT => 'Saída',
+            self::TYPE_START_BREAK => 'Início da Pausa',
+            self::TYPE_END_BREAK => 'Fim da Pausa',
+            self::TYPE_MANUAL_ENTRY => 'Entrada Manual', // <<<---- ADICIONADO AQUI
         ];
     }
 
-    public function getEntryTypeLabelAttribute(): string
-    {
-        return self::getEntryTypeOptions()[$this->type] ?? $this->type;
-    }
-
-    // Método para obter as opções de status
+    /**
+     * Retorna um array com as opções de status para selects.
+     */
     public static function getStatusOptions(): array
     {
         return [
@@ -93,9 +97,19 @@ class TimeClockEntry extends Model
         ];
     }
 
-    // Acessor para o label do status
+    /**
+     * Acessor para obter o label do status.
+     */
     public function getStatusLabelAttribute(): string
     {
         return self::getStatusOptions()[$this->status] ?? ucfirst($this->status);
+    }
+
+    /**
+     * Acessor para obter o label do tipo de entrada.
+     */
+    public function getEntryTypeLabelAttribute(): string
+    {
+        return self::getEntryTypeOptions()[$this->type] ?? ucfirst($this->type);
     }
 }

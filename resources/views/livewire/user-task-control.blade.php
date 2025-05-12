@@ -16,7 +16,7 @@
         <div class="fi-section-header flex flex-col gap-y-2 sm:flex-row sm:items-center">
             <div class="grid flex-1 gap-y-1">
                 <h3 class="fi-section-header-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
-                    Minha Tarefa Atual
+                    Minha Produção
                 </h3>
                 <p class="fi-section-header-description text-sm text-gray-500 dark:text-gray-400">
                     Gerencie sua atividade de produção atual.

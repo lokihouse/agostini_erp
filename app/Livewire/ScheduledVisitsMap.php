@@ -11,6 +11,7 @@ class ScheduledVisitsMap extends Component
 {
     public array $visitsForMap = [];
     public ?string $googleMapsApiKey;
+    public string $viewMode = 'map';
 
     public function mount(): void
     {
@@ -35,14 +36,11 @@ class ScheduledVisitsMap extends Component
         ])
             ->where('assigned_to_user_id', $user->uuid)
             ->where('status', SalesVisit::STATUS_SCHEDULED)
-            // ->whereDate('scheduled_at', '>=', Carbon::today()) // Apenas de hoje em diante
-            // Ou, para um período específico, ex: próximos 7 dias
-            ->whereBetween('scheduled_at', [Carbon::today()->startOfDay(), Carbon::today()->addDays(7)->endOfDay()])
+            ->whereDate('scheduled_at', '>=', Carbon::today())
             ->orderBy('scheduled_at', 'asc')
             ->get();
 
         $this->visitsForMap = $visits->filter(function ($visit) {
-            // Garante que o cliente foi carregado e tem coordenadas
             return $visit->client && $visit->client->latitude && $visit->client->longitude;
         })->map(function (SalesVisit $visit) {
             return [
@@ -66,6 +64,10 @@ class ScheduledVisitsMap extends Component
         })->values()->all(); // values() para reindexar o array após o filter
     }
 
+    public function toggleView(): void
+    {
+        $this->viewMode = ($this->viewMode === 'map') ? 'list' : 'map';
+    }
     public function render()
     {
         return view('livewire.scheduled-visits-map');

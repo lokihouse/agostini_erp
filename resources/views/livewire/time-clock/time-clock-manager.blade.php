@@ -1,20 +1,18 @@
-<div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-        Olá, {{ $userName }}!
-    </h4>
+<div class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
+    <div class="fi-section-header-ctn border-b border-gray-200 px-6 py-4 dark:border-white/10">
+        <div class="fi-section-header flex flex-col gap-y-2 sm:flex-row sm:items-center">
+            <div class="grid flex-1 gap-y-1">
+                <h3 class="fi-section-header-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+                    Olá, {{ $userName }}
+                </h3>
+                <p class="fi-section-header-description text-sm text-gray-500 dark:text-gray-400">
+                    Controle aqui seus registros de ponto
+                </p>
+            </div>
+        </div>
+    </div>
 
-{{--    <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">--}}
-{{--        @if($workShiftName)--}}
-{{--            <p>Sua jornada: <strong class="font-medium text-gray-900 dark:text-white">{{ $workShiftName }}</strong></p>--}}
-{{--        @else--}}
-{{--            <p>Nenhuma jornada de trabalho atribuída.</p>--}}
-{{--        @endif--}}
-
-{{--        <p>Horas programadas para hoje: <strong class="font-medium text-gray-900 dark:text-white">{{ $scheduledHoursToday ?? 'N/D' }}</strong></p>--}}
-{{--        <p>Horas trabalhadas hoje: <strong class="font-medium text-gray-900 dark:text-white">{{ $workedHoursToday ?? '00:00' }}</strong></p>--}}
-{{--    </div>--}}
-
-    <div class="mt-6 space-y-2">
+    <div class="p-4 space-y-2">
         <x-filament::button
             tag="a"
             href="{{ route('filament.app.pages.registro-de-ponto.cartao-de-ponto') }}"

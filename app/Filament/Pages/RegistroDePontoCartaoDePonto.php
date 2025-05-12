@@ -94,7 +94,6 @@ class RegistroDePontoCartaoDePonto extends Page
                 'cha' => 0,
                 'saldo_dia' => 0,
                 'saldo_acumulado' => 0,
-                'pode_justificar' => true,
             ];
 
             $dateStringYMD = $date->format('Y-m-d');
@@ -143,10 +142,6 @@ class RegistroDePontoCartaoDePonto extends Page
             $dayEntries = $this->allTimeClockEntries->filter(
                 fn($entry) => Carbon::parse($entry->recorded_at)->isSameDay($date)
             )->values();
-
-            if ($dayEntries->whereIn('status', [TimeClockEntry::STATUS_JUSTIFIED, TimeClockEntry::STATUS_APPROVED])->isNotEmpty()) {
-                $obj['pode_justificar'] = false;
-            }
 
             if ($dayEntries->isNotEmpty()) {
                 $workedSecondsThisDay = 0;
@@ -202,11 +197,16 @@ class RegistroDePontoCartaoDePonto extends Page
             }
 
             // Inconsistências e Saldos (mantidos como antes)
-            // ... (resto da sua lógica de inconsistências e saldos) ...
             if ($dayEntries->count() % 2 != 0 && $obj['tipo'] === 'util') {
                 $obj['inconsistencia'] = true;
                 $obj["observacao"][] = "Número ímpar de batidas.";
             }
+
+            if ($dayEntries->count() % 4 != 0 && $obj['tipo'] === 'util') {
+                $obj['inconsistencia'] = true;
+                $obj["observacao"][] = "Número de batidas diferente do esperado.";
+            }
+
             $startBreakCount = $dayEntries->where('type', TimeClockEntry::TYPE_START_BREAK)->count();
             $endBreakCount = $dayEntries->where('type', TimeClockEntry::TYPE_END_BREAK)->count();
             if ($startBreakCount !== $endBreakCount) {
@@ -238,7 +238,6 @@ class RegistroDePontoCartaoDePonto extends Page
 
             $this->cumulativeBalanceSeconds += $obj['saldo_dia'];
             $obj['saldo_acumulado'] = $this->cumulativeBalanceSeconds;
-
 
             $this->tabela[$dateStringYMD] = $obj;
         }

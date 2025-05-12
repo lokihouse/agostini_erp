@@ -58,17 +58,19 @@ class DatabaseSeeder extends Seeder
         ])->assignRole($roleUsuario);
 
         $this->call([
-            /*
+            PauseReasonSeeder::class,
+            // --------------
             ProductSeeder::class,
             ProductionStepSeeder::class,
             WorkSlotSeeder::class,
             ProductionProcessSeeder::class,
             ProductionOrderSeeder::class,
-            /**/
             // --------------
             WorkShiftSeeder::class,
             HolidaySeeder::class,
-            TimeClockEntrySeeder::class
+            // TimeClockEntrySeeder::class
+            // --------------
+            ClientSeeder::class
         ]);
     }
 }

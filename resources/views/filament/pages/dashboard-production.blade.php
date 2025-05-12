@@ -1,8 +1,5 @@
 <x-filament-panels::page>
-    <div class="">
-        <div>@livewire(\App\Filament\Widgets\ProductionStatsOverview::class)</div>
-    </div>
-    <div class="">
-        <div>@livewire(\App\Filament\Widgets\AverageProductionTimes::class)</div>
-    </div>
+    @livewire(\App\Filament\Widgets\ProductionStatsOverview::class)
+    @livewire(\App\Filament\Widgets\PauseTimesOverview::class)
+    @livewire(\App\Filament\Widgets\AverageProductionTimes::class)
 </x-filament-panels::page>

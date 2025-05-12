@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('production_order_items', function (Blueprint $table) {
             $table->uuid('uuid')->primary();
 
-            // Adiciona a chave estrangeira para a empresa
-            // Embora a ordem já tenha company_id, adicionar aqui pode simplificar
-            // algumas queries e garante consistência se a estrutura mudar.
             $table->foreignUuid('company_id')
                 ->constrained(table: 'companies', column: 'uuid') // Vincula à tabela 'companies'
                 ->cascadeOnDelete(); // Exclui itens se a empresa for excluída
@@ -29,6 +26,11 @@ return new class extends Migration
             $table->foreignUuid('product_uuid')
                 ->constrained('products', 'uuid') // Liga com products.uuid
                 ->cascadeOnDelete(); // Se o produto for deletado, os itens da ordem relacionados a ele também são
+
+            $table->foreignUuid('production_step_uuid')
+                ->nullable() // Or not nullable if every item MUST have a step
+                ->constrained('production_steps', 'uuid')
+                ->nullOnDelete(); // Or cascadeOnDelete() depending on your needs
 
             // Campos específicos deste item na ordem
             $table->decimal('quantity_planned', 15, 4)->default(0);

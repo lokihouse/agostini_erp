@@ -1,13 +1,14 @@
 {{-- resources/views/livewire/user-task-control.blade.php --}}
 <div x-data="{
         showScannerModal: false,
-        showPauseModal: false,
+        showPauseModal: false, // Esta variável controlará o modal de pausa
         showFinishModal: false,
         scanErrorMessage: '' // Para exibir erros do scanner no modal
      }"
      x-on:scan-success.window="showScannerModal = false; stopScanner(); scanErrorMessage = '';" {{-- Fecha modal no sucesso --}}
      x-on:scan-error.window="scanErrorMessage = $event.detail.message;" {{-- Mostra erro no modal --}}
      x-on:qr-code-scanned.window="$wire.call('processScanResult', $event.detail.decodedText); scanErrorMessage = '';" {{-- Chama Livewire no evento --}}
+     x-on:close-pause-modal.window="showPauseModal = false; $wire.resetModalFields();" {{-- Adicionado para fechar via evento Livewire --}}
      class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
 >
     {{-- Cabeçalho --}}
@@ -26,47 +27,45 @@
 
     {{-- Conteúdo Principal --}}
     <div class="fi-section-content-ctn">
-        <div class="fi-section-content p-6">
+        <div class="fi-section-content p-2">
 
             @if ($currentTask)
                 {{-- ============================================= --}}
                 {{--      EXIBIÇÃO QUANDO HÁ TAREFA ATIVA        --}}
                 {{-- ============================================= --}}
-                <div class="space-y-4">
+                <div class="space-y-2">
                     {{-- Detalhes da Tarefa --}}
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                        <dl class="grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
-                            <div class="sm:col-span-1">
-                                <dt class="font-medium text-gray-500 dark:text-gray-400">Ordem:</dt>
-                                <dd class="font-semibold text-gray-900 dark:text-white">{{ $orderNumber }}</dd>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div class="text-sm space-y-2">
+                                <div class="sm:col-span-1">
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Ordem:</dt>
+                                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $orderNumber }}</dd>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Produto:</dt>
+                                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $productName }}</dd>
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <dt class="font-medium text-gray-500 dark:text-gray-400">Etapa:</dt>
+                                    <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $stepName }}</dd>
+                                </div>
                             </div>
-                            <div class="sm:col-span-2">
-                                <dt class="font-medium text-gray-500 dark:text-gray-400">Produto:</dt>
-                                <dd class="font-semibold text-gray-900 dark:text-white">{{ $productName }}</dd>
+                            <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                                <h4 class="mb-2 text-center text-sm font-medium text-gray-500 dark:text-gray-400">Progresso</h4>
+                                <div class="flex items-baseline justify-center gap-x-2">
+                                    <span class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ number_format($quantityProduced, 0, ',', '.') }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">/ {{ number_format($quantityPlanned, 0, ',', '.') }}</span>
+                                </div>
+                                <p class="mt-2 text-center text-sm font-semibold {{ $quantityRemaining > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400' }}">
+                                    Restante: {{ number_format($quantityRemaining, 0, ',', '.') }}
+                                </p>
                             </div>
-                            <div class="sm:col-span-3">
-                                <dt class="font-medium text-gray-500 dark:text-gray-400">Etapa:</dt>
-                                <dd class="font-semibold text-gray-900 dark:text-white">{{ $stepName }}</dd>
-                            </div>
-                        </dl>
+                        </div>
                     </div>
 
                     {{-- Progresso e Tempo --}}
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        {{-- Quantidades --}}
-                        <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <h4 class="mb-2 text-center text-sm font-medium text-gray-500 dark:text-gray-400">Progresso</h4>
-                            <div class="flex items-baseline justify-center gap-x-2">
-                                <span class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ number_format($quantityProduced, 0, ',', '.') }}</span>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">/ {{ number_format($quantityPlanned, 0, ',', '.') }}</span>
-                            </div>
-                            <p class="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">Produzido / Planejado</p>
-                            <p class="mt-2 text-center text-sm font-semibold {{ $quantityRemaining > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400' }}">
-                                Restante: {{ number_format($quantityRemaining, 0, ',', '.') }}
-                            </p>
-                        </div>
-
-                        {{-- Tempo na Tarefa --}}
+                    <div class="">
                         <div class="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:col-span-2">
                             <h4 class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Tempo na Tarefa</h4>
                             <div class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -77,6 +76,9 @@
                                 <span class="mt-1 inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20">
                                      <x-heroicon-s-pause class="-ml-0.5 mr-1.5 h-4 w-4"/>
                                      Pausado
+                                     @if($currentTask && $currentTask->lastPauseReasonDetail)
+                                        <span class="ml-1 hidden sm:inline"> - {{ $currentTask->lastPauseReasonDetail->name }}</span>
+                                    @endif
                                  </span>
                             @else
                                 <span class="mt-1 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
@@ -183,75 +185,92 @@
     </div>
 
     {{-- --- MODAL DE PAUSA --- --}}
-    <div x-show="showPauseModal" x-transition
-         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75" style="display: none;"
-         aria-labelledby="pause-modal-title" role="dialog" aria-modal="true">
-        <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
-             x-on:click.outside="showPauseModal = false">
-            <h3 id="pause-modal-title" class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Pausar Tarefa</h3>
-            <form wire:submit.prevent="pauseTask">
-                <div class="space-y-4">
-                    {{-- Motivo --}}
-                    <div>
-                        <x-filament::input.wrapper :valid="!$errors->has('pauseReason')">
-                            <x-filament::input.select wire:model="pauseReason" id="pause_reason" required>
-                                <option value="" disabled>Selecione o Motivo...</option>
-                                <option value="banheiro">Pausa - Banheiro</option>
-                                <option value="almoco">Pausa - Almoço/Refeição</option>
-                                <option value="cafe">Pausa - Café/Descanso</option>
-                                <option value="limpeza">Pausa - Limpeza/Organização</option>
-                                <option value="material">Pausa - Aguardando Material</option>
-                                <option value="manutencao">Pausa - Aguardando Manutenção</option>
-                                <option value="fim_expediente">Pausa - Fim de Expediente</option>
-                                <option value="outro">Pausa - Outro Motivo</option>
-                            </x-filament::input.select>
-                        </x-filament::input.wrapper>
-                        @error('pauseReason') <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p> @enderror
-                    </div>
+    {{-- CORREÇÃO: Removido x-data e @entangle daqui. O x-show agora usa a variável do escopo pai. --}}
+    <div x-show="showPauseModal" x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title-pause" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showPauseModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75"
+                 aria-hidden="true" @click="showPauseModal = false; $wire.resetModalFields()"></div>
 
-                    {{-- Quantidade Produzida na Sessão --}}
-                    <div>
-                        <label for="pause_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantidade Produzida (Nesta Sessão)</label>
-                        <x-filament::input.wrapper :valid="!$errors->has('pauseQuantityProduced')">
-                            <x-filament::input type="number" wire:model="pauseQuantityProduced" id="pause_quantity" min="0" step="any"/>
-                        </x-filament::input.wrapper>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Informe quantas unidades você finalizou ANTES de iniciar esta pausa.</p>
-                        @error('pauseQuantityProduced') <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p> @enderror
-                    </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                    {{-- Notas --}}
-                    <div>
-                        <label for="pause_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observações da Pausa (Opcional)</label>
-                        {{-- Textarea Corrigido --}}
-                        <x-filament::input.wrapper :valid="!$errors->has('pauseNotes')">
-                            <x-filament::input
-                                type="textarea"
-                                wire:model.defer="pauseNotes"
-                                id="pause_notes"
-                                rows="2"
-                            />
-                        </x-filament::input.wrapper>
-                        @error('pauseNotes') <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p> @enderror
+            <div x-show="showPauseModal" x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 class="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 dark:bg-gray-800">
+                <div>
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white" id="modal-title-pause">
+                            Pausar Tarefa
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                Informe o motivo da pausa e a quantidade produzida nesta sessão (se houver).
+                            </p>
+                        </div>
                     </div>
                 </div>
+                <form wire:submit.prevent="pauseTask" class="mt-5 space-y-4">
+                    {{-- Select para Motivo da Pausa --}}
+                    <div>
+                        <label for="pause_reason_uuid" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Motivo da Pausa <span class="text-red-500">*</span>
+                        </label>
+                        <select wire:model.live="selectedPauseReasonUuid" id="pause_reason_uuid" name="pause_reason_uuid"
+                                class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 @error('selectedPauseReasonUuid') border-red-500 @enderror">
+                            <option value="">Selecione um motivo...</option>
+                            @foreach($availablePauseReasons as $uuid => $name)
+                                <option value="{{ $uuid }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('selectedPauseReasonUuid') <span class="mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
+                    </div>
 
-                {{-- Botões do formulário de pausa --}}
-                <div class="mt-6 flex justify-end gap-3">
-                    <x-filament::button type="button" color="gray" x-on:click="showPauseModal = false">
-                        Cancelar
-                    </x-filament::button>
-                    <x-filament::button
-                        type="submit"
-                        color="warning"
-                        wire:loading.attr="disabled"
-                        wire:target="pauseTask"
-                        x-bind:disabled="!$wire.pauseReason"
-                    >
-                        Confirmar Pausa
-                        <x-filament::loading-indicator wire:loading wire:target="pauseTask" class="h-5 w-5"/>
-                    </x-filament::button>
-                </div>
-            </form>
+                    <div>
+                        <label for="pause_quantity_produced" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Quantidade Produzida (nesta sessão)
+                        </label>
+                        <input type="number" step="any" wire:model.defer="pauseQuantityProduced" id="pause_quantity_produced" name="pause_quantity_produced"
+                               placeholder="0.00"
+                               class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 @error('pauseQuantityProduced') border-red-500 @enderror">
+                        @error('pauseQuantityProduced') <span class="mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="pause_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Observações (Opcional)
+                        </label>
+                        <textarea wire:model.defer="pauseNotes" id="pause_notes" name="pause_notes" rows="3"
+                                  class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 @error('pauseNotes') border-red-500 @enderror"></textarea>
+                        @error('pauseNotes') <span class="mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                        <button type="submit"
+                                wire:loading.attr="disabled"
+                                wire:target="pauseTask"
+                                class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white border border-transparent rounded-md shadow-sm bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:col-start-2 sm:text-sm dark:focus:ring-offset-gray-800">
+                        <span wire:loading wire:target="pauseTask" class="mr-2">
+                            <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </span>
+                            Confirmar Pausa
+                        </button>
+                        <button type="button" @click="showPauseModal = false; $wire.resetModalFields()"
+                                class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:col-start-1 sm:text-sm dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-800">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -260,7 +279,7 @@
          class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75" style="display: none;"
          aria-labelledby="finish-modal-title" role="dialog" aria-modal="true">
         <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
-             x-on:click.outside="showFinishModal = false">
+             x-on:click.outside="showFinishModal = false; $wire.resetModalFields()">
             <h3 id="finish-modal-title" class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Finalizar Tarefa</h3>
             <form wire:submit.prevent="finishTask">
                 <div class="space-y-4">
@@ -277,7 +296,6 @@
                     {{-- Notas --}}
                     <div>
                         <label for="finish_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observações da Finalização (Opcional)</label>
-                        {{-- Textarea Corrigido --}}
                         <x-filament::input.wrapper :valid="!$errors->has('finishNotes')">
                             <x-filament::input
                                 type="textarea"
@@ -292,7 +310,7 @@
 
                 {{-- Botões do formulário de finalizar --}}
                 <div class="mt-6 flex justify-end gap-3">
-                    <x-filament::button type="button" color="gray" x-on:click="showFinishModal = false">
+                    <x-filament::button type="button" color="gray" x-on:click="showFinishModal = false; $wire.resetModalFields()">
                         Cancelar
                     </x-filament::button>
                     <x-filament::button
@@ -341,21 +359,16 @@
                     stopScanner();
                     setTimeout(() => {
                         isProcessingScan = false;
-                    }, 500);
+                    }, 500); // Pequeno delay para evitar re-scans imediatos se o modal não fechar rápido
                 }, DEBOUNCE_DELAY);
             }
 
-            // Função chamada em caso de falha na leitura
             function onScanFailure(error) {
-                // Evita poluir o console com erros comuns de "não encontrado"
                 if (!error.includes("NotFoundException")) {
                     console.warn(`Code scan error = ${error}`);
                 }
-                // Você pode opcionalmente atualizar a UI aqui se quiser mostrar erros de leitura
-                // document.getElementById('qr-reader-results').innerText = `Erro: ${error}`;
             }
 
-            // Função para iniciar o scanner
             function startScanner() {
                 console.log('Função startScanner chamada.');
                 const qrReaderElement = document.getElementById('qr-reader');
@@ -363,124 +376,77 @@
                     console.error("Elemento #qr-reader não encontrado.");
                     return;
                 }
-
-                // Garante que qualquer instância anterior seja limpa antes de iniciar uma nova
-                stopScanner(); // Chama stopScanner para limpar qualquer estado anterior
-
+                stopScanner();
                 try {
-                    // Cria uma NOVA instância do scanner
-                    html5QrCode = new Html5Qrcode("qr-reader"); // Usando a classe base
-
+                    html5QrCode = new Html5Qrcode("qr-reader");
                     const config = {
-                        fps: 10, // Taxa de quadros por segundo para scan
+                        fps: 10,
                         qrbox: (viewfinderWidth, viewfinderHeight) => {
-                            // Define o tamanho da caixa de scan (ex: 70% do menor lado do viewfinder)
                             let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
                             let qrboxSize = Math.floor(minEdge * 0.7);
                             return { width: qrboxSize, height: qrboxSize };
                         },
-                        rememberLastUsedCamera: true, // Lembra a última câmera usada
-                        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] // Força o uso da câmera
+                        rememberLastUsedCamera: true,
+                        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
                     };
-
-                    // Inicia o scanner
                     html5QrCode.start(
-                        { facingMode: "environment" }, // Tenta usar a câmera traseira ('environment') primeiro
+                        { facingMode: "environment" },
                         config,
-                        onScanSuccess, // Função de callback para sucesso
-                        onScanFailure  // Função de callback para falha
+                        onScanSuccess,
+                        onScanFailure
                     ).then(() => {
                         console.log("Scanner iniciado com sucesso via start().");
                     }).catch((err) => {
                         console.error("Falha ao iniciar o scanner via start().", err);
-                        // Poderia tentar com 'facingMode: "user"' (câmera frontal) como fallback aqui
                     });
-
                 } catch (error) {
                     console.error("Erro ao criar ou configurar a instância Html5Qrcode.", error);
-                    // Limpa a variável global em caso de erro na inicialização
                     html5QrCode = null;
                 }
             }
 
-            // Função para parar o scanner (Versão Robusta)
             function stopScanner() {
                 console.log('Função stopScanner chamada.');
-
                 clearTimeout(debounceTimer);
                 isProcessingScan = false;
-
                 if (!html5QrCode) {
-                    console.log("Instância do scanner já é nula ou inválida. Nada a fazer.");
+                    console.log("Instância do scanner já é nula ou inválida.");
                     return;
                 }
-
                 const scannerInstanceToStop = html5QrCode;
-                html5QrCode = null; // Anula a referência global imediatamente
+                html5QrCode = null;
                 console.log("Variável global html5QrCode definida como null.");
-
-                // Verifica se a instância era válida e estava escaneando
                 if (scannerInstanceToStop && typeof scannerInstanceToStop.getState === 'function' && scannerInstanceToStop.getState() === Html5QrcodeScannerState.SCANNING) {
                     console.log("Tentando parar scanner ativo...");
                     scannerInstanceToStop.stop().then(() => {
                         console.log("Scanner parado com sucesso (stop resolved).");
-                        // Tenta limpar o elemento após parar
                         const currentQrReaderElement = document.getElementById('qr-reader');
                         if (currentQrReaderElement) {
-                            try {
-                                scannerInstanceToStop.clear(); // Limpa o conteúdo da div #qr-reader
-                                console.log("Elemento #qr-reader limpo via clear().");
-                            } catch (e) { console.error("Erro durante clear() após stop bem-sucedido:", e); }
-                        } else { console.log("Elemento #qr-reader não encontrado após stop, clear() não chamado."); }
+                            try { scannerInstanceToStop.clear(); console.log("Elemento #qr-reader limpo via clear()."); }
+                            catch (e) { console.error("Erro durante clear() após stop bem-sucedido:", e); }
+                        }
                     }).catch((err) => {
                         console.error("Falha ao parar o scanner (stop rejected).", err);
-                        // Mesmo com falha no stop, tenta limpar se o elemento existir
                         const currentQrReaderElement = document.getElementById('qr-reader');
                         if (currentQrReaderElement) {
-                            try {
-                                scannerInstanceToStop.clear();
-                                console.log("Elemento #qr-reader limpo via clear() (após falha no stop).");
-                            } catch (e) { console.error("Erro durante clear() após falha no stop:", e); }
-                        } else { console.log("Elemento #qr-reader não encontrado após falha no stop, clear() não chamado."); }
+                            try { scannerInstanceToStop.clear(); console.log("Elemento #qr-reader limpo via clear() (após falha no stop)."); }
+                            catch (e) { console.error("Erro durante clear() após falha no stop:", e); }
+                        }
                     });
                 } else if (scannerInstanceToStop) {
-                    console.log("Scanner não estava ativo (getState() !== SCANNING) ou estado inválido. Tentando limpar.");
-                    // Se não estava escaneando, apenas tenta limpar
+                    console.log("Scanner não estava ativo ou estado inválido. Tentando limpar.");
                     const currentQrReaderElement = document.getElementById('qr-reader');
                     if (currentQrReaderElement) {
-                        try {
-                            scannerInstanceToStop.clear();
-                            console.log("Elemento #qr-reader limpo via clear() (scanner não estava ativo).");
-                        } catch (e) { console.error("Erro durante clear() (scanner não estava ativo):", e); }
-                    } else { console.log("Elemento #qr-reader não encontrado (scanner não estava ativo), clear() não chamado."); }
-                } else {
-                    // Isso não deve acontecer devido à verificação inicial, mas é um fallback
-                    console.log("Instância do scanner era inválida ao verificar estado.");
+                        try { scannerInstanceToStop.clear(); console.log("Elemento #qr-reader limpo via clear() (scanner não estava ativo)."); }
+                        catch (e) { console.error("Erro durante clear() (scanner não estava ativo):", e); }
+                    }
                 }
             }
 
-            // Garante que o scanner pare se o usuário navegar para fora da página
             document.addEventListener('livewire:navigating', () => {
                 console.log('Livewire navigating detectado, chamando stopScanner.');
                 stopScanner();
             });
-
-            // Opcional: Limpa o scanner se o modal for fechado por outros meios
-            // (já coberto por x-on:keydown e x-on:click.outside, mas pode ser redundante aqui)
-            // const observer = new MutationObserver((mutationsList) => {
-            //     for(let mutation of mutationsList) {
-            //         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-            //             if (mutation.target.style.display === 'none' && html5QrCode) {
-            //                 console.log('Modal do scanner ficou oculto, chamando stopScanner.');
-            //                 stopScanner();
-            //             }
-            //         }
-            //     }
-            // });
-            // const scannerModalElement = document.querySelector('[x-show="showScannerModal"]');
-            // if (scannerModalElement) {
-            //     observer.observe(scannerModalElement, { attributes: true });
-            // }
 
         </script>
     @endpush

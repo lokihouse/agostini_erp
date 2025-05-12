@@ -31,7 +31,7 @@ class UserCurrentTask extends Model
         'started_at',
         'last_resumed_at',
         'last_pause_at',
-        'last_pause_reason',
+        'last_pause_reason_uuid',
         'total_active_seconds',
         'notes',
     ];
@@ -80,6 +80,11 @@ class UserCurrentTask extends Model
     public function workSlot(): BelongsTo
     {
         return $this->belongsTo(WorkSlot::class, 'work_slot_uuid', 'uuid');
+    }
+
+    public function lastPauseReasonDetail(): BelongsTo // NOVO RELACIONAMENTO
+    {
+        return $this->belongsTo(PauseReason::class, 'last_pause_reason_uuid', 'uuid');
     }
 
     // --- FIM RELACIONAMENTOS ---

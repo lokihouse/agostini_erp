@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardProductionPdfController;
 use App\Http\Controllers\ProductionOrderPdfController;
 use App\Http\Controllers\TimeClockController;
 use Illuminate\Support\Facades\Route;
@@ -11,10 +12,14 @@ Route::middleware(['auth'])->group(function () {
         ->name('production-orders.pdf');
 
     Route::get('/map-register-point/{actionType}', function (string $actionType) {
-        // Valide $actionType se necessário (ex: in_array($actionType, ['clock_in', ...]))
         return view('livewire.time-clock.map-register-point', ['actionType' => $actionType]);
     })->name('time-clock.map-register-point');
 
-// Rota para receber os dados da batida de ponto (POST request do JavaScript)
     Route::post('/time-clock/store', [TimeClockController::class, 'store'])->name('time-clock.store');
+
+    Route::get('/sales-orders/{uuid}/pdf', [\App\Http\Controllers\SalesOrderPdfController::class, 'generatePdf'])
+        ->name('sales-orders.pdf');
+
+    Route::get('/dp/pdf', [DashboardProductionPdfController::class, 'generatePdf'])
+        ->name('production-dashboard.pdf');
 });

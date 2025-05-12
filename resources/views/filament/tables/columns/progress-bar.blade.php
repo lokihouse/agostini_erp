@@ -16,7 +16,12 @@
 
 {{-- Renderiza a barra apenas se a porcentagem foi calculada --}}
 @if (!is_null($percentage))
-    <div class="w-full {{ $bgColor }} rounded-full h-2.5 overflow-hidden">
+    <div class="w-full {{ $bgColor }} rounded-full h-2.5 overflow-hidden"
+         role="progressbar"
+         aria-valuenow="{{ $percentage }}"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         aria-label="Progresso de {{ $record->name ?? 'item' }}"> {{-- Or a more descriptive label --}}
         <div class="{{ $barColor }} h-2.5 rounded-full text-center text-xs font-medium text-white leading-none" style="width: {{ $percentage }}%">
             {{ $percentage }}%
         </div>

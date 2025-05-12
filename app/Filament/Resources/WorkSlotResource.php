@@ -45,8 +45,8 @@ class WorkSlotResource extends Resource
     protected static ?string $modelLabel = 'Local de Trabalho'; // Nome singular
     protected static ?string $pluralModelLabel = 'Locais de Trabalho'; // Nome plural
 
-    protected static ?string $navigationGroup = 'Produção';
-    protected static ?int $navigationSort = 23; // Ordem na navegação (depois de Etapas)
+    protected static ?string $navigationGroup = 'Cadastros';
+    protected static ?int $navigationSort = 21; // Ordem na navegação (depois de Etapas)
 
     // Configuração para busca global
     protected static ?string $recordTitleAttribute = 'name';

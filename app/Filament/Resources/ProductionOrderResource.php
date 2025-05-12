@@ -29,7 +29,7 @@ class ProductionOrderResource extends Resource
     protected static ?string $modelLabel = 'Ordem de Produção';
     protected static ?string $pluralModelLabel = 'Ordens de Produção';
     protected static ?string $navigationGroup = 'Produção';
-    protected static ?int $navigationSort = 25;
+    protected static ?int $navigationSort = 34;
 
     protected static ?string $recordTitleAttribute = 'order_number';
 
@@ -177,9 +177,7 @@ class ProductionOrderResource extends Resource
                     ->color('info')
                     ->url(fn (ProductionOrder $record): string => route('production-orders.pdf', $record->uuid))
                     ->openUrlInNewTab(),
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([

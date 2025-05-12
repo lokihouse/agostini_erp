@@ -36,6 +36,7 @@ class Product extends Model
         'unit_of_measure',
         'standard_cost',
         'sale_price',
+        'minimum_sale_price'
     ];
 
     /**
@@ -46,6 +47,7 @@ class Product extends Model
     protected $casts = [
         'standard_cost' => 'decimal:2', // Manter casts existentes
         'sale_price' => 'decimal:2',
+        'minimum_sale_price' => 'decimal:2',
     ];
 
     // --- RELAÇÕES ---

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('unit_of_measure')->default('unidade'); // Unidade de medida (ex: peça, kg, litro)
             $table->decimal('standard_cost', 8, 2)->nullable();
             $table->decimal('sale_price', 8, 2)->nullable();
+            $table->decimal('minimum_sale_price', 8, 2)->nullable();
             $table->timestamps(); // created_at e updated_at
             $table->softDeletes(); // deleted_at (para exclusão lógica)
 

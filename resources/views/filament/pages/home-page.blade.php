@@ -6,5 +6,8 @@
         <div>
             @livewire('user-task-control')
         </div>
+        <div>
+            @livewire('scheduled-visits-map')
+        </div>
     </div>
 </x-filament-panels::page>

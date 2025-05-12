@@ -47,7 +47,7 @@
 </div>
 
 {{-- Inclua a API do Google Maps. Substitua YOUR_GOOGLE_MAPS_API_KEY pela sua chave --}}
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjtviMDS4x0iIx1IqrsLlV3jHOXUEwbgg&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap"></script>
 <script>
     let userMarker;
     let mapInstance;

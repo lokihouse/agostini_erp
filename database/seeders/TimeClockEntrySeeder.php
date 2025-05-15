@@ -8,9 +8,7 @@ use Illuminate\Database\Seeder;
 
 class TimeClockEntrySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    
     public function run(): void
     {
         $users = User::all();
@@ -21,12 +19,10 @@ class TimeClockEntrySeeder extends Seeder
         }
 
         foreach ($users as $user) {
-            // Exemplo: Criar batidas com status 'normal' por padrão no seeder
-            TimeClockEntry::factory(10)->create([
+                        TimeClockEntry::factory(10)->create([
                 'user_id' => $user->uuid,
                 'company_id' => $user->company_id,
-                'status' => TimeClockEntry::STATUS_NORMAL // Definindo um status padrão
-            ]);
+                'status' => TimeClockEntry::STATUS_NORMAL             ]);
         }
 
         $this->command->info('Batidas de ponto de exemplo criadas.');

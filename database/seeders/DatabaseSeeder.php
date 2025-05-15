@@ -28,8 +28,7 @@ class DatabaseSeeder extends Seeder
 
         $roleUsuario->syncPermissions([]);
 
-        // ----------------------
-
+        
         $this->call([
             CompanySeeder::class,
         ]);
@@ -60,17 +59,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PauseReasonSeeder::class,
             HolidaySeeder::class,
-            // --------------
-            /*ProductSeeder::class,
-            ProductionStepSeeder::class,
-            WorkSlotSeeder::class,
-            ProductionProcessSeeder::class,
-            ProductionOrderSeeder::class,*/
-            // --------------
-            /*WorkShiftSeeder::class,
-            TimeClockEntrySeeder::class*/
-            // --------------
-            ClientSeeder::class
+                        
+                        
+                        ClientSeeder::class
         ]);
     }
 }

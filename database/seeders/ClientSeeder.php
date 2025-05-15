@@ -3,27 +3,19 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
-use App\Models\Company; // Importar Company
-use Illuminate\Database\Seeder;
+use App\Models\Company; use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class ClientSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    
     public function run(): void
     {
-        // Tenta obter a primeira empresa. Se não existir, o seeder falhará ou você pode criar uma.
-        $company = Company::first();
+                $company = Company::first();
 
         if (!$company) {
             $this->command->error('Nenhuma empresa encontrada. Crie uma empresa antes de rodar o ClientSeeder ou ajuste o seeder para criar uma empresa padrão.');
-            // Opcionalmente, crie uma empresa padrão aqui:
-            // $company = Company::factory()->create(['name' => 'Empresa Padrão Seeder']);
-            // $this->command->info('Empresa Padrão Seeder criada.');
-            return; // Interrompe se não houver empresa e você não quiser criar uma
-        }
+                                                return;         }
 
         $clientsData = [
             ['name' => 'Petrobras', 'social_name' => 'Petrobras (PETR3/PETR4)', 'tax_number' => '33.000.167/0001-01'],
@@ -50,8 +42,7 @@ class ClientSeeder extends Seeder
 
         foreach ($clientsData as $clientData) {
             Client::create([
-                'company_id' => $company->uuid, // Atribui o company_id
-                'name' => $clientData['name'],
+                'company_id' => $company->uuid,                 'name' => $clientData['name'],
                 'social_name' => $clientData['social_name'],
                 'tax_number' => preg_replace('/[^0-9]/', '', $clientData['tax_number']),
                 'status' => Client::STATUS_ACTIVE,

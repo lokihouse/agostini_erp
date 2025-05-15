@@ -22,7 +22,7 @@ class HolidayResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
     protected static ?string $navigationGroup = 'R.H.';
-    protected static ?int $navigationSort = 40;
+    protected static ?int $navigationSort = 60;
 
     public static function getHolidayTypeOptions(): array
     {

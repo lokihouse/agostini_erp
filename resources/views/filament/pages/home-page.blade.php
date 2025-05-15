@@ -3,11 +3,15 @@
         <div>
             @livewire('time-clock.time-clock-manager')
         </div>
-        <div>
-            @livewire('user-task-control')
-        </div>
-        <div>
-            @livewire('scheduled-visits-map')
-        </div>
+        @if(auth()->user() && (auth()->user()->hasRole('Produção') || auth()->user()->hasRole(config('filament-shield.super_admin.name'))))
+            <div>
+                @livewire('user-task-control')
+            </div>
+        @endif
+        @if(auth()->user() && (auth()->user()->hasRole('Vendedor') || auth()->user()->hasRole(config('filament-shield.super_admin.name'))))
+            <div>
+                @livewire('scheduled-visits-map')
+            </div>
+        @endif
     </div>
 </x-filament-panels::page>

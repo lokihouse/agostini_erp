@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\ChartOfAccount;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -25,6 +26,7 @@ use Illuminate\Validation\ValidationException; // Import ValidationException
 class FinancialDashboard extends Page implements HasForms
 {
     use InteractsWithForms;
+    use HasPageShield;
 
     public array $data = []; // Property to hold form state
 
@@ -33,7 +35,7 @@ class FinancialDashboard extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
     protected static ?string $navigationGroup = 'Financeiro';
-    protected static ?int $navigationSort = 51;
+    protected static ?int $navigationSort = 51; // Mantido o seu sort
     protected static ?string $title = 'Resumo Financeiro';
     protected static string $view = 'filament.pages.financial-dashboard';
 
@@ -72,7 +74,7 @@ class FinancialDashboard extends Page implements HasForms
                 ->default(Carbon::now()->endOfMonth())
                 ->native(false)
                 ->reactive()
-                ->minDate(fn (callable $get) => $get('startDate'))
+                ->minDate(fn (callable $get) => $get('startDate')) // $get se refere a $this->data
                 ->required()
                 ->afterStateUpdated(fn (FinancialDashboard $livewire) => $livewire->updateReportData()),
         ];
@@ -80,23 +82,31 @@ class FinancialDashboard extends Page implements HasForms
 
     protected function updateReportData(): void
     {
-        $validatedData = [];
         try {
-            // This will validate $this->data based on the schema defined in getFormSchema()
-            $validatedData = $this->form->validate();
+            // 1. Executa a validação. Se falhar, uma ValidationException será lançada.
+            // O propósito principal aqui é garantir que as regras sejam verificadas e os erros exibidos.
+            $this->form->validate();
         } catch (ValidationException $e) {
             Log::warning('FinancialDashboard: Validation failed.', ['errors' => $e->errors(), 'form_data' => $this->data]);
             $this->reportData = collect();
             $this->monthHeaders = [];
-            // Notification for validation errors is usually handled by Filament automatically.
+            // A notificação de erro de validação geralmente é tratada automaticamente pelo Filament.
             return;
         }
 
-        // Defensive check: Ensure required keys are present after successful validation
-        if (!isset($validatedData['startDate']) || !isset($validatedData['endDate'])) {
-            Log::error('FinancialDashboard: CRITICAL - Validation passed but required date keys are missing.', [
-                'validated_data' => $validatedData,
-                'form_data_property_at_time_of_error' => $this->data
+        // 2. Se a validação passou (nenhuma exceção), $this->data deve conter o estado válido.
+        // Acesse $this->data diretamente.
+        $currentFormData = $this->data;
+
+        // 3. Verificação defensiva adicional em $this->data.
+        // Adicionada verificação de empty() porque ->required() deve garantir que não sejam nulos,
+        // mas uma string vazia passaria no isset(). Carbon::parse('') falharia.
+        if (
+            !isset($currentFormData['startDate']) || empty($currentFormData['startDate']) ||
+            !isset($currentFormData['endDate']) || empty($currentFormData['endDate'])
+        ) {
+            Log::error('FinancialDashboard: CRITICAL - Form state ($this->data) is missing required date keys or they are empty, after validation supposedly passed.', [
+                'current_form_data_property' => $currentFormData,
             ]);
 
             $this->reportData = collect();
@@ -109,13 +119,13 @@ class FinancialDashboard extends Page implements HasForms
             return;
         }
 
-        // Keys 'startDate' and 'endDate' should now be safely accessible
-        $startDate = Carbon::parse($validatedData['startDate']);
-        $endDate = Carbon::parse($validatedData['endDate']);
+        // Agora, as chaves 'startDate' e 'endDate' devem estar acessíveis com segurança em $currentFormData
+        $startDate = Carbon::parse($currentFormData['startDate']);
+        $endDate = Carbon::parse($currentFormData['endDate']);
 
         $this->reportData = ChartOfAccount::query()
             ->whereNull('parent_uuid')
-            ->with(['childAccounts']) // Ensure ChartOfAccount model eager loads childAccounts recursively
+            ->with(['childAccounts']) // Certifique-se de que o modelo ChartOfAccount carrega childAccounts recursivamente
             ->orderBy('code')
             ->get();
 
@@ -136,53 +146,31 @@ class FinancialDashboard extends Page implements HasForms
 
     protected function getValidatedFilterDates(): array
     {
-        // This will validate $this->data
-        $validatedData = $this->form->validate(); // This will throw ValidationException if fails
+        // 1. Executa a validação
+        $this->form->validate(); // Lançará ValidationException se falhar
 
-        // Add the same defensive check here if this method is used independently
-        if (!isset($validatedData['startDate']) || !isset($validatedData['endDate'])) {
-            Log::error('FinancialDashboard (getValidatedFilterDates): CRITICAL - Validation passed but required date keys are missing.', [
-                'validated_data' => $validatedData,
-                'form_data_property_at_time_of_error' => $this->data
+        // 2. Usa $this->data como a fonte dos dados validados
+        $currentFormData = $this->data;
+
+        // 3. Verificação defensiva
+        if (
+            !isset($currentFormData['startDate']) || empty($currentFormData['startDate']) ||
+            !isset($currentFormData['endDate']) || empty($currentFormData['endDate'])
+        ) {
+            Log::error('FinancialDashboard (getValidatedFilterDates): CRITICAL - Form state ($this->data) is missing required date keys or they are empty, after validation.', [
+                'current_form_data_property' => $currentFormData,
             ]);
-            // Decide how to handle this: throw an exception, or return default/null dates?
-            // For now, let's re-throw or throw a new specific exception if this happens.
-            throw new \LogicException('Validated data is missing required date keys in getValidatedFilterDates.');
+            throw new \LogicException('O estado do formulário está faltando chaves de data obrigatórias em getValidatedFilterDates após a validação.');
         }
 
-        $startDate = Carbon::parse($validatedData['startDate']);
-        $endDate = Carbon::parse($validatedData['endDate']);
+        $startDate = Carbon::parse($currentFormData['startDate']);
+        $endDate = Carbon::parse($currentFormData['endDate']);
         return [$startDate, $endDate];
     }
 
 
     protected function getHeaderActions(): array
     {
-        // Example Export Action
-        // if (class_exists(FinancialDashboardExporter::class)) {
-        //     try {
-        //         [$startDate, $endDate] = $this->getValidatedFilterDates();
-        //         return [
-        //             ExportAction::make()
-        //                 ->label('Exportar Relatório')
-        //                 ->exporter(FinancialDashboardExporter::class)
-        //                 ->formats([ExportFormat::Xlsx, ExportFormat::Csv])
-        //                 ->fileName(fn (): string => 'resumo-financeiro-' . now()->format('Y-m-d'))
-        //                 ->getExporterOptionsUsing(fn () => [
-        //                     'startDate' => $startDate,
-        //                     'endDate' => $endDate,
-        //                 ]),
-        //         ];
-        //     } catch (ValidationException $e) {
-        //         // Validation failed when trying to get dates for export
-        //         return [];
-        //     } catch (\LogicException $e) {
-        //         // Catch the custom exception from getValidatedFilterDates
-        //         Log::error($e->getMessage());
-        //         Notification::make()->danger()->title('Erro ao Preparar Exportação')->body('Datas de filtro inválidas.')->send();
-        //         return [];
-        //     }
-        // }
         return [];
     }
 }

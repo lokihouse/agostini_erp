@@ -76,7 +76,8 @@ return [
             'AccountWidget',
             'FilamentInfoWidget',
             'AverageProductionTimes',
-            'ProductionStatsOverview'
+            'ProductionStatsOverview',
+            'PauseTimesOverview'
         ],
 
         'resources' => [],

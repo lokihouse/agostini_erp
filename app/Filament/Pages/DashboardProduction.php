@@ -5,10 +5,14 @@ namespace App\Filament\Pages;
 use App\Filament\Widgets\AverageProductionTimes;
 use App\Filament\Widgets\PauseTimesOverview;
 use App\Filament\Widgets\ProductionStatsOverview;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+
 // use Filament\Pages\Dashboard as BaseDashboard; // Mantenha como BaseDashboard
 
 class DashboardProduction extends \Filament\Pages\Page
 {
+    use HasPageShield;
+
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
     protected static string $view = 'filament.pages.dashboard-production';
     protected static ?string $navigationGroup = 'Produção'; // Grupo onde vai aparecer

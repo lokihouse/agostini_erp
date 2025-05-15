@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         $roleGerente = Role::firstOrCreate(['name' => 'Gerente', 'guard_name' => 'web']);
         $roleUsuario = Role::firstOrCreate(['name' => 'Usuário', 'guard_name' => 'web']);
 
+        $roleProducao = Role::firstOrCreate(['name' => 'Produção', 'guard_name' => 'web']);
+        $roleVendedor = Role::firstOrCreate(['name' => 'Vendedor', 'guard_name' => 'web']);
+
         $allPermissions = Permission::pluck('name')->toArray();
         $roleSuperAdmin->syncPermissions($allPermissions);
 
@@ -28,7 +31,7 @@ class DatabaseSeeder extends Seeder
 
         $roleUsuario->syncPermissions([]);
 
-        
+
         $this->call([
             CompanySeeder::class,
         ]);
@@ -51,17 +54,34 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'company_id' => $company->uuid,
+            'name' => 'Vendedor',
+            'username' => 'vendedor',
+            'is_active' => true,
+        ])->assignRole($roleVendedor);
+
+        User::factory()->create([
+            'company_id' => $company->uuid,
             'name' => 'Usuario Comum',
             'username' => 'usuario',
             'is_active' => true,
-        ])->assignRole($roleUsuario);
+        ])->assignRole([$roleUsuario, $roleProducao]);
 
         $this->call([
             PauseReasonSeeder::class,
             HolidaySeeder::class,
-                        
-                        
-                        ClientSeeder::class
+            ClientSeeder::class,
+
+            ChartOfAccountSeeder::class,
+            FinancialTransactionSeeder::class,
+
+            ProductSeeder::class,
+            ProductionStepSeeder::class,
+            ProductionProcessSeeder::class,
+            ProductionOrderSeeder::class,
+
+            SalesGoalSeeder::class,
+            SalesVisitSeeder::class,
+            SalesOrderSeeder::class,
         ]);
     }
 }

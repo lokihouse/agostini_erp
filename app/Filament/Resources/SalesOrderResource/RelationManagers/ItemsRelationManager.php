@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesOrderResource\RelationManagers;
 
+use App\Filament\Pages\ProcessVisitPage;
 use App\Models\Product;
 use App\Models\SalesOrderItem;
 use Filament\Forms;
@@ -175,9 +176,10 @@ class ItemsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data): array {
-                        // O modelo SalesOrderItem já calcula final_price e total_price no evento 'creating'
-                        // Não precisamos fazer aqui, mas poderíamos se quiséssemos.
                         return $data;
+                    })
+                    ->after(function () {
+                        $this->dispatch('itemsUpdated')->to(ProcessVisitPage::class);
                     }),
             ])
             ->actions([
@@ -186,7 +188,10 @@ class ItemsRelationManager extends RelationManager
                         // O modelo SalesOrderItem já recalcula no evento 'updating'
                         return $data;
                     }),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->after(function () {
+                        $this->dispatch('itemsUpdated')->to(ProcessVisitPage::class);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

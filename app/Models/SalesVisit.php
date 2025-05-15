@@ -30,14 +30,21 @@ class SalesVisit extends Model
         'cancellation_reason',
         'cancellation_details',
         'sales_order_id',
+        'visit_start_time',
+        'visit_end_time',
+        'report_reason_no_order',
+        'report_corrective_actions',
     ];
 
     protected $casts = [
         'scheduled_at' => 'datetime',
         'visited_at' => 'datetime',
+        'visit_start_time' => 'datetime',
+        'visit_end_time' => 'datetime',
     ];
 
     public const STATUS_SCHEDULED = 'scheduled';
+    public const STATUS_IN_PROGRESS = 'in_progress';
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_RESCHEDULED = 'rescheduled';
@@ -46,6 +53,7 @@ class SalesVisit extends Model
     {
         return [
             self::STATUS_SCHEDULED => 'Agendada',
+            self::STATUS_IN_PROGRESS => 'Em Andamento',
             self::STATUS_COMPLETED => 'Concluída',
             self::STATUS_CANCELLED => 'Cancelada',
             self::STATUS_RESCHEDULED => 'Reagendada',

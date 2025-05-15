@@ -380,6 +380,7 @@ class SalesOrderResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('status', '!=', SalesOrder::STATUS_DRAFT);
     }
 }

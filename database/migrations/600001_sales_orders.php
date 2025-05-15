@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('order_date');
             $table->date('delivery_deadline')->nullable();
 
-            $table->enum('status', ['pending', 'approved', 'processing', 'shipped', 'delivered', 'cancelled'])
+            $table->enum('status', ['draft', 'pending', 'approved', 'processing', 'shipped', 'delivered', 'cancelled'])
                 ->default('pending');
             $table->decimal('total_amount', 15, 2)->default(0); // Calculado a partir dos itens
 

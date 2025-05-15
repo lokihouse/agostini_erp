@@ -45,6 +45,7 @@ class SalesOrder extends Model
         'cancelled_at' => 'datetime'
     ];
 
+    public const STATUS_DRAFT = 'draft';
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_PROCESSING = 'processing';
@@ -55,6 +56,7 @@ class SalesOrder extends Model
     public static function getStatusOptions(): array
     {
         return [
+            self::STATUS_DRAFT => 'Rascunho',
             self::STATUS_PENDING => 'Pendente',
             self::STATUS_APPROVED => 'Aprovado',
             self::STATUS_PROCESSING => 'Processando',
@@ -78,7 +80,6 @@ class SalesOrder extends Model
             if (empty($model->order_date)) {
                 $model->order_date = Carbon::today();
             }
-            // Lógica para gerar order_number (PV-AAAA-NNNN)
             if (empty($model->order_number) && $model->company_id) {
                 $year = Carbon::now()->format('Y');
                 $prefix = "PV-{$year}-";
@@ -103,17 +104,18 @@ class SalesOrder extends Model
             $newStatus = $salesOrder->status;
 
             if ($originalStatus === $newStatus) {
-                return; // Nenhuma mudança de status
+                return;
             }
 
-            // Regra 1: Se já cancelado, não pode mudar para nenhum outro status.
             if ($originalStatus === self::STATUS_CANCELLED) {
                 throw ValidationException::withMessages(['status' => 'Um pedido cancelado não pode ter seu status alterado.']);
             }
 
             // Regra 2: Não pode voltar a ser pendente, a menos que esteja sendo criado (o que não é o caso aqui no updating)
-            if ($newStatus === self::STATUS_PENDING && $originalStatus !== self::STATUS_PENDING) {
-                throw ValidationException::withMessages(['status' => 'O pedido não pode voltar ao status Pendente.']);
+            if ($newStatus === self::STATUS_PENDING) {
+                if (!in_array($originalStatus, [self::STATUS_DRAFT, self::STATUS_PENDING])) {
+                    throw ValidationException::withMessages(['status' => 'O pedido não pode voltar ao status Pendente a partir do status atual.']);
+                }
             }
 
             // Regra 3: Se 'Aprovada', cria Ordem de Produção. Não pode voltar de 'Processando' para 'Aprovada'.

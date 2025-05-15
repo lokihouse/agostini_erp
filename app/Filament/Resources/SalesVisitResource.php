@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SalesVisitResource\Pages;
-use App\Models\SalesOrder;
+use App\Models\SalesOrder; // Usado para o link do pedido
 use App\Models\SalesVisit;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,9 +12,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model; // Necessário para type hint em Form
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\HtmlString; // Para renderizar HTML no Placeholder
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Carbon; // Para formatação de data, se necessário
 
 class SalesVisitResource extends Resource
 {
@@ -33,82 +33,104 @@ class SalesVisitResource extends Resource
                 Forms\Components\Tabs::make('SalesVisitTabs')
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('Detalhes da Visita')
-                            ->icon('heroicon-o-information-circle') // Ícone opcional para a aba
+                            ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Forms\Components\Select::make('client_id')
                                     ->label('Cliente')
                                     ->relationship('client', 'name', modifyQueryUsing: fn (Builder $query) => $query->orderBy('name'))
                                     ->searchable()
+                                    ->disabled($form->getOperation() === 'edit')
                                     ->preload()
-                                    ->required()
-                                    ->columnSpanFull()
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                                    ->required(),
+                                // Removido o disabled, pois o formulário padrão de edição deve permitir alterações se necessário
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
 
                                 Forms\Components\Select::make('assigned_to_user_id')
                                     ->label('Vendedor Responsável')
                                     ->relationship('assignedTo', 'name', modifyQueryUsing: fn (Builder $query) => $query->orderBy('name'))
                                     ->searchable()
                                     ->preload()
-                                    ->required()
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                                    ->required(),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
 
                                 Forms\Components\DateTimePicker::make('scheduled_at')
                                     ->label('Data/Hora Agendada')
                                     ->native(false)
                                     ->seconds(false)
                                     ->required()
-                                    ->default(now()->addDay()->setHour(9)->setMinute(0))
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                                    ->default(now()->addDay()->setHour(9)->setMinute(0)),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
 
                                 Forms\Components\Select::make('status')
                                     ->label('Status')
                                     ->options(SalesVisit::getStatusOptions())
                                     ->required()
+                                    ->disabled($form->getOperation() === 'edit')
                                     ->default(SalesVisit::STATUS_SCHEDULED)
-                                    ->live()
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                                    ->live(),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
 
                                 Forms\Components\DateTimePicker::make('visited_at')
                                     ->label('Data/Hora da Realização')
                                     ->native(false)
                                     ->seconds(false)
-                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && in_array($get('status'), [SalesVisit::STATUS_COMPLETED]))
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
-                            ])->columns(2), // Mantém as 2 colunas para esta aba
+                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && in_array($get('status'), [SalesVisit::STATUS_COMPLETED])),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                            ])->columns(2),
 
                         Forms\Components\Tabs\Tab::make('Observações e Cancelamento')
-                            ->icon('heroicon-o-pencil-square') // Ícone opcional
-                            // Visível na edição se for completada ou cancelada
+                            ->icon('heroicon-o-pencil-square')
                             ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && in_array($get('status'), [SalesVisit::STATUS_COMPLETED, SalesVisit::STATUS_CANCELLED]))
                             ->schema([
                                 Forms\Components\Textarea::make('notes')
                                     ->label('Observações da Visita')
                                     ->rows(3)
                                     ->columnSpanFull()
-                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && $get('status') === SalesVisit::STATUS_COMPLETED)
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && $get('status') === SalesVisit::STATUS_COMPLETED),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
 
                                 Forms\Components\TextInput::make('cancellation_reason')
                                     ->label('Motivo do Cancelamento')
                                     ->maxLength(255)
-                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && $get('status') === SalesVisit::STATUS_CANCELLED)
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && $get('status') === SalesVisit::STATUS_CANCELLED),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
 
                                 Forms\Components\Textarea::make('cancellation_details')
                                     ->label('Detalhes do Cancelamento')
                                     ->rows(3)
                                     ->columnSpanFull()
-                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && $get('status') === SalesVisit::STATUS_CANCELLED)
-                                    ->disabled(fn (string $operation): bool => $operation === 'edit'),
-                            ]), // Esta aba pode ter 1 coluna por padrão ou definir ->columns(1)
+                                    ->visible(fn (Get $get, string $operation): bool => $operation === 'edit' && $get('status') === SalesVisit::STATUS_CANCELLED),
+                                // ->disabled(fn (string $operation): bool => $operation === 'edit'),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make('Relatório (Sem Pedido)')
+                            ->icon('heroicon-o-document-chart-bar')
+                            ->visible(fn (?SalesVisit $record, string $operation): bool =>
+                                $operation === 'edit' &&
+                                $record &&
+                                $record->status === SalesVisit::STATUS_COMPLETED &&
+                                is_null($record->sales_order_id) &&
+                                (!empty($record->report_reason_no_order) || !empty($record->report_corrective_actions))
+                            )
+                            ->schema([
+                                Forms\Components\TextInput::make('report_reason_no_order')
+                                    ->label('Motivo da Não Geração de Pedido')
+                                    ->disabled()
+                                    ->columnSpanFull(),
+                                Forms\Components\Textarea::make('report_corrective_actions')
+                                    ->label('Ações Corretivas Sugeridas')
+                                    ->disabled()
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+                            ]),
 
                         Forms\Components\Tabs\Tab::make('Pedido Associado')
-                            ->icon('heroicon-o-shopping-cart') // Ícone opcional
+                            ->icon('heroicon-o-shopping-cart')
                             ->visible(fn (?SalesVisit $record, string $operation): bool => $operation === 'edit' && $record && $record->sales_order_id !== null)
                             ->schema([
                                 Forms\Components\Placeholder::make('sales_order_info')
                                     ->label('Pedido de Venda')
-                                    ->content(function (?SalesVisit $record): HtmlString|string { // Especificar HtmlString
+                                    ->content(function (?SalesVisit $record): HtmlString|string {
                                         if ($record && $record->salesOrder) {
                                             $url = SalesOrderResource::getUrl('edit', ['record' => $record->sales_order_id]);
                                             $statusLabel = SalesOrder::getStatusOptions()[$record->salesOrder->status] ?? $record->salesOrder->status;
@@ -116,12 +138,12 @@ class SalesVisitResource extends Resource
                                                 htmlspecialchars($record->salesOrder->order_number) .
                                                 " (Status: " . htmlspecialchars($statusLabel) . ")" .
                                                 "</a>";
-                                            return new HtmlString($linkHtml); // Usar HtmlString
+                                            return new HtmlString($linkHtml);
                                         }
                                         return 'Nenhum pedido associado.';
                                     }),
                             ]),
-                    ])->columnSpanFull(), // Faz as abas ocuparem a largura total
+                    ])->columnSpanFull(),
             ]);
     }
 
@@ -147,6 +169,7 @@ class SalesVisitResource extends Resource
                     ->formatStateUsing(fn (string $state): string => SalesVisit::getStatusOptions()[$state] ?? ucfirst($state))
                     ->color(fn (string $state): string => match ($state) {
                         SalesVisit::STATUS_SCHEDULED => 'warning',
+                        SalesVisit::STATUS_IN_PROGRESS => 'primary', // Cor para Em Andamento
                         SalesVisit::STATUS_COMPLETED => 'success',
                         SalesVisit::STATUS_CANCELLED => 'danger',
                         SalesVisit::STATUS_RESCHEDULED => 'info',
@@ -158,7 +181,12 @@ class SalesVisitResource extends Resource
                     ->placeholder('Nenhum')
                     ->searchable()
                     ->sortable()
-                    ->url(fn (SalesVisit $record): ?string => $record->sales_order_id ? SalesOrderResource::getUrl('edit', ['record' => $record->sales_order_id]) : null, shouldOpenInNewTab: true),
+                    ->url(function (SalesVisit $record): ?string {
+                        if ($record->sales_order_id) {
+                            return route('sales-orders.pdf', ['uuid' => $record->sales_order_id]);
+                        }
+                        return null;
+                    }, shouldOpenInNewTab: true),
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Empresa')
                     ->searchable()
@@ -208,8 +236,8 @@ class SalesVisitResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->label('Visualizar'),
+                Tables\Actions\EditAction::make()->label('Detalhes')
+                    ->hidden(fn (SalesVisit $record): bool => $record->status === SalesVisit::STATUS_COMPLETED),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -218,22 +246,27 @@ class SalesVisitResource extends Resource
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
+            ->recordUrl(null
+                // fn (SalesVisit $record): ?string => $record->status === SalesVisit::STATUS_COMPLETED ? null : static::getUrl('edit', ['record' => $record]),
+            )
             ->defaultSort('scheduled_at', 'desc');
     }
 
     public static function getRelations(): array
     {
         return [
-            // RelationManagers\SalesOrderRelationManager::class, // Se existir
+            // Se você tiver RelationManagers, eles entram aqui.
         ];
     }
 
     public static function getPages(): array
     {
+        // Apenas as páginas padrão do resource
         return [
             'index' => Pages\ListSalesVisits::route('/'),
             'create' => Pages\CreateSalesVisit::route('/create'),
             'edit' => Pages\EditSalesVisit::route('/{record}/edit'),
+            // Removida a página 'conduct' que existia antes
         ];
     }
 

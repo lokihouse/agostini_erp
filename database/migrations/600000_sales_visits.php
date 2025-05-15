@@ -16,9 +16,13 @@ return new class extends Migration
             $table->foreignUuid('assigned_to_user_id')->comment('Usuário que realizou/realizará')->constrained('users', 'uuid')->restrictOnDelete();
 
             $table->dateTime('scheduled_at')->comment('Data/Hora Agendada');
+            $table->timestamp('visit_start_time')->nullable();
+            $table->timestamp('visit_end_time')->nullable();
+            $table->string('report_reason_no_order')->nullable();
+            $table->text('report_corrective_actions')->nullable();
             $table->dateTime('visited_at')->nullable()->comment('Data/Hora da Realização');
 
-            $table->enum('status', ['scheduled', 'completed', 'cancelled', 'rescheduled'])->default('scheduled');
+            $table->enum('status', ['scheduled', 'in_progress', 'completed', 'cancelled', 'rescheduled'])->default('scheduled');
             $table->text('notes')->nullable()->comment('Observações gerais da visita');
 
             $table->string('cancellation_reason')->nullable();

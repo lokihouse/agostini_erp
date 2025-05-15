@@ -59,16 +59,16 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PauseReasonSeeder::class,
+            HolidaySeeder::class,
             // --------------
-            ProductSeeder::class,
+            /*ProductSeeder::class,
             ProductionStepSeeder::class,
             WorkSlotSeeder::class,
             ProductionProcessSeeder::class,
-            ProductionOrderSeeder::class,
+            ProductionOrderSeeder::class,*/
             // --------------
-            WorkShiftSeeder::class,
-            HolidaySeeder::class,
-            // TimeClockEntrySeeder::class
+            /*WorkShiftSeeder::class,
+            TimeClockEntrySeeder::class*/
             // --------------
             ClientSeeder::class
         ]);

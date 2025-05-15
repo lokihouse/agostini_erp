@@ -11,12 +11,14 @@
             </div>
 
             <div class="flex items-center gap-x-3">
+                {{-- Botão de alternância atualizado --}}
                 <x-filament::icon-button
                     icon="{{ $viewMode === 'map' ? 'heroicon-o-list-bullet' : 'heroicon-o-map' }}"
                     wire:click="toggleView"
                     color="gray"
                     size="sm"
-                    outlined
+                    label="{{ $viewMode === 'map' ? 'Ver Lista' : 'Ver Mapa' }}"
+                    tooltip="{{ $viewMode === 'map' ? 'Alternar para visualização em lista' : 'Alternar para visualização em mapa' }}"
                 />
             </div>
         </div>
@@ -37,22 +39,48 @@
                         configurada.</p>
                 @endif
             @else
+                {{-- Modo Lista --}}
                 @if(!empty($visitsForMap))
-                    <div class="p-2">
+                    <div class="p-2 max-h-[297px] overflow-y-auto"> {{-- Adicionado max-height e overflow --}}
                         <ul class="divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach($visitsForMap as $visit)
-                                <li class="py-3">
+                                @php
+                                    $markerColor = "gray";
+                                    switch($visit['marker_category']){
+                                        case 'danger':
+                                            $markerColor = "red";
+                                            break;
+                                        case 'warning':
+                                            $markerColor = "#FFA500";
+                                            break;
+                                    }
+                                @endphp
+                                <li class="py-3 px-2 border-s-8" style="border-color: {{ $markerColor }};"> {{-- Adicionado px-2 para consistência --}}
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $visit['scheduled_at_formatted'] }}</p>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $visit['scheduled_at_formatted'] }}
+                                                @if($visit['marker_category'] === 'danger')
+                                                    <span class="ml-1 text-red-500 font-semibold">(Atrasada/Hoje)</span>
+                                                @elseif($visit['marker_category'] === 'warning')
+                                                    <span class="ml-1 text-yellow-500 font-semibold">(Em Andamento)</span>
+                                                @elseif($visit['marker_category'] === 'gray')
+                                                    <span class="ml-1 text-gray-400 font-semibold">(Distante)</span>
+                                                @endif
+                                            </div>
                                             <p class="text-xs font-semibold text-gray-900 dark:text-white">{{ $visit['client_name'] }}</p>
+                                            <div class="text-[9px] text-gray-500 dark:text-gray-400 truncate" title="{{ $visit['address'] }}">{{ $visit['address'] }}</div>
                                         </div>
                                         <div class="flex-shrink-0 ml-4">
+                                            {{-- Botão de detalhes atualizado --}}
                                             <x-filament::icon-button
                                                 icon="heroicon-m-chevron-double-right"
                                                 href="{{ $visit['edit_url'] }}"
                                                 tag="a"
-                                                label="Filament"
+                                                label="Ver Detalhes"
+                                                tooltip="Ver detalhes da visita"
+                                                size="sm"
+                                                color="gray"
                                             />
                                         </div>
                                     </div>
@@ -68,10 +96,11 @@
         </div>
     </div>
 
-    @if($googleMapsApiKey && !empty($visitsForMap))
+    {{-- Script do Google Maps só é carregado se o modo mapa estiver ativo e houver dados --}}
+    @if($googleMapsApiKey && !empty($visitsForMap) && $viewMode === 'map')
         @push('scripts')
             <script>
-                function initScheduledVisitsMap() {
+                async function initScheduledVisitsMap() {
                     const visitsData = @json($visitsForMap);
                     let map;
                     let infoWindow;
@@ -80,6 +109,8 @@
                     if (visitsData.length === 0) {
                         return;
                     }
+
+                    const {PinElement} = await google.maps.importLibrary("marker");
 
                     const initialCenter = {
                         lat: visitsData[0].latitude,
@@ -96,13 +127,51 @@
 
                     infoWindow = new google.maps.InfoWindow();
 
+                    // CORREÇÃO: de visitsData para visitsData
                     visitsData.forEach((visit, index) => {
                         const markerPosition = {lat: visit.latitude, lng: visit.longitude};
+                        let pinGlyphElement, pinBackground, pinBorderColor; // Renomeado pinGlyph para pinGlyphElement para clareza
+
+                        switch (visit.marker_category) {
+                            case 'danger': // Atrasadas (Vermelho)
+                                pinBackground = '#FF0000'; // Vermelho
+                                pinBorderColor = '#A00000'; // Vermelho escuro
+                                pinGlyphElement = new PinElement({
+                                    glyph: "!",
+                                    glyphColor: "white",
+                                    background: pinBackground,
+                                    borderColor: pinBorderColor,
+                                    scale: 1,
+                                }).element;
+                                break;
+                            case 'warning': // Em Andamento (Amarelo)
+                                pinBackground = '#FFA500'; // Laranja/Amarelo
+                                pinBorderColor = '#CC8400';
+                                pinGlyphElement = new PinElement({
+                                    glyphColor: "#CC8400", // Melhor contraste com amarelo
+                                    background: pinBackground,
+                                    borderColor: pinBorderColor,
+                                    scale: 1,
+                                }).element;
+                                break;
+                            default: // Mais de 7 dias (Cinza)
+                                pinBackground = '#DDDDDD'; // Cinza
+                                pinBorderColor = '#000000';
+                                pinGlyphElement = new PinElement({
+                                    glyph: "",
+                                    glyphColor: "white",
+                                    background: pinBackground,
+                                    borderColor: pinBorderColor,
+                                    scale: 0.6, // Um pouco menor
+                                }).element;
+                                break;
+                        }
 
                         const marker = new google.maps.marker.AdvancedMarkerElement({
-                            position: markerPosition, // Usar a variável
+                            position: markerPosition,
                             map: map,
                             title: visit.client_name + ' - ' + visit.scheduled_at_formatted,
+                            content: pinGlyphElement, // Usa o elemento DOM do PinElement
                         });
 
                         marker.addListener('gmp-click', () => {
@@ -113,7 +182,7 @@
                                 <p style="font-size: 0.85em; margin-bottom: 3px;"><strong>Agendado para:</strong> ${visit.scheduled_at_formatted}</p>
                                 <p style="font-size: 0.85em; margin-bottom: 3px;"><strong>Endereço:</strong> ${visit.address || 'N/A'}</p>
                                 <p style="font-size: 0.85em; margin-bottom: 3px;"><strong>Status:</strong> ${visit.status}</p>
-                                <a href="${visit.edit_url}" target="_blank" style="font-size: 0.85em; color: #3b82f6; text-decoration: underline;">Ver Detalhes da Visita</a>
+                                <a href="${visit.edit_url}" style="font-size: 0.85em; color: #3b82f6; text-decoration: underline;">Ver Detalhes da Visita</a>
                             </div>
                         `;
                             infoWindow.setContent(content);
@@ -125,9 +194,8 @@
 
                     if (visitsData.length > 0) {
                         map.fitBounds(bounds);
-                        // Se houver apenas um marcador, o fitBounds pode dar um zoom muito alto.
                         if (visitsData.length === 1) {
-                            map.setZoom(15); // Ajuste o zoom para um único marcador
+                            map.setZoom(15);
                         }
                     }
                 }

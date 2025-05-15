@@ -27,22 +27,35 @@ class ScheduledVisitsMap extends Component
             return;
         }
 
-        // Buscar visitas agendadas para o usuário, de hoje em diante,
-        // que não estão canceladas ou concluídas, e cujo cliente tem lat/lng.
+        $today = Carbon::today();
+        $sevenDaysFromNow = $today->copy()->addDays(7);
+
         $visits = SalesVisit::with([
             'client' => function ($query) {
                 $query->whereNotNull('latitude')->whereNotNull('longitude');
             }
         ])
             ->where('assigned_to_user_id', $user->uuid)
-            ->where('status', SalesVisit::STATUS_SCHEDULED)
-            ->whereDate('scheduled_at', '>=', Carbon::today())
+            ->whereIn('status', [SalesVisit::STATUS_SCHEDULED, SalesVisit::STATUS_IN_PROGRESS])
             ->orderBy('scheduled_at', 'asc')
             ->get();
 
         $this->visitsForMap = $visits->filter(function ($visit) {
             return $visit->client && $visit->client->latitude && $visit->client->longitude;
-        })->map(function (SalesVisit $visit) {
+        })->map(function (SalesVisit $visit) use ($today, $sevenDaysFromNow){
+            $scheduledAt = Carbon::parse($visit->scheduled_at);
+            $markerCategory = 'default';
+
+            if($visit->status === SalesVisit::STATUS_IN_PROGRESS){
+                $markerCategory = 'warning';
+            } elseif($visit->status === SalesVisit::STATUS_SCHEDULED){
+                if($scheduledAt->isPast() || $scheduledAt->isToday()){
+                    $markerCategory = 'danger';
+                } elseif ($scheduledAt->gt($sevenDaysFromNow)){
+                    $markerCategory = 'gray';
+                }
+            }
+
             return [
                 'id' => $visit->uuid,
                 'client_name' => $visit->client->name,
@@ -54,14 +67,16 @@ class ScheduledVisitsMap extends Component
                     $visit->client->address_city,
                     $visit->client->address_state,
                 ]))),
-                'scheduled_at_formatted' => Carbon::parse($visit->scheduled_at)->format('d/m/Y H:i'),
+                'scheduled_at_formatted' => $scheduledAt->format('d/m/Y H:i'),
                 'latitude' => (float) $visit->client->latitude,
                 'longitude' => (float) $visit->client->longitude,
                 'status' => SalesVisit::getStatusOptions()[$visit->status] ?? $visit->status,
-                // Link para editar a visita (opcional)
-                'edit_url' => route('filament.app.resources.sales-visits.edit', ['record' => $visit->uuid]),
+                'status_key' => $visit->status, // Adiciona a chave do status para lógica
+                'marker_category' => $markerCategory, // Nova chave para a cor/tipo do marcador
+                'edit_url' => route('filament.app.pages.processar-visita', ['visit_uuid' => $visit->uuid])
             ];
-        })->values()->all(); // values() para reindexar o array após o filter
+        })->values()->all();
+
     }
 
     public function toggleView(): void

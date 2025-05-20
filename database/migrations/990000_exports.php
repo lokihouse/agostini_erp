@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('processed_rows')->default(0);
             $table->unsignedInteger('total_rows');
             $table->unsignedInteger('successful_rows')->default(0);
-            $table->foreignUuid('user_id')
+            $table->foreignUuid('user_uuid')
                 ->constrained(table: 'users', column: 'uuid')
                 ->cascadeOnDelete();
             $table->timestamps();

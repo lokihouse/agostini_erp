@@ -40,6 +40,8 @@ class AppPanelProvider extends PanelProvider
             ->topNavigation()
             ->maxContentWidth(MaxWidth::Full)
             ->theme(asset('css/filament/app/theme.css'))
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('10s')
             ->spa()
             // ->unsavedChangesAlerts()
             ->broadcasting(false)
@@ -47,6 +49,7 @@ class AppPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->plugins([
+                \Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin::make(),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
                     ->gridColumns([
                         'default' => 1,

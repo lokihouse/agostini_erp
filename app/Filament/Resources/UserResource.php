@@ -2,21 +2,26 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\UserExporter;
+use App\Filament\Imports\UserImporter;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Models\WorkShift; // Importar WorkShift
+use App\Models\WorkShift;
+use Filament\Actions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Forms\Get; // Importar Get
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder; // Importar Builder
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -162,6 +167,12 @@ class UserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()->label('Excluir Selecionados'),
                 ]),
+            ])
+            ->headerActions([
+//                ExportAction::make()
+//                    ->exporter(UserExporter::class),
+//                ImportAction::make()
+//                    ->importer(UserImporter::class),
             ])
             ->emptyStateHeading('Nenhum usuário encontrado')
             ->emptyStateDescription('Crie um usuário para começar.');

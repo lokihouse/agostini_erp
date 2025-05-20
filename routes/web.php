@@ -20,6 +20,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/sales-orders/{uuid}/pdf', [\App\Http\Controllers\SalesOrderPdfController::class, 'generatePdf'])
         ->name('sales-orders.pdf');
 
+    Route::get('/transport-orders/{uuid}/pdf', [\App\Http\Controllers\TransportOrderPdfController::class, 'generatePdf'])
+        ->name('transport-orders.pdf');
+
     Route::get('/dp/pdf', [DashboardProductionPdfController::class, 'generatePdf'])
         ->name('production-dashboard.pdf');
 });

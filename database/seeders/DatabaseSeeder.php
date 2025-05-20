@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
 
         $roleProducao = Role::firstOrCreate(['name' => 'Produção', 'guard_name' => 'web']);
         $roleVendedor = Role::firstOrCreate(['name' => 'Vendedor', 'guard_name' => 'web']);
+        $roleMotorista = Role::firstOrCreate(['name' => 'Motorista', 'guard_name' => 'web']);
 
         $allPermissions = Permission::pluck('name')->toArray();
         $roleSuperAdmin->syncPermissions($allPermissions);
@@ -54,17 +55,24 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'company_id' => $company->uuid,
-            'name' => 'Vendedor',
+            'name' => 'Usuário Vendedor',
             'username' => 'vendedor',
             'is_active' => true,
         ])->assignRole($roleVendedor);
 
         User::factory()->create([
             'company_id' => $company->uuid,
-            'name' => 'Usuario Comum',
-            'username' => 'usuario',
+            'name' => 'Usuario Produção',
+            'username' => 'producao',
             'is_active' => true,
-        ])->assignRole([$roleUsuario, $roleProducao]);
+        ])->assignRole([$roleProducao]);
+
+        User::factory()->create([
+            'company_id' => $company->uuid,
+            'name' => 'Usuario Motorista',
+            'username' => 'motorista',
+            'is_active' => true,
+        ])->assignRole($roleMotorista);
 
         $this->call([
             PauseReasonSeeder::class,
@@ -82,6 +90,8 @@ class DatabaseSeeder extends Seeder
             SalesGoalSeeder::class,
             SalesVisitSeeder::class,
             SalesOrderSeeder::class,
+
+            VehicleSeeder::class
         ]);
     }
 }

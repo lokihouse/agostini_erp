@@ -64,6 +64,19 @@ class Client extends Model
         return self::getStatusOptions()[$this->status] ?? ucfirst($this->status);
     }
 
+    public function getFullAddress(): string
+    {
+        return trim(implode(', ', array_filter([
+            $this->address_street,
+            $this->address_number,
+            $this->address_complement,
+            $this->address_neighborhood,
+            $this->address_city,
+            $this->address_state,
+            $this->address_zip_code,
+        ])));
+    }
+
     protected static function booted(): void
     {
         static::addGlobalScope(new TenantScope());

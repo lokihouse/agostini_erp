@@ -16,7 +16,17 @@ return new class extends Migration
             $table->string('name');
             $table->string('socialName')->nullable();
             $table->string('taxNumber')->unique();
-            $table->string('address')->nullable();
+
+            $table->string('address_zip_code')->nullable();
+            $table->string('address_street')->nullable();
+            $table->string('address_number')->nullable();
+            $table->string('address_complement')->nullable();
+            $table->string('address_district')->nullable();
+            $table->string('address_city')->nullable();
+            $table->string('address_state', 2)->nullable();
+
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->string('telephone')->nullable();
 
             $table->timestamps();

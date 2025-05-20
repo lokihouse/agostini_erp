@@ -13,5 +13,10 @@
                 @livewire('scheduled-visits-map')
             </div>
         @endif
+        @if(auth()->user() && (auth()->user()->hasRole('Motorista') || auth()->user()->hasRole(config('filament-shield.super_admin.name'))))
+            <div>
+                @livewire('driver-delivery-manager')
+            </div>
+        @endif
     </div>
 </x-filament-panels::page>

@@ -100,6 +100,8 @@
             </script>
         @endif
 
+        @laravelPWA
+
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_END, scopes: $livewire->getRenderHookScopes()) }}
     </head>
 

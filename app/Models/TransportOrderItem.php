@@ -41,7 +41,7 @@ class TransportOrderItem extends Model
     ];
 
     protected $casts = [
-        'quantity' => 'decimal:4',
+        'quantity' => 'integer',
         'delivery_photos' => 'array',
         'delivered_at' => 'datetime',
         'returned_at' => 'datetime',

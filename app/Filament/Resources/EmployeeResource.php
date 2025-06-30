@@ -30,13 +30,26 @@ class EmployeeResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(4)
             ->schema([
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Ativo?')
+                    ->required()
+                    ->inline(false)
+                    ->default(true),
+
                 Forms\Components\TextInput::make('name')
                     ->label('Nome Completo')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Hidden::make('company_id')
                     ->default(fn () => Auth::user()->company_id),
+
+                Forms\Components\TextInput::make('username')
+                    ->label('Usuário (Login)')
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(255),
 
                 Forms\Components\Select::make('work_shift_id')
                     ->label('Jornada de Trabalho')
@@ -51,14 +64,7 @@ class EmployeeResource extends Resource
                     })
                     ->searchable()
                     ->preload()
-                    ->nullable()
-                    ->helperText('Jornadas da sua empresa.'),
-
-                Forms\Components\Toggle::make('is_active')
-                    ->label('Ativo?')
-                    ->required()
-                    ->default(true)
-                    ->columnSpanFull(), // Ocupa a largura total se for o último na linha
+                    ->nullable(),
                 Forms\Components\TextInput::make('password')
                     ->label('Senha')
                     ->password()

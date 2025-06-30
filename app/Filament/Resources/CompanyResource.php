@@ -8,6 +8,8 @@ use App\Models\Company;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -42,29 +44,35 @@ class CompanyResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make('CompanyTabs')
+                Tabs::make('ClientTabs')
                     ->tabs([
                         Tabs\Tab::make('Dados Cadastrais')
                             ->icon('heroicon-o-identification')
-                            ->columns(4)
                             ->schema([
-                                TextInput::make('taxNumber')
+                                TextInput::make('tax_number')
                                     ->label('CNPJ')
                                     ->required()
+                                    ->maxLength(20)
                                     ->mask('99.999.999/9999-99')
-                                    ->live(onBlur: true) // Para consulta de CNPJ
+                                    ->live(onBlur: true)
                                     ->rule(function (Get $get, $record) {
-                                        // Para Company, a unicidade é global, não por company_id
-                                        return Rule::unique('companies', 'taxNumber')
+                                        $companyId = $record?->company_id ?? auth()->user()?->company_id;
+                                        // Basic check, model should handle if company_id is absolutely required for validation logic
+                                        if (!$companyId && !$record) {
+                                            // Potentially return a validation failure if companyId is indeterminable and critical for the unique rule context
+                                        }
+                                        return Rule::unique('clients', 'tax_number')
+                                            ->where('company_id', $companyId)
                                             ->ignore($record?->uuid, 'uuid');
                                     })
                                     ->suffixAction(
-                                        Action::make('consultarCnpjEmpresa')
+                                        Action::make('consultarCnpj')
                                             ->label('Consultar')
-                                            ->icon(fn (Livewire $livewire) => property_exists($livewire, 'isLoadingCnpj') && $livewire->isLoadingCnpj ? 'heroicon-o-arrow-path fi-spin' : 'heroicon-o-magnifying-glass')
-                                            ->disabled(fn (Livewire $livewire) => property_exists($livewire, 'isLoadingCnpj') && $livewire->isLoadingCnpj)
+                                            // Dynamically set icon and disabled state
+                                            ->icon(fn (Livewire $livewire) => $livewire->isLoadingCnpj ? 'heroicon-o-arrow-path fi-spin' : 'heroicon-o-magnifying-glass')
+                                            ->disabled(fn (Livewire $livewire) => $livewire->isLoadingCnpj)
                                             ->action(function (Get $get, Livewire $livewire) {
-                                                $cnpj = $get('taxNumber');
+                                                $cnpj = $get('tax_number');
                                                 if (empty($cnpj)) {
                                                     Notification::make()
                                                         ->title('CNPJ não informado')
@@ -74,56 +82,55 @@ class CompanyResource extends Resource
                                                     return;
                                                 }
                                                 $cleanedCnpj = preg_replace('/[^0-9]/', '', $cnpj);
-                                                // A página CreateCompany/EditCompany precisará tratar este evento
-                                                $livewire->dispatch('fetchCnpjDataCompany', cnpj: $cleanedCnpj);
+                                                // The Livewire component (CreateClient/EditClient) will set isLoadingCnpj
+                                                $livewire->dispatch('fetchCnpjData', cnpj: $cleanedCnpj);
                                             })
                                             ->color('gray')
+                                    // ->loadingIndicator() // Removed as it's causing an error
                                     )
-                                    ->placeholder('12.345.678/9012-34'),
-                                TextInput::make('name')
-                                    ->label('Nome Fantasia')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->columnSpanFull(),
-                                TextInput::make('socialName')
+                                    ->placeholder('12.345.678/9012-34')
+                                    ->columnSpan(3),
+                                TextInput::make('social_name')
                                     ->label('Razão Social')
                                     ->maxLength(255)
-                                    ->columnSpanFull(), // Para ocupar a linha toda se estiver em grid de 1
-
-                                TextInput::make('telephone')
-                                    ->label('Telefone')
-                                    ->tel()
-                                    ->mask('(99) 9999-9999')
-                                    ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? preg_replace('/[^0-9]/', '', $state) : null)
-                                    ->rule(static function () {
-                                        return static function (string $attribute, $value, \Closure $fail) {
-                                            if (empty($value)) {
-                                                return;
-                                            }
-                                            $cleaned = preg_replace('/[^0-9]/', '', $value);
-                                            if (!in_array(strlen($cleaned), [10, 11])) {
-                                                $fail('O campo Telefone deve conter 10 ou 11 dígitos.');
-                                            }
-                                        };
+                                    ->columnSpan(4),
+                                TextInput::make('name')
+                                    ->label('Nome Fantasia')
+                                    ->maxLength(255)
+                                    ->columnSpan(5),
+                                TextInput::make('state_registration')
+                                    ->label('Inscrição Estadual')
+                                    ->maxLength(20)
+                                    ->rule(function (Get $get, $record) {
+                                        $value = $get('state_registration');
+                                        if (empty($value)) return null;
+                                        $companyId = $record?->company_id ?? auth()->user()?->company_id;
+                                        return Rule::unique('clients', 'state_registration')
+                                            ->where('company_id', $companyId)
+                                            ->ignore($record?->uuid, 'uuid');
                                     })
-                                    ->columnSpanFull(),
-                            ])->columns(1), // Ajuste o layout interno da aba se necessário
+                                    ->columnSpan(4),
+                                TextInput::make('municipal_registration')
+                                    ->label('Inscrição Municipal')
+                                    ->maxLength(20)
+                                    ->columnSpan(4)
+                            ])->columns(12),
 
                         Tabs\Tab::make('Endereço e Localização')
                             ->icon('heroicon-o-map-pin')
                             ->schema([
-                                Group::make() // Grupo para campos de endereço
-                                ->schema([
+                                Group::make([
                                     TextInput::make('address_zip_code')
                                         ->label('CEP')
                                         ->mask('99999-999')
-                                        ->live(onBlur: true) // Para consulta de CEP
-                                        ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? preg_replace('/[^0-9]/', '', $state) : null)
+                                        ->maxLength(9)
+                                        ->live(onBlur: true)
                                         ->suffixAction(
-                                            Action::make('consultarCepEmpresa')
+                                            Action::make('consultarCep')
                                                 ->label('Buscar')
-                                                ->icon(fn (Livewire $livewire) => property_exists($livewire, 'isLoadingCep') && $livewire->isLoadingCep ? 'heroicon-o-arrow-path fi-spin' : 'heroicon-o-magnifying-glass')
-                                                ->disabled(fn (Livewire $livewire) => property_exists($livewire, 'isLoadingCep') && $livewire->isLoadingCep)
+                                                // Dynamically set icon and disabled state
+                                                ->icon(fn (Livewire $livewire) => $livewire->isLoadingCep ? 'heroicon-o-arrow-path fi-spin' : 'heroicon-o-magnifying-glass')
+                                                ->disabled(fn (Livewire $livewire) => $livewire->isLoadingCep)
                                                 ->action(function (Get $get, Livewire $livewire) {
                                                     $cep = $get('address_zip_code');
                                                     if (empty($cep)) {
@@ -143,17 +150,18 @@ class CompanyResource extends Resource
                                                             ->send();
                                                         return;
                                                     }
-                                                    // A página CreateCompany/EditCompany precisará tratar este evento
-                                                    $livewire->dispatch('fetchCepDataCompany', cep: $cleanedCep);
+                                                    // The Livewire component (CreateClient/EditClient) will set isLoadingCep
+                                                    $livewire->dispatch('fetchCepData', cep: $cleanedCep);
                                                 })
                                                 ->color('gray')
+                                        // ->loadingIndicator() // Removed
                                         )
                                         ->placeholder('12345-678')
-                                        ->columnSpan(1), // Ocupa 1 de 3 colunas
+                                        ->columnSpan(1),
                                     TextInput::make('address_street')
                                         ->label('Logradouro')
                                         ->maxLength(255)
-                                        ->columnSpan(2), // Ocupa 2 de 3 colunas
+                                        ->columnSpanFull(),
                                     TextInput::make('address_number')
                                         ->label('Número')
                                         ->maxLength(50)
@@ -169,70 +177,48 @@ class CompanyResource extends Resource
                                     TextInput::make('address_city')
                                         ->label('Cidade')
                                         ->maxLength(100)
-                                        ->columnSpan(2),
+                                        ->columnSpan(1),
                                     TextInput::make('address_state')
                                         ->label('UF')
+                                        ->length(2)
                                         ->maxLength(2)
                                         ->columnSpan(1),
-                                ])->columns(3), // Define 3 colunas para o grupo de endereço
+                                ])->columns(3),
 
-                                Group::make() // Grupo para coordenadas e mapa
-                                ->schema([
+                                Group::make([
                                     TextInput::make('latitude')
+                                        ->numeric()
                                         ->label('Latitude')
-                                        ->numeric()
-                                        ->readOnly() // Será preenchido pela consulta de CEP/CNPJ ou mapa
-                                        ->rules(['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/']),
+                                        ->readOnly(), // Mantido readOnly
                                     TextInput::make('longitude')
-                                        ->label('Longitude')
                                         ->numeric()
-                                        ->readOnly() // Será preenchido pela consulta de CEP/CNPJ ou mapa
-                                        ->rules(['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/']),
+                                        ->label('Longitude')
+                                        ->readOnly(), // Mantido readOnly
                                     Map::make('map_visualization')
-                                        ->label('Localização no Mapa')
+                                        ->label('Localização')
                                         ->columnSpanFull()
                                         ->height('400px')
-                                        ->reactive() // Para atualizar com base na lat/lng
-                                        ->draggable(true) // Permitir arrastar o marcador para ajustar
-                                        ->clickable(true) // Permitir clicar no mapa para definir lat/lng
-                                        ->geolocate(true) // Botão para geolocalização do usuário
-                                        ->geolocateLabel('Usar minha localização')
-                                        ->defaultLocation(fn (Get $get): array => [ // Posição inicial do mapa
-                                            (float)($get('latitude') ?? -14.235004), // Centro do Brasil se não houver lat/lng
-                                            (float)($get('longitude') ?? -51.92528)
+                                        ->reactive()
+                                        ->draggable(false)
+                                        ->clickable(false)
+                                        ->geolocate(false)
+                                        ->defaultLocation(fn (Get $get): array => [
+                                            (float)($get('latitude') ?? -23.550520),
+                                            (float)($get('longitude') ?? -46.633308)
                                         ])
-                                        ->defaultZoom(fn (Get $get): int => ($get('latitude') && $get('longitude')) ? 16 : 4) // Zoom inicial
-                                        ->mapControls([ // Controles do mapa
-                                            'mapTypeControl'    => true,
-                                            'scaleControl'      => true,
-                                            'streetViewControl' => true,
-                                            'rotateControl'     => true,
-                                            'fullscreenControl' => true,
-                                            'searchBoxControl'  => false, // Desabilitar busca no mapa, pois temos CEP/CNPJ
-                                            'zoomControl'       => true,
-                                        ])
-                                        // Atualiza os campos de latitude e longitude quando o marcador do mapa é movido
-                                        ->afterStateUpdated(function (Get $get, callable $set, $state) {
-                                            if (isset($state['lat']) && isset($state['lng'])) {
-                                                $set('latitude', $state['lat']);
-                                                $set('longitude', $state['lng']);
-                                            }
-                                        })
-                                        // Define a localização do marcador com base nos campos de latitude e longitude
-                                        ->reverseGeocode([
-                                            'street' => 'address_street',
-                                            'city' => 'address_city',
-                                            'state' => 'address_state',
-                                            'zip' => 'address_zip_code',
-                                            // Adicione outros campos se o pacote suportar e for útil
-                                        ])
-                                        ->drawingControl(false) // Desabilitar ferramentas de desenho
-                                        ->autocomplete('address_street') // Tentar autocompletar o campo de rua
-                                        ->autocompleteReverse(true) // Tentar geocodificação reversa ao mover o marcador
-                                        ->columnSpanFull(),
-                                ])->columns(2), // Define 2 colunas para o grupo de coordenadas e mapa
-                            ])->columns(1), // A aba em si ocupa 1 coluna no layout principal de abas
-                    ])->columnSpanFull(), // Faz com que o componente Tabs ocupe toda a largura
+                                        ->defaultZoom(fn (Get $get): int => ($get('latitude') && $get('longitude')) ? 15 : 5)
+                                        ->mapControls([
+                                            'mapTypeControl'    => false,
+                                            'scaleControl'      => false,
+                                            'streetViewControl' => false,
+                                            'rotateControl'     => false,
+                                            'fullscreenControl' => false,
+                                            'searchBoxControl'  => false,
+                                            'zoomControl'       => false,
+                                        ]),
+                                ])->columns(2),
+                            ])->columns(2),
+                    ])->columnSpanFull(),
             ]);
     }
 
@@ -348,3 +334,4 @@ class CompanyResource extends Resource
             ]);
     }
 }
+

@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardProductionPdfController;
 use App\Http\Controllers\ProductionOrderPdfController;
 use App\Http\Controllers\TimeClockController;
+use App\Http\Controllers\VisitWithoutOrderPdfController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/app');
@@ -24,5 +25,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('transport-orders.pdf');
 
     Route::get('/dp/pdf', [DashboardProductionPdfController::class, 'generatePdf'])
-        ->name('production-dashboard.pdf');
+	    ->name('production-dashboard.pdf');
+
+    Route::get('/visits-without-order/pdf', VisitWithoutOrderPdfController::class)->name('visits.without.order.pdf');
 });

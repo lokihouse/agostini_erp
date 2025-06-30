@@ -2,9 +2,13 @@
 
 namespace App\Filament\Resources\TransportOrderResource\RelationManagers;
 
+use App\Models\Client;
 use App\Models\TransportOrder; // Importante para type hinting do ownerRecord
+use App\Services\RouteOptimizationService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,6 +19,10 @@ class ItemsRelationManager extends RelationManager
     protected static string $relationship = 'items';
     // Defina um recordTitleAttribute se aplicável, ex:
     // protected static ?string $recordTitleAttribute = 'product.name';
+
+    protected static ?string $title = "Itens para Transporte";
+    protected static ?string $label = "Encomenda";
+    protected static ?string $pluralLabel = "Encomendas";
 
     // Função auxiliar para verificar o status da ordem pai
     protected function isParentOrderCompleted(): bool
@@ -36,6 +44,32 @@ class ItemsRelationManager extends RelationManager
                     ->required()
                     ->searchable()
                     ->preload()
+                    ->live() // Torna o campo reativo
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        if (blank($state)) {
+                            $set('delivery_address_snapshot', null);
+                            return;
+                        }
+
+                        $client = Client::find($state);
+
+                        if ($client) {
+                            $address = $client->getFullAddress();
+                            $set('delivery_address_snapshot', $address);
+                        }
+                    })
+                    ->disabled($this->isParentOrderCompleted()),
+                Forms\Components\Textarea::make('delivery_address_snapshot')
+                    ->label('Endereço de Entrega')
+                    ->rows(3)
+                    ->disabled()
+                    ->readOnly(true)
+                    ->columnSpanFull()
+                    ->disabled($this->isParentOrderCompleted()),
+                Forms\Components\TextInput::make('quantity')
+                    ->label('Quantidade')
+                    ->numeric()
+                    ->required()
                     ->disabled($this->isParentOrderCompleted()),
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
@@ -43,22 +77,6 @@ class ItemsRelationManager extends RelationManager
                     ->required()
                     ->searchable()
                     ->preload()
-                    ->disabled($this->isParentOrderCompleted()),
-                Forms\Components\TextInput::make('quantity')
-                    ->label('Quantidade')
-                    ->numeric()
-                    ->required()
-                    ->disabled($this->isParentOrderCompleted()),
-                Forms\Components\Textarea::make('delivery_address_snapshot')
-                    ->label('Endereço de Entrega (Snapshot)')
-                    ->rows(3)
-                    ->columnSpanFull()
-                    ->disabled($this->isParentOrderCompleted()),
-                Forms\Components\TextInput::make('delivery_sequence')
-                    ->label('Sequência de Entrega')
-                    ->numeric()
-                    ->helperText('Define a ordem em que as entregas devem ser feitas. Deixe em branco para definir automaticamente ou ajuste manualmente.')
-                    ->nullable()
                     ->disabled($this->isParentOrderCompleted()),
                 Forms\Components\Textarea::make('notes')
                     ->label('Observações do Item')
@@ -105,19 +123,26 @@ class ItemsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                Tables\Actions\Action::make('Recalcular Sequencial')
+                    ->visible(!$this->isParentOrderCompleted())
+                    ->action(fn () => $this->recalculateSequence()),
                 Tables\Actions\CreateAction::make()
-                    ->visible(!$this->isParentOrderCompleted()), // Oculta o botão de criar
+                    ->visible(!$this->isParentOrderCompleted())
+                    ->after(fn () => $this->recalculateSequence()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(!$this->isParentOrderCompleted()), // Oculta o botão de editar
+                    ->visible(!$this->isParentOrderCompleted())
+                    ->after(fn () => $this->recalculateSequence()),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(!$this->isParentOrderCompleted()), // Oculta o botão de excluir
+                    ->visible(!$this->isParentOrderCompleted())
+                    ->after(fn () => $this->recalculateSequence()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(!$this->isParentOrderCompleted()), // Oculta a ação em massa de excluir
+                        ->visible(!$this->isParentOrderCompleted())
+                        ->after(fn () => $this->recalculateSequence()),
                 ]),
             ]);
     }
@@ -154,4 +179,24 @@ class ItemsRelationManager extends RelationManager
         }
         return parent::canDeleteAny();
     }
+
+    private function recalculateSequence(): void
+    {
+        $optimizer = new RouteOptimizationService();
+        $success = $optimizer->calculateSequence($this->getOwnerRecord());
+
+        if ($success) {
+            Notification::make()
+                ->title('Sequência de entrega recalculada!')
+                ->success()
+                ->send();
+        } else {
+            Notification::make()
+                ->title('Falha ao calcular a rota')
+                ->body('Verifique as coordenadas da empresa e dos clientes e a chave da API do Google.')
+                ->danger()
+                ->send();
+        }
+    }
 }
+

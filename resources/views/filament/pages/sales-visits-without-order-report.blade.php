@@ -1,15 +1,20 @@
 <x-filament-panels::page>
-    <form wire:submit.prevent="submitFilters" class="mb-6">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
-            {{ $this->form }}
+    <x-filament::section collapsible collapsed>
+        <x-slot name="heading">
+            Filtros
+        </x-slot>
+        <form wire:submit.prevent="submitFilters" class="mb-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
+                {{ $this->form }}
 
-            <div class="flex items-end">
-                <x-filament::button type="submit">
-                    Aplicar Filtros
-                </x-filament::button>
+                <div class="flex items-end">
+                    <x-filament::button type="submit">
+                        Aplicar Filtros
+                    </x-filament::button>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </x-filament::section>
 
     @if($reportData->isNotEmpty())
         <x-filament::section>

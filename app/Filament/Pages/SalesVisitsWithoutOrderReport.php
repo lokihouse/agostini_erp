@@ -6,6 +6,7 @@ use App\Models\SalesVisit;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
+use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select as FormSelect;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -115,6 +116,16 @@ class SalesVisitsWithoutOrderReport extends Page implements HasForms
 
     protected function getHeaderActions(): array
     {
-        return []; // Pode adicionar um botão de exportar aqui no futuro
+        return [
+            Actions\Action::make('print')
+                ->label('Imprimir PDF')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(route('visits.without.order.pdf', [
+                    'start_date' => Carbon::parse($this->start_date)->format('Y-m-d'),
+                    'end_date' => Carbon::parse($this->end_date)->format('Y-m-d'),
+                    'salesperson_id' => $this->salesperson_id,
+                ]), shouldOpenInNewTab: true),
+        ];
     }
 }

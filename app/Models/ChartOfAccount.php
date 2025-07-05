@@ -113,6 +113,6 @@ class ChartOfAccount extends Model
             ->whereBetween('transaction_date', [$startDate->toDateString(), $endDate->toDateString()])
             ->sum(DB::raw("CASE WHEN type = '" . FinancialTransaction::TYPE_INCOME . "' THEN amount ELSE -amount END"));
 
-        return (float) $total;
+        return (float) ($total / 100);
     }
 }

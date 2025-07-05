@@ -66,6 +66,7 @@ class FinancialTransactionResource extends Resource
                     MoneyInput::make('amount')
                         ->label('Valor')
                         ->currency('BRL') // Defina a moeda
+                        ->decimals(2)
                         ->required()
                         ->columnSpan(2),
 

@@ -41,23 +41,6 @@ class ProductionOrderItemsRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->required()
-                    // Validação: Garantir que o mesmo produto não seja adicionado duas vezes na MESMA ordem
-                    // A regra 'unique' básica do Filament já lida com ignoreRecord=true
-                    ->unique(
-                        table: 'production_order_items', // Tabela a verificar
-                        column: 'product_uuid', // Coluna a verificar
-                        ignoreRecord: true // Ignora o registro atual ao editar
-                    )
-                    // Condição extra: A unicidade só se aplica DENTRO da ordem atual
-                    // Usando closure para acessar o registro pai (OwnerRecord)
-                    ->rule(function (RelationManager $livewire) {
-                        return Rule::unique('production_order_items', 'product_uuid')
-                            ->where('production_order_uuid', $livewire->getOwnerRecord()->uuid)
-                            // O ignoreRecord: true acima já deve lidar com a edição.
-                            // Se precisar ignorar manualmente em cenários específicos:
-                            // ->ignore($livewire->getRecord()?->uuid);
-                            ;
-                    })
                     ->columnSpan(2), // Ocupa 2 colunas
 
                 TextInput::make('quantity_planned')
@@ -128,7 +111,29 @@ class ProductionOrderItemsRelationManager extends RelationManager
                 // Ação para CRIAR um novo ProductionOrderItem associado a esta ProductionOrder
                 Tables\Actions\CreateAction::make()
                     ->label('Adicionar Item')
-                    ->modalHeading('Adicionar Item à Ordem de Produção'),
+                    ->modalHeading('Adicionar Item à Ordem de Produção')
+                    ->using(function (array $data, RelationManager $livewire) {
+                        $parent = $livewire->getOwnerRecord();
+                        $item = $parent->items()
+                            ->withTrashed() // Inclui soft-deletados
+                            ->where('product_uuid', $data['product_uuid'])
+                            ->first();
+
+                        if ($item) {
+                            if ($item->trashed()) {
+                                $item->restore();
+                                $item->quantity_planned = $data['quantity_planned'];
+                            } else {
+                                $item->quantity_planned += $data['quantity_planned'];
+                            }
+                            $item->notes = $data['notes'] ?? $item->notes;
+                            $item->save();
+                            return $item;
+                        }
+
+                        // Cria novo se não existir
+                        return $parent->items()->create($data);
+                    }),
             ])
             ->actions([
                 // Ação para EDITAR um ProductionOrderItem existente

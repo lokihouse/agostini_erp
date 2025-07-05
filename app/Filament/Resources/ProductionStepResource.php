@@ -46,17 +46,13 @@ class ProductionStepResource extends Resource
                                 // Garante que temos o company_id do usuário logado
                                 $companyId = auth()->user()?->company_id;
                                 if (!$companyId) {
-                                    // Se não tiver company_id, a validação não pode ocorrer corretamente.
-                                    // Isso não deve acontecer em rotas protegidas por auth.
-                                    // Você pode querer logar um erro aqui ou lançar uma exceção.
-                                    // Retornar uma string causa uma falha genérica na validação.
                                     return 'Falha ao obter ID da empresa para validação.';
                                 }
 
-                                // Constrói a regra unique completa aqui
-                                return Rule::unique('production_steps', 'name') // Tabela e coluna
-                                ->where('company_id', $companyId) // Condição da empresa
-                                ->ignore($record?->uuid); // Ignora o registro atual na edição
+                                return Rule::unique('production_steps', 'name')
+                                ->where('company_id', $companyId)
+                                ->whereNot('name', $record?->name)
+                                ->ignore($record?->uuid);
                             })
                             // --- FIM DA VALIDAÇÃO ---
                             ->columnSpan(1),

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardProductionPdfController;
+use App\Http\Controllers\FinancialReportPdfController;
 use App\Http\Controllers\ProductionOrderPdfController;
 use App\Http\Controllers\TimeClockController;
 use App\Http\Controllers\VisitWithoutOrderPdfController;
@@ -28,4 +29,6 @@ Route::middleware(['auth'])->group(function () {
 	    ->name('production-dashboard.pdf');
 
     Route::get('/visits-without-order/pdf', VisitWithoutOrderPdfController::class)->name('visits.without.order.pdf');
+
+    Route::get('/financial-report/pdf', FinancialReportPdfController::class)->name('financial.report.pdf');
 });

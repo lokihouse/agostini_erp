@@ -5,23 +5,15 @@ namespace App\Filament\Pages;
 use App\Models\ChartOfAccount;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
+use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification; // Import Notification
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder; // Import Builder
-use Illuminate\Support\Facades\DB; // Import DB
-use Illuminate\Support\Facades\Log; // Import Log
-use Illuminate\Validation\ValidationException; // Import ValidationException
-
-// If you create an exporter:
-// use App\Filament\Exports\FinancialDashboardExporter;
-// use Filament\Actions\Exports\Enums\ExportFormat;
-// use Filament\Actions\ExportAction;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class FinancialDashboard extends Page implements HasForms
 {
@@ -171,6 +163,15 @@ class FinancialDashboard extends Page implements HasForms
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            Actions\Action::make('print')
+                ->label('Imprimir PDF')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(route('financial.report.pdf', [
+                    'start_date' => Carbon::parse($this->data['startDate'])->format('Y-m-d'),
+                    'end_date' => Carbon::parse($this->data['endDate'])->format('Y-m-d'),
+                ]), shouldOpenInNewTab: true),
+        ];
     }
 }

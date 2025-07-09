@@ -36,7 +36,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['company_id', 'transport_order_number'], 'transport_order_company_number_unique');
+            // $table->unique(['company_id', 'transport_order_number'], 'transport_order_company_number_unique');
         });
     }
 

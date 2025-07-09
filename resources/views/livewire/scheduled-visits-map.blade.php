@@ -25,7 +25,7 @@
     </div>
     <div class="fi-section-content-ctn">
         <div class="fi-section-content p-0">
-            @if($viewMode === 'map')
+            <div @if($viewMode !== 'map') class="hidden" @endif>
                 @if($googleMapsApiKey)
                     @if(!empty($visitsForMap))
                         <div wire:ignore id="scheduledVisitsMapContainer" style="height: 297px; width: 100%;"
@@ -38,7 +38,8 @@
                     <p class="text-center text-red-500 dark:text-red-400 p-4">Chave da API do Google Maps não
                         configurada.</p>
                 @endif
-            @else
+            </div>
+            <div @if($viewMode !== 'list') class="hidden" @endif>
                 {{-- Modo Lista --}}
                 @if(!empty($visitsForMap))
                     <div class="p-2 max-h-[297px] overflow-y-auto"> {{-- Adicionado max-height e overflow --}}
@@ -92,7 +93,7 @@
                     <p class="text-center text-gray-500 dark:text-gray-400 p-4">Nenhuma visita agendada com localização
                         definida para exibir na lista.</p>
                 @endif
-            @endif
+            </div>
         </div>
     </div>
 

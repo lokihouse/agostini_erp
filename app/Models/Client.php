@@ -25,7 +25,7 @@ class Client extends Model
         'company_id',
         'name',
         'social_name',
-        'tax_number',
+        'taxNumber',
         'state_registration',
         'municipal_registration',
         'email',

@@ -40,7 +40,7 @@ class ClientResource extends Resource
                         Forms\Components\Tabs\Tab::make('Dados Cadastrais')
                             ->icon('heroicon-o-identification')
                             ->schema([
-                                Forms\Components\TextInput::make('tax_number')
+                                Forms\Components\TextInput::make('taxNumber')
                                     ->label('CNPJ')
                                     ->required()
                                     ->maxLength(20)
@@ -52,7 +52,7 @@ class ClientResource extends Resource
                                         if (!$companyId && !$record) {
                                             // Potentially return a validation failure if companyId is indeterminable and critical for the unique rule context
                                         }
-                                        return Rule::unique('clients', 'tax_number')
+                                        return Rule::unique('clients', 'taxNumber')
                                             ->where('company_id', $companyId)
                                             ->ignore($record?->uuid, 'uuid');
                                     })
@@ -63,7 +63,7 @@ class ClientResource extends Resource
                                             ->icon(fn (Livewire $livewire) => $livewire->isLoadingCnpj ? 'heroicon-o-arrow-path fi-spin' : 'heroicon-o-magnifying-glass')
                                             ->disabled(fn (Livewire $livewire) => $livewire->isLoadingCnpj)
                                             ->action(function (Get $get, Livewire $livewire) {
-                                                $cnpj = $get('tax_number');
+                                                $cnpj = $get('taxNumber');
                                                 if (empty($cnpj)) {
                                                     Notification::make()
                                                         ->title('CNPJ não informado')
@@ -74,7 +74,7 @@ class ClientResource extends Resource
                                                 }
                                                 $cleanedCnpj = preg_replace('/[^0-9]/', '', $cnpj);
                                                 // The Livewire component (CreateClient/EditClient) will set isLoadingCnpj
-                                                $livewire->dispatch('fetchCnpjData', cnpj: $cleanedCnpj);
+                                                $livewire->dispatch('fetchCnpjClientData', cnpj: $cleanedCnpj);
                                             })
                                             ->color('gray')
                                     // ->loadingIndicator() // Removed as it's causing an error
@@ -255,7 +255,7 @@ class ClientResource extends Resource
                     ->label('Nome Fantasia')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tax_number')
+                Tables\Columns\TextColumn::make('taxNumber')
                     ->label('CNPJ')
                     ->searchable()
                     ->formatStateUsing(fn (?string $state): string => $state ? preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $state) : ''),

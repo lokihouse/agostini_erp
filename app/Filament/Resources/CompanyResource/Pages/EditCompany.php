@@ -26,8 +26,8 @@ class EditCompany extends EditRecord
         ];
     }
 
-    #[On('fetchCnpjData')]
-    public function fetchCnpjData(string $cnpj): void
+    #[On('fetchCnpjCompanyData')]
+    public function fetchCnpjCompanyData(string $cnpj): void
     {
         if (empty($cnpj)) {
             Notification::make()

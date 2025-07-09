@@ -26,8 +26,8 @@ class EditClient extends EditRecord
         ];
     }
 
-    #[On('fetchCnpjData')]
-    public function fetchCnpjData(string $cnpj): void
+    #[On('fetchCnpjClientData')]
+    public function fetchCnpjClientData(string $cnpj): void
     {
         if (empty($cnpj)) {
             Notification::make()

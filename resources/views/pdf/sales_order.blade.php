@@ -154,7 +154,7 @@
                     <h2>Cliente</h2>
                     <div><strong>Nome Fantasia:</strong> {{ $order->client->name ?? 'N/A' }}</div>
                     <div><strong>Razão Social:</strong> {{ $order->client->social_name ?? 'N/A' }}</div>
-                    <div><strong>CNPJ:</strong> {{ $order->client->tax_number ? \App\Utils\Cnpj::format($order->client->tax_number) : 'N/A' }}</div>
+                    <div><strong>CNPJ:</strong> {{ $order->client->taxNumber ? \App\Utils\Cnpj::format($order->client->taxNumber) : 'N/A' }}</div>
                     <div><strong>Email:</strong> {{ $order->client->email ?? 'N/A' }}</div>
                     <div><strong>Telefone:</strong> {{ $order->client->phone_number ?? 'N/A' }}</div>
                     <div>

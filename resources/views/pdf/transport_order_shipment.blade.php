@@ -144,7 +144,7 @@
             @endphp
             <div class="client-cluster">
                 <div class="client-cluster-header">
-                    Cliente: {{ $client->name ?? 'N/A' }} (CNPJ/CPF: {{ $client->tax_number ?? 'N/A' }}) <br>
+                    Cliente: {{ $client->name ?? 'N/A' }} (CNPJ/CPF: {{ $client->taxNumber ?? 'N/A' }}) <br>
                     Endereço Principal: {{ $client->getFullAddress() }}
                 </div>
 

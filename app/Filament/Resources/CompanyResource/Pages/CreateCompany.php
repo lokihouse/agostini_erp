@@ -17,8 +17,8 @@ class CreateCompany extends CreateRecord
     public bool $isLoadingCnpj = false;
     public bool $isLoadingCep = false;
 
-    #[On('fetchCnpjData')]
-    public function fetchCnpjData(string $cnpj): void
+    #[On('fetchCnpjCompanyData')]
+    public function fetchCnpjCompanyData(string $cnpj): void
     {
         if (empty($cnpj)) {
             Notification::make()
@@ -68,7 +68,7 @@ class CreateCompany extends CreateRecord
 
             $newData = [
                 'social_name' => $data['razao_social'] ?? null,
-                'tax_number' => $data['estabelecimento']['cnpj'] ?? $cnpj,
+                'taxNumber' => $data['estabelecimento']['cnpj'] ?? $cnpj,
                 'name' => $data['nome_fantasia'] ?? $data['razao_social'] ?? null,
                 'email' => $data['estabelecimento']['email'] ?? null,
                 'phone_number' => $this->formatPhoneNumber($data['estabelecimento'] ?? []),

@@ -9,7 +9,7 @@
                                 Informações do Cliente:
                             </x-slot>
                             <div class="grid grid-cols-1 gap-2 text-sm">
-                                <p><strong>CNPJ:</strong> {{ $client->tax_number_formatted ?? $client->tax_number }}</p>
+                                <p><strong>CNPJ:</strong> {{ $client->taxNumber_formatted ?? $client->taxNumber }}</p>
                                 <p><strong>Nome Fantasia:</strong> {{ $client->name }}</p>
                                 <p>
                                     <strong>Telefone:</strong> {{ $client->phone_number_formatted ?? $client->phone_number ?: 'N/A' }}

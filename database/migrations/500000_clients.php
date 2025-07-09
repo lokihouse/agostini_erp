@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('social_name');
-            $table->string('tax_number');
+            $table->string('taxNumber');
             $table->string('state_registration')->nullable();
             $table->string('municipal_registration')->nullable();
 

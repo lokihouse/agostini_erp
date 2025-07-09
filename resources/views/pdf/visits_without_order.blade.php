@@ -36,8 +36,8 @@
         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
             <td class="px-4 py-2 font-medium text-gray-900 dark:text-white">
                 {{ $visit->client?->name ?? 'N/A' }}
-                @if($visit->client?->tax_number)
-                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $visit->client->tax_number_formatted }}</span>
+                @if($visit->client?->taxNumber)
+                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $visit->client->taxNumber_formatted }}</span>
                 @endif
             </td>
             <td class="px-4 py-2 text-gray-700 dark:text-gray-300">

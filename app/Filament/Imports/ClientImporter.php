@@ -32,7 +32,7 @@ class ClientImporter extends Importer
                 ->label('Social Name')
                 ->requiredMapping()
                 ->rules(['nullable', 'max:255']),
-            ImportColumn::make('tax_number')
+            ImportColumn::make('taxNumber')
                 ->label('Tax Number')
                 ->requiredMapping()
                 ->rules(['nullable', 'max:255']),

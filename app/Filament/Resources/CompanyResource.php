@@ -49,22 +49,13 @@ class CompanyResource extends Resource
                         Tabs\Tab::make('Dados Cadastrais')
                             ->icon('heroicon-o-identification')
                             ->schema([
-                                TextInput::make('tax_number')
+                                TextInput::make('taxNumber')
                                     ->label('CNPJ')
                                     ->required()
                                     ->maxLength(20)
                                     ->mask('99.999.999/9999-99')
                                     ->live(onBlur: true)
-                                    ->rule(function (Get $get, $record) {
-                                        $companyId = $record?->company_id ?? auth()->user()?->company_id;
-                                        // Basic check, model should handle if company_id is absolutely required for validation logic
-                                        if (!$companyId && !$record) {
-                                            // Potentially return a validation failure if companyId is indeterminable and critical for the unique rule context
-                                        }
-                                        return Rule::unique('clients', 'tax_number')
-                                            ->where('company_id', $companyId)
-                                            ->ignore($record?->uuid, 'uuid');
-                                    })
+                                    ->unique(ignoreRecord: true)
                                     ->suffixAction(
                                         Action::make('consultarCnpj')
                                             ->label('Consultar')
@@ -72,7 +63,7 @@ class CompanyResource extends Resource
                                             ->icon(fn (Livewire $livewire) => $livewire->isLoadingCnpj ? 'heroicon-o-arrow-path fi-spin' : 'heroicon-o-magnifying-glass')
                                             ->disabled(fn (Livewire $livewire) => $livewire->isLoadingCnpj)
                                             ->action(function (Get $get, Livewire $livewire) {
-                                                $cnpj = $get('tax_number');
+                                                $cnpj = $get('taxNumber');
                                                 if (empty($cnpj)) {
                                                     Notification::make()
                                                         ->title('CNPJ não informado')
@@ -83,10 +74,9 @@ class CompanyResource extends Resource
                                                 }
                                                 $cleanedCnpj = preg_replace('/[^0-9]/', '', $cnpj);
                                                 // The Livewire component (CreateClient/EditClient) will set isLoadingCnpj
-                                                $livewire->dispatch('fetchCnpjData', cnpj: $cleanedCnpj);
+                                                $livewire->dispatch('fetchCnpjCompanyData', cnpj: $cleanedCnpj);
                                             })
                                             ->color('gray')
-                                    // ->loadingIndicator() // Removed as it's causing an error
                                     )
                                     ->placeholder('12.345.678/9012-34')
                                     ->columnSpan(3),

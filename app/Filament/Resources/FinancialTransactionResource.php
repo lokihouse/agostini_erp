@@ -32,72 +32,71 @@ class FinancialTransactionResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(['default' => 3, 'lg' => 12])
             ->schema([
-                Forms\Components\Grid::make(12)->schema([
-                    SelectTree::make('chart_of_account_uuid')
-                        ->label('Plano de Conta')
-                        ->relationship(
-                            'chartOfAccount', // 1. Nome da relação (posicional)
-                            'name',           // 2. Atributo para o título (posicional)
-                            'parent_uuid',    // 3. Atributo para o pai (posicional)
-                            fn (Builder $query) => $query->orderBy('code') // 4. Closure para modificar a query (posicional)
-                        )
-                        ->enableBranchNode() // Permite selecionar contas pai (se desejado, caso contrário remova)
-                        ->searchable()
-                        // ->withCount() // Verifique se esta opção é compatível e desejada
-                        ->required()
-                        ->columnSpan(4),
+                SelectTree::make('chart_of_account_uuid')
+                    ->label('Plano de Conta')
+                    ->relationship(
+                        'chartOfAccount', // 1. Nome da relação (posicional)
+                        'name',           // 2. Atributo para o título (posicional)
+                        'parent_uuid',    // 3. Atributo para o pai (posicional)
+                        fn (Builder $query) => $query->orderBy('code') // 4. Closure para modificar a query (posicional)
+                    )
+                    ->enableBranchNode() // Permite selecionar contas pai (se desejado, caso contrário remova)
+                    ->searchable()
+                    // ->withCount() // Verifique se esta opção é compatível e desejada
+                    ->required()
+                    ->columnSpan(['default' => 3, 'lg' => 4]),
 
-                    Forms\Components\Select::make('type')
-                        ->label('Tipo de Lançamento')
-                        ->options(FinancialTransaction::getTypeOptions()) // Usando o método do modelo
-                        ->required()
-                        ->searchable()
-                        ->columnSpan(2),
+                Forms\Components\Select::make('type')
+                    ->label('Tipo de Lançamento')
+                    ->options(FinancialTransaction::getTypeOptions()) // Usando o método do modelo
+                    ->required()
+                    ->searchable()
+                    ->columnSpan(['default' => 3, 'lg' => 2]),
 
-                    Forms\Components\DatePicker::make('transaction_date')
-                        ->label('Data do Lançamento')
-                        ->native(false)
-                        ->required()
-                        ->default(now())
-                        ->maxDate(now())
-                        ->columnSpan(2),
+                Forms\Components\DatePicker::make('transaction_date')
+                    ->label('Data do Lançamento')
+                    ->native(false)
+                    ->required()
+                    ->default(now())
+                    ->maxDate(now())
+                    ->columnSpan(['default' => 3, 'lg' => 2]),
 
-                    MoneyInput::make('amount')
-                        ->label('Valor')
-                        ->currency('BRL') // Defina a moeda
-                        ->decimals(2)
-                        ->required()
-                        ->columnSpan(2),
+                MoneyInput::make('amount')
+                    ->label('Valor')
+                    ->currency('BRL') // Defina a moeda
+                    ->decimals(2)
+                    ->required()
+                    ->columnSpan(['default' => 3, 'lg' => 2]),
 
-                    Forms\Components\TextInput::make('description')
-                        ->label('Descrição')
-                        ->maxLength(255)
-                        ->nullable()
-                        ->columnSpan(6),
+                Forms\Components\TextInput::make('description')
+                    ->label('Descrição')
+                    ->maxLength(255)
+                    ->nullable()
+                    ->columnSpan(['default' => 3, 'lg' => 6]),
 
-                    Forms\Components\TextInput::make('payment_method')
-                        ->label('Método de Pagamento')
-                        ->maxLength(255)
-                        ->nullable()
-                        ->columnSpan(3),
+                Forms\Components\TextInput::make('payment_method')
+                    ->label('Método de Pagamento')
+                    ->maxLength(255)
+                    ->nullable()
+                    ->columnSpan(['default' => 3, 'lg' => 3]),
 
-                    Forms\Components\TextInput::make('reference_document')
-                        ->label('Documento de Referência')
-                        ->helperText('Ex: NFe 123, Boleto XYZ')
-                        ->maxLength(255)
-                        ->nullable()
-                        ->columnSpan(3),
+                Forms\Components\TextInput::make('reference_document')
+                    ->label('Documento de Referência')
+                    ->helperText('Ex: NFe 123, Boleto XYZ')
+                    ->maxLength(255)
+                    ->nullable()
+                    ->columnSpan(['default' => 3, 'lg' => 3]),
 
-                    Forms\Components\Textarea::make('notes')
-                        ->label('Observações Adicionais')
-                        ->rows(3)
-                        ->nullable()
-                        ->columnSpanFull(),
+                Forms\Components\Textarea::make('notes')
+                    ->label('Observações Adicionais')
+                    ->rows(3)
+                    ->nullable()
+                    ->columnSpan(['default' => 3, 'lg' => 12]),
 
-                    // user_id será preenchido automaticamente no backend
-                    // company_id também será preenchido automaticamente
-                ])
+                // user_id será preenchido automaticamente no backend
+                // company_id também será preenchido automaticamente
             ]);
     }
 

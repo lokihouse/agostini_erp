@@ -49,20 +49,20 @@ class ProductionOrderItemsRelationManager extends RelationManager
                     ->required()
                     ->minValue(0)
                     ->default(1)
-                    ->columnSpan(1),
+                    ->columnSpan(['default' => 2, 'lg' => 1]),
 
                 TextInput::make('quantity_produced')
                     ->label('Qtd. Produzida')
                     ->numeric()
                     ->minValue(0)
-                    ->default(0) // Produzido começa em 0
-                    ->readOnly() // Geralmente a quantidade produzida é atualizada por logs, não editada aqui
-                    ->columnSpan(1),
+                    ->default(0)
+                    ->readOnly()
+                    ->columnSpan(['default' => 2, 'lg' => 1]),
 
                 Textarea::make('notes')
                     ->label('Observações do Item')
-                    ->columnSpanFull(), // Ocupa largura total
-            ])->columns(2); // Define 2 colunas para o layout do formulário
+                    ->columnSpan(['default' => 2, 'lg' => 1]),
+            ])->columns(2);
     }
 
     /**

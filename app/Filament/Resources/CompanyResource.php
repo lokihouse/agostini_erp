@@ -48,6 +48,7 @@ class CompanyResource extends Resource
                     ->tabs([
                         Tabs\Tab::make('Dados Cadastrais')
                             ->icon('heroicon-o-identification')
+                            ->columns(['default' => 3, 'lg' => 12])
                             ->schema([
                                 TextInput::make('taxNumber')
                                     ->label('CNPJ')
@@ -83,11 +84,11 @@ class CompanyResource extends Resource
                                 TextInput::make('social_name')
                                     ->label('Razão Social')
                                     ->maxLength(255)
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 TextInput::make('name')
                                     ->label('Nome Fantasia')
                                     ->maxLength(255)
-                                    ->columnSpan(5),
+                                    ->columnSpan(['default' => 3, 'lg' => 5]),
                                 TextInput::make('state_registration')
                                     ->label('Inscrição Estadual')
                                     ->maxLength(20)
@@ -99,12 +100,12 @@ class CompanyResource extends Resource
                                             ->where('company_id', $companyId)
                                             ->ignore($record?->uuid, 'uuid');
                                     })
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 TextInput::make('municipal_registration')
                                     ->label('Inscrição Municipal')
                                     ->maxLength(20)
-                                    ->columnSpan(4)
-                            ])->columns(12),
+                                    ->columnSpan(['default' => 3, 'lg' => 4])
+                            ]),
 
                         Tabs\Tab::make('Endereço e Localização')
                             ->icon('heroicon-o-map-pin')

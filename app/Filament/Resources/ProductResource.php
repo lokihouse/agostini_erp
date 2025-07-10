@@ -63,7 +63,7 @@ class ProductResource extends Resource
                                 Forms\Components\Textarea::make('description')
                                     ->label('Descrição')
                                     ->columnSpanFull(),
-                            ])->columns(2), // Mantém 2 colunas para esta aba
+                            ])->columns(2),
 
                         Tabs\Tab::make('Custos e Preços')
                             ->icon('heroicon-o-currency-dollar')
@@ -74,14 +74,14 @@ class ProductResource extends Resource
                                     ->prefix('R$')
                                     ->maxValue(42949672.95)
                                     ->default(null)
-                                    ->columnSpan(1),
+                                    ->columnSpan(['default' => 2, 'lg' => 1]),
                                 Forms\Components\TextInput::make('sale_price')
                                     ->label('Preço de Venda')
                                     ->numeric()
                                     ->prefix('R$')
                                     ->maxValue(42949672.95)
                                     ->default(null)
-                                    ->columnSpan(1),
+                                    ->columnSpan(['default' => 2, 'lg' => 1]),
                                 Forms\Components\TextInput::make('minimum_sale_price')
                                     ->label('Preço Mínimo de Venda')
                                     ->numeric()
@@ -89,9 +89,9 @@ class ProductResource extends Resource
                                     ->maxValue(42949672.95)
                                     ->default(null)
                                     ->helperText('Usado para validar descontos em pedidos de venda.')
-                                    ->columnSpan(2), // Pode ocupar 2 colunas ou 1, conforme preferir
-                            ])->columns(2), // Define 2 colunas para esta aba
-                    ])->columnSpanFull(), // Faz as abas ocuparem a largura total
+                                    ->columnSpan(2),
+                            ])->columns(['default' => 1, 'lg' => 2]),
+                    ])->columnSpanFull(),
             ]);
     }
 

@@ -84,11 +84,11 @@ class ClientResource extends Resource
                                 Forms\Components\TextInput::make('social_name')
                                     ->label('Razão Social')
                                     ->maxLength(255)
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\TextInput::make('name')
                                     ->label('Nome Fantasia')
                                     ->maxLength(255)
-                                    ->columnSpan(5),
+                                    ->columnSpan(['default' => 3, 'lg' => 5]),
                                 Forms\Components\TextInput::make('state_registration')
                                     ->label('Inscrição Estadual')
                                     ->maxLength(20)
@@ -100,15 +100,15 @@ class ClientResource extends Resource
                                             ->where('company_id', $companyId)
                                             ->ignore($record?->uuid, 'uuid');
                                     })
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\TextInput::make('municipal_registration')
                                     ->label('Inscrição Municipal')
                                     ->maxLength(20)
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\Select::make('status')
                                     ->options(Client::getStatusOptions())
                                     ->default(Client::STATUS_ACTIVE)
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\TextInput::make('email')
                                     ->email()
                                     ->maxLength(255)
@@ -120,22 +120,22 @@ class ClientResource extends Resource
                                             ->where('company_id', $companyId)
                                             ->ignore($record?->uuid, 'uuid');
                                     })
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\TextInput::make('phone_number')
                                     ->label('Telefone')
                                     ->tel()
                                     ->mask('(99) 99999-9999')
                                     ->maxLength(20)
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\TextInput::make('website')
                                     ->url()
                                     ->prefix("http://")
                                     ->maxLength(255)
-                                    ->columnSpan(4),
+                                    ->columnSpan(['default' => 3, 'lg' => 4]),
                                 Forms\Components\Textarea::make('notes')
                                     ->label('Observações')
                                     ->columnSpanFull(),
-                            ])->columns(12),
+                            ])->columns(['default' => 3, 'lg' => 12]),
 
                         Forms\Components\Tabs\Tab::make('Endereço e Localização')
                             ->icon('heroicon-o-map-pin')

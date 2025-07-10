@@ -53,7 +53,7 @@ class ItemsRelationManager extends RelationManager
                     })
                     ->distinct() // Garante que o mesmo produto não possa ser adicionado múltiplas vezes
                     ->disableOptionsWhenSelectedInSiblingRepeaterItems() // Se usar dentro de um repeater, previne duplicados
-                    ->columnSpan(2),
+                    ->columnSpan(['default' => 3, 'lg' => 2]),
 
                 Forms\Components\TextInput::make('quantity')
                     ->label('Quantidade')
@@ -63,7 +63,7 @@ class ItemsRelationManager extends RelationManager
                     ->minValue(0.0001) // Ajuste conforme sua necessidade de precisão
                     ->step('any') // Permite decimais
                     ->reactive()
-                    ->columnSpan(1),
+                    ->columnSpan(['default' => 3, 'lg' =>1]),
 
                 Forms\Components\TextInput::make('unit_price')
                     ->label('Preço Unitário (R$)')
@@ -72,7 +72,7 @@ class ItemsRelationManager extends RelationManager
                     ->prefix('R$')
                     ->inputMode('decimal')
                     ->reactive()
-                    ->columnSpan(1),
+                    ->columnSpan(['default' => 3, 'lg' => 1]),
 
                 Forms\Components\TextInput::make('discount_amount')
                     ->label('Desconto (R$)')
@@ -103,7 +103,7 @@ class ItemsRelationManager extends RelationManager
                             }
                         },
                     ])
-                    ->columnSpan(1),
+                    ->columnSpan(['default' => 3, 'lg' => 1]),
 
                 Forms\Components\Placeholder::make('final_price_placeholder')
                     ->label('Preço Final Unitário (R$)')
@@ -113,7 +113,7 @@ class ItemsRelationManager extends RelationManager
                         $finalPrice = max(0, $unitPrice - $discount); // Garante que não seja negativo
                         return 'R$ ' . number_format($finalPrice, 2, ',', '.');
                     })
-                    ->columnSpan(1),
+                    ->columnSpan(['default' => 3, 'lg' => 1]),
 
                 Forms\Components\Placeholder::make('total_price_placeholder')
                     ->label('Preço Total do Item (R$)')
@@ -125,12 +125,12 @@ class ItemsRelationManager extends RelationManager
                         $totalPrice = $quantity * $finalPrice;
                         return 'R$ ' . number_format($totalPrice, 2, ',', '.');
                     })
-                    ->columnSpan(2), // Ocupa mais espaço
+                    ->columnSpan(['default' => 3, 'lg' => 2]), // Ocupa mais espaço
 
                 Forms\Components\Textarea::make('notes')
                     ->label('Observações do Item')
                     ->rows(2)
-                    ->columnSpanFull(),
+                    ->columnSpan(3),
             ])->columns(3); // Ajuste o número de colunas conforme preferir
     }
 

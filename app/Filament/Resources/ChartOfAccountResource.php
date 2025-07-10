@@ -28,42 +28,41 @@ class ChartOfAccountResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(12)
             ->schema([
-                Forms\Components\Grid::make(12)
-                    ->schema([
-                        Forms\Components\Select::make('parent_uuid')
-                            ->label('Conta Pai')
-                            ->relationship(
-                                name: 'parentAccount', // Nome da relação no modelo ChartOfAccount
-                                titleAttribute: 'name', // Atributo para exibir no select
-                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('code') // Ordena pela coluna 'code'
-                            )
-                            ->searchable()
-                            ->preload()
-                            ->nullable()
-                            ->helperText('Selecione a conta de nível superior, se aplicável.')
-                            ->columnSpan(4), // Ajustado para melhor layout
+                Forms\Components\Select::make('parent_uuid')
+                    ->label('Conta Pai')
+                    ->relationship(
+                        name: 'parentAccount', // Nome da relação no modelo ChartOfAccount
+                        titleAttribute: 'name', // Atributo para exibir no select
+                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('code') // Ordena pela coluna 'code'
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->helperText('Selecione a conta de nível superior, se aplicável.')
+                    ->columnSpan(3), // Ajustado para melhor layout
 
-                        Forms\Components\Select::make('type')
-                            ->label('Tipo da Conta')
-                            ->options(ChartOfAccount::getTypeOptions()) // Usando o método do modelo
-                            ->required()
-                            ->columnSpan(3), // Ajustado
+                Forms\Components\Select::make('type')
+                    ->label('Tipo da Conta')
+                    ->options(ChartOfAccount::getTypeOptions()) // Usando o método do modelo
+                    ->required()
+                    ->columnSpan(3), // Ajustado
 
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nome da Conta')
-                            ->required()
-                            ->maxLength(100)
-                            ->columnSpan(5), // Ajustado
+                Forms\Components\TextInput::make('name')
+                    ->label('Nome da Conta')
+                    ->required()
+                    ->maxLength(100)
+                    ->columnSpan(3), // Ajustado
 
-                        // O campo 'code' será gerado automaticamente na página de criação
-                        Forms\Components\TextInput::make('code')
-                            ->label('Código da Conta')
-                            ->disabled() // Desabilitado no formulário, pois é gerado
-                            ->dehydrated(false) // Não envia este valor do form, pois será definido no backend
-                            ->visibleOn('edit') // Visível apenas na edição
-                            ->columnSpan(12),
-                    ])
+                // O campo 'code' será gerado automaticamente na página de criação
+                Forms\Components\TextInput::make('code')
+                    ->hidden(true)
+                    ->label('Código da Conta')
+                    ->disabled() // Desabilitado no formulário, pois é gerado
+                    ->dehydrated(false) // Não envia este valor do form, pois será definido no backend
+                    ->visibleOn('edit') // Visível apenas na edição
+                    ->columnSpan(12),
             ]);
     }
 

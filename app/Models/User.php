@@ -54,10 +54,20 @@ class User extends Authenticatable
         return $this->hasMany(TimeClockEntry::class, 'user_id', 'uuid');
     }
 
-    // Nova Relação
     public function workShift(): BelongsTo
     {
         return $this->belongsTo(WorkShift::class, 'work_shift_id', 'uuid');
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            if ($user->relationLoaded('employee')) {
+                $user->employee->delete();
+            } else {
+                Employee::where('user_id', $user->uuid)->delete();
+            }
+        });
     }
 }
 

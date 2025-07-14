@@ -14,10 +14,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
-// Remova a importação genérica de Rule se não for usada em outro lugar,
-// ou mantenha se for. Para este caso específico, vamos importar a classe Unique.
-// use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Unique; // Importe a classe Unique
+use Illuminate\Validation\Rules\Unique;
 
 class SalesGoalResource extends Resource
 {
@@ -38,7 +35,12 @@ class SalesGoalResource extends Resource
                     ->relationship(
                         name: 'user',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn (Builder $query) => $query->whereHas('roles', fn(Builder $q) => $q->whereIn('name', ['Vendedor', 'Administrador'])) // Ajuste os nomes das roles
+                        modifyQueryUsing: function (Builder $query) {
+                            return $query
+                                ->where('is_active', true)
+                                ->where('company_id', auth()->user()->company_id)
+                                ->whereHas('roles', fn(Builder $q) => $q->whereIn('name', ['Vendedor', 'Administrador']));
+                        }
                     )
                     ->searchable()
                     ->preload()

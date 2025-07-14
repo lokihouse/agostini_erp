@@ -108,6 +108,7 @@ class SalesPerformanceReport extends Page implements HasForms
         }
 
         $salespeopleQuery = User::query()
+            ->where('company_id', auth()->user()->company_id)
             ->whereHas('roles', fn(Builder $q) => $q->whereIn('name', ['Vendedor', 'Administrador'])) // Ajuste as roles
             ->orderBy('name');
 

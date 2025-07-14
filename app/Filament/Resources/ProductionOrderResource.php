@@ -35,8 +35,6 @@ class ProductionOrderResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // ... (seu código do formulário aqui) ...
-        // Baseado no contexto anterior, o formulário parece ok.
         return $form
             ->schema([
                 Section::make('Detalhes da Ordem')
@@ -81,7 +79,11 @@ class ProductionOrderResource extends Resource
 
                         Forms\Components\Select::make('user_uuid')
                             ->label('Responsável')
-                            ->relationship('user', 'name')
+                            ->relationship('user', 'name', function (Builder $query) {
+                                $query
+                                    ->where('company_id', auth()->user()->company_id)
+                                    ->where('is_active', true);
+                            })
                             ->searchable()
                             ->preload()
                             ->columnSpan(1),
@@ -118,11 +120,10 @@ class ProductionOrderResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // --- COLUNA DE PROGRESSO (v3) ---
-                ViewColumn::make('progress_view') // Pode usar um nome diferente se quiser
+                ViewColumn::make('progress_view')
                 ->label('Progresso')
-                    ->view('filament.tables.columns.progress-bar') // <-- Aponta para a view criada
-                    ->visible(function (?ProductionOrder $record): bool { // Mantém a lógica de visibilidade
+                    ->view('filament.tables.columns.progress-bar')
+                    ->visible(function (?ProductionOrder $record): bool {
                         if (!$record) {
                             return true; // Mostra o cabeçalho da coluna
                         }

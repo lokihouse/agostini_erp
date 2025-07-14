@@ -58,7 +58,7 @@ class RelatoriosCargas extends Page implements HasForms
                 ->default(Carbon::now()),
             Select::make('motorista_id')
                 ->label('Motorista')
-                ->options(User::whereHas('roles', fn($q) => $q->where('name', 'Motorista'))->pluck('name', 'uuid'))
+                ->options(User::where('company_id', auth()->user()->company_id)->whereHas('roles', fn($q) => $q->where('name', 'Motorista'))->pluck('name', 'uuid'))
                 ->searchable()
                 ->reactive(),
             Select::make('status')

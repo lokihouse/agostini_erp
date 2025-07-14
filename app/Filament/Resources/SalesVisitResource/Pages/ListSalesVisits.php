@@ -33,7 +33,12 @@ class ListSalesVisits extends ListRecords
 
                     Select::make('assigned_to_user_id')
                         ->label('Vendedor Responsável')
-                        ->relationship('assignedTo', 'name', modifyQueryUsing: fn (Builder $query) => $query->orderBy('name'))
+                        ->relationship('assignedTo', 'name', modifyQueryUsing: function (Builder $query) {
+                            return $query
+                                ->where('company_id', auth()->user()->company_id)
+                                ->where('is_active', true)
+                                ->orderBy('name');
+                        })
                         ->searchable()
                         ->preload()
                         ->required(),

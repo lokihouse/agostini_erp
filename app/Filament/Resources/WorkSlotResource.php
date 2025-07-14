@@ -4,36 +4,28 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WorkSlotResource\Pages;
 
-// Importar Relation Manager
 use App\Filament\Resources\WorkSlotResource\RelationManagers;
-use App\Filament\Resources\WorkSlotResource\RelationManagers\ProductionStepsRelationManager;
 
-// Adicionar esta linha
 use App\Models\WorkSlot;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
-// Para unique rule
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Section;
 
-// Para agrupar
 use Filament\Tables\Filters\TrashedFilter;
 
-// Para filtro de excluídos
 use Filament\Forms\Components\Toggle;
 
-// Para o campo is_active
 use Filament\Tables\Columns\IconColumn;
 
-// Para a coluna is_active
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 // Para colunas de texto
 
@@ -59,17 +51,21 @@ class WorkSlotResource extends Resource
                     ->columns(2) // Dividir em colunas
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('Nome do Local') // Traduzir
+                            ->label('Nome do Local')
                             ->required()
+                            ->live(onBlur: true)
                             ->maxLength(255)
-                            // Garantir nome único, ignorando o registro atual na edição
-                            ->rule(function ($record) { // <-- Passe $record como argumento para a closure
-                                return Rule::unique('work_slots', 'name') // Tabela e coluna corretas
-                                ->where('company_id', auth()->user()->company_id) // Condição da empresa
-                                ->ignore($record?->uuid); // Usa o $record injetado para ignorar
-                            })
-                            ->columnSpan(1), // Ocupa 1 coluna
+                            ->unique(
+                                ignoreRecord: true,
+                                modifyRuleUsing: function (Unique $rule, callable $get) {
+                                    return $rule->where('company_id', $get('company_id'));
+                                }
+                            )
+                            ->columnSpan(1),
 
+                        Hidden::make('company_id')
+                            ->default(fn () => auth()->user()->company_id)
+                            ->required(),
                         Forms\Components\TextInput::make('location')
                             ->label('Localização (Opcional)') // Traduzir
                             ->maxLength(255)

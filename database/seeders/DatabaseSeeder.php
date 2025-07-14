@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $company = Company::first();
+        $company2 = Company::skip(2)->first();
 
         User::factory()->create([
             'company_id' => $company->uuid,
@@ -71,6 +72,13 @@ class DatabaseSeeder extends Seeder
             'company_id' => $company->uuid,
             'name' => 'Usuario Motorista',
             'username' => 'motorista',
+            'is_active' => true,
+        ])->assignRole($roleMotorista);
+
+        User::factory()->create([
+            'company_id' => $company2->uuid,
+            'name' => 'Usuario de outra Empresa',
+            'username' => 'outro',
             'is_active' => true,
         ])->assignRole($roleMotorista);
 

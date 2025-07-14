@@ -40,10 +40,7 @@ class ProductionStepResource extends Resource
                             ->label('Nome da Etapa')
                             ->required()
                             ->maxLength(255)
-                            // --- VALIDAÇÃO DE UNICIDADE POR EMPRESA (REFINADA) ---
-                            // Removemos o ->unique() daqui
-                            ->rule(function ($record) { // Usamos apenas ->rule()
-                                // Garante que temos o company_id do usuário logado
+                            ->rule(function ($record) {
                                 $companyId = auth()->user()?->company_id;
                                 if (!$companyId) {
                                     return 'Falha ao obter ID da empresa para validação.';
@@ -51,8 +48,7 @@ class ProductionStepResource extends Resource
 
                                 return Rule::unique('production_steps', 'name')
                                 ->where('company_id', $companyId)
-                                ->whereNot('name', $record?->name)
-                                ->ignore($record?->uuid);
+                                ->ignore($record?->uuid, 'uuid');
                             })
                             // --- FIM DA VALIDAÇÃO ---
                             ->columnSpan(1),

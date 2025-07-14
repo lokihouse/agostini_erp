@@ -26,7 +26,7 @@ class WorkSlot extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'company_id', // <-- Está no fillable, ótimo
+        'company_id',
         'name',
         'description',
         'location',

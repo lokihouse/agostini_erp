@@ -70,7 +70,7 @@ class TransportOrderResource extends Resource
                                 ->preload(),
                             Forms\Components\Select::make('driver_id')
                                 ->label('Motorista')
-                                ->relationship('driver', 'name', fn(Builder $query) => $query->whereHas('roles', fn($q) => $q->whereIn('name', ['Motorista', config('filament-shield.super_admin.name')])))
+                                ->relationship('driver', 'name', fn(Builder $query) => $query->where('is_active', true)->where('company_id', auth()->user()->company_id)->whereHas('roles', fn($q) => $q->whereIn('name', ['Motorista', config('filament-shield.super_admin.name')])))
                                 ->searchable()
                                 ->preload(),
                         ]),

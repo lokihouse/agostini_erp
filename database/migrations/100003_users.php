@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->foreignUuid('work_shift_id')
                 ->nullable()
-                ->constrained('work_shifts', 'uuid') // Assumindo que a PK de work_shifts é uuid
+                ->constrained('work_shifts', 'uuid')
                 ->nullOnDelete();
 
             $table->string('name');

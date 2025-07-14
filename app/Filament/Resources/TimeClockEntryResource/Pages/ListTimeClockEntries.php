@@ -7,6 +7,7 @@ use App\Models\TimeClockEntry;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Actions;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -35,7 +36,10 @@ class ListTimeClockEntries extends ListRecords
             ->color('primary')
             ->form([
                 Select::make('user_id')
-                    ->relationship('user', 'name')
+                    ->relationship('user', 'name', function (Builder $query) {
+                        $query->where('is_active', true)
+                            ->where('company_id', Auth::user()->company_id);
+                    })
                     ->label('Funcionário')
                     ->required()
                     ->searchable()

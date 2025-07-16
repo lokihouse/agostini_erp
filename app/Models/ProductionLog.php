@@ -23,7 +23,7 @@ class ProductionLog extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'company_id', // <-- Adicionar company_id aqui
+        'company_id',
         'production_order_item_uuid',
         'production_step_uuid',
         'work_slot_uuid',

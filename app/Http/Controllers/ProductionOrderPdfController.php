@@ -22,7 +22,7 @@ class ProductionOrderPdfController extends Controller
             'company',
             'user',
             'items.product',
-            'items.productionStep'
+            'items.productionSteps'
         ])
             ->findOrFail($uuid);
 

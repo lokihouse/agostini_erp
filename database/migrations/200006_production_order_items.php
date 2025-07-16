@@ -27,11 +27,6 @@ return new class extends Migration
                 ->constrained('products', 'uuid') // Liga com products.uuid
                 ->cascadeOnDelete(); // Se o produto for deletado, os itens da ordem relacionados a ele também são
 
-            $table->foreignUuid('production_step_uuid')
-                ->nullable() // Or not nullable if every item MUST have a step
-                ->constrained('production_steps', 'uuid')
-                ->nullOnDelete(); // Or cascadeOnDelete() depending on your needs
-
             // Campos específicos deste item na ordem
             $table->decimal('quantity_planned', 15, 4)->default(0);
             $table->decimal('quantity_produced', 15, 4)->default(0);
@@ -40,14 +35,6 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
-
-            // --- Índices e Constraints ---
-            // Garante que um produto não se repita dentro da mesma ordem (já estava ok)
-            // A unicidade por empresa é garantida pela ordem pai.
-            $table->unique(['production_order_uuid', 'product_uuid'], 'order_item_product_unique');
-
-            // Opcional: Índice composto para otimizar buscas por empresa e ordem
-            // $table->index(['company_id', 'production_order_uuid']);
         });
     }
 

@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\ProductionOrderResource\RelationManagers;
 
-use Filament\Forms\Components\Select;
+use App\Models\Product;
+use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -10,58 +11,73 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Validation\Rule;
-// Adicione a importação do Model se for usar no ->url()
-// use App\Models\ProductionOrderItem;
-// use App\Filament\Resources\ProductResource;
+use Illuminate\Database\Eloquent\Builder;
 
 
 class ProductionOrderItemsRelationManager extends RelationManager
 {
-    // Relação definida no Model ProductionOrder
-    protected static string $relationship = 'items'; // <-- CORRIGIDO AQUI
+    protected static string $relationship = 'items';
 
-    // Título da seção na página da Ordem de Produção
     protected static ?string $title = 'Itens da Ordem';
 
-    // Atributo do MODELO RELACIONADO (ProductionOrderItem) usado como título (não muito útil aqui)
-    // Vamos usar product.name na tabela
-    // protected static ?string $recordTitleAttribute = 'product.name'; // Removido, definiremos na tabela
-
-    /**
-     * Formulário para CRIAR ou EDITAR um ProductionOrderItem.
-     */
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Select::make('product_uuid')
+                Forms\Components\Select::make('product_uuid')
                     ->label('Produto')
-                    ->relationship('product', 'name') // Busca na relação 'product' do ProductionOrderItem
+                    ->relationship('product', 'name', fn (Builder $query) => $query->orderBy('name'))
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->columnSpan(2), // Ocupa 2 colunas
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        // Se nenhum produto for selecionado, limpa as etapas
+                        if (blank($state)) {
+                            $set('productionSteps', []);
+                            return;
+                        }
 
-                TextInput::make('quantity_planned')
+                        // Busca o produto selecionado
+                        $product = Product::find($state);
+
+                        // Obtém os UUIDs de todas as etapas de produção associadas ao produto
+                        $stepUuids = $product?->productionSteps()->pluck('production_steps.uuid')->toArray() ?? [];
+
+                        // Define o estado do campo 'productionSteps' com todos os UUIDs encontrados
+                        $set('productionSteps', $stepUuids);
+                    })
+                    ->columnSpanFull(),
+
+                Forms\Components\CheckboxList::make('productionSteps')
+                    ->label('Etapas de Produção (Geradas Automaticamente)')
+                    ->relationship(
+                        name: 'productionSteps',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: function (Builder $query, callable $get) {
+                            $product = Product::find($get('product_uuid'));
+                            if (!$product) {
+                                return $query->whereRaw('false'); // Retorna nenhuma etapa se o produto não for selecionado
+                            }
+                            return $query->whereHas('products', fn (Builder $q) => $q->where('products.uuid', $product->uuid));
+                        }
+                    )
+                    ->disabled() // <-- Torna o campo apenas informativo
+                    ->required()
+                    ->columns(3) // Organiza a lista em 3 colunas para melhor visualização
+                    ->columnSpanFull(),
+
+                Forms\Components\TextInput::make('quantity_planned')
                     ->label('Qtd. Planejada')
                     ->numeric()
                     ->required()
                     ->minValue(0)
                     ->default(1)
-                    ->columnSpan(['default' => 2, 'lg' => 1]),
+                    ->columnSpan(1),
 
-                TextInput::make('quantity_produced')
-                    ->label('Qtd. Produzida')
-                    ->numeric()
-                    ->minValue(0)
-                    ->default(0)
-                    ->readOnly()
-                    ->columnSpan(['default' => 2, 'lg' => 1]),
-
-                Textarea::make('notes')
+                Forms\Components\Textarea::make('notes')
                     ->label('Observações do Item')
-                    ->columnSpan(['default' => 2, 'lg' => 1]),
+                    ->columnSpan(1),
             ])->columns(2);
     }
 
@@ -77,7 +93,12 @@ class ProductionOrderItemsRelationManager extends RelationManager
                 ->label('Produto')
                     ->searchable()
                     ->sortable(),
-                // ->url(fn (ProductionOrderItem $record): string => ProductResource::getUrl('edit', ['record' => $record->product_uuid])) // Opcional: Link para editar o produto
+
+                TextColumn::make('productionSteps.name') // Mostra as etapas na tabela
+                ->label('Etapas')
+                    ->badge()
+                    ->limitList(2)
+                    ->searchable(),
 
                 TextColumn::make('product.sku') // Mostrar SKU do produto
                 ->label('SKU')
@@ -112,7 +133,7 @@ class ProductionOrderItemsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->label('Adicionar Item')
                     ->modalHeading('Adicionar Item à Ordem de Produção')
-                    ->using(function (array $data, RelationManager $livewire) {
+                    /*->using(function (array $data, RelationManager $livewire) {
                         $parent = $livewire->getOwnerRecord();
                         $item = $parent->items()
                             ->withTrashed() // Inclui soft-deletados
@@ -133,7 +154,7 @@ class ProductionOrderItemsRelationManager extends RelationManager
 
                         // Cria novo se não existir
                         return $parent->items()->create($data);
-                    }),
+                    })*/,
             ])
             ->actions([
                 // Ação para EDITAR um ProductionOrderItem existente

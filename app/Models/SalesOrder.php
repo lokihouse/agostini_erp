@@ -190,13 +190,22 @@ class SalesOrder extends Model
             $productionOrder = ProductionOrder::create($productionOrderData);
 
             foreach ($salesOrder->items as $salesItem) {
-                ProductionOrderItem::create([
+                $productionOrderItem = ProductionOrderItem::create([
                     'company_id' => $salesOrder->company_id,
                     'production_order_uuid' => $productionOrder->uuid,
                     'product_uuid' => $salesItem->product_id,
                     'quantity_planned' => $salesItem->quantity,
                     'notes' => 'Item originado do Pedido de Venda ' . $salesOrder->order_number,
                 ]);
+
+                $product = $productionOrderItem->product;
+
+                if($product){
+                    $stepUuids = $product->productionSteps()->pluck('production_steps.uuid')->all();
+                    if (!empty($stepUuids)) {
+                        $productionOrderItem->productionSteps()->sync($stepUuids);
+                    }
+                }
             }
         });
     }

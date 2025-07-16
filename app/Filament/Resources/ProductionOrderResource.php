@@ -42,8 +42,9 @@ class ProductionOrderResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('order_number')
                             ->label('Número da Ordem')
-                            ->required()
                             ->maxLength(255)
+                            ->readOnly()
+                            ->hiddenOn('create')
                             ->columnSpan(1),
 
                         Forms\Components\Select::make('status')
@@ -84,6 +85,7 @@ class ProductionOrderResource extends Resource
                                     ->where('company_id', auth()->user()->company_id)
                                     ->where('is_active', true);
                             })
+                            ->default(auth()->user()->uuid)
                             ->searchable()
                             ->preload()
                             ->columnSpan(1),

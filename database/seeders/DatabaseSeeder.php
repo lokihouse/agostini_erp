@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $company = Company::first();
-        $company2 = Company::skip(2)->first();
+        $company2 = Company::skip(1)->first();
 
         User::factory()->create([
             'company_id' => $company->uuid,

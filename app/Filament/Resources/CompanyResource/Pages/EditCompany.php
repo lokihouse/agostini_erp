@@ -146,8 +146,8 @@ class EditCompany extends EditRecord
         return null;
     }
 
-    #[On('fetchCepData')]
-    public function fetchCepData(string $cep): void
+    #[On('fetchCompanyCepData')]
+    public function fetchCompanyCepData(string $cep): void
     {
         if (empty($cep)) {
             Notification::make()

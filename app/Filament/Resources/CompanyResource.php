@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -141,8 +142,11 @@ class CompanyResource extends Resource
                                                             ->send();
                                                         return;
                                                     }
-                                                    // The Livewire component (CreateClient/EditClient) will set isLoadingCep
-                                                    $livewire->dispatch('fetchCepData', cep: $cleanedCep);
+                                                    Notification::make()
+                                                        ->title('Consultando o CEP')
+                                                        ->info()
+                                                        ->send();
+                                                    $livewire->dispatch('fetchCompanyCepData', cep: $cleanedCep);
                                                 })
                                                 ->color('gray')
                                         // ->loadingIndicator() // Removed
@@ -190,7 +194,12 @@ class CompanyResource extends Resource
                                         ->columnSpanFull()
                                         ->height('400px')
                                         ->reactive()
-                                        ->draggable(false)
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(function(Get $get, Set $set){
+                                            $set('latitude', $get('map_visualization')["lat"]);
+                                            $set('longitude', $get('map_visualization')["lng"]);
+                                        })
+                                        ->draggable(true)
                                         ->clickable(false)
                                         ->geolocate(false)
                                         ->defaultLocation(fn (Get $get): array => [

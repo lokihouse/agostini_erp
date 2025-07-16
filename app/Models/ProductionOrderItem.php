@@ -5,15 +5,19 @@ namespace App\Models;
 use App\Models\Scopes\TenantScope;
 
 // <-- Importar Scope
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // Para os logs
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+
+use App\Models\ProductionOrderItemStep;
 
 // <-- Importar Auth
 
@@ -26,10 +30,9 @@ class ProductionOrderItem extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'company_id', // <-- Adicionar company_id aqui
+        'company_id',
         'production_order_uuid',
         'product_uuid',
-        'production_step_uuid',
         'quantity_planned',
         'quantity_produced',
         'notes',
@@ -75,34 +78,24 @@ class ProductionOrderItem extends Model
         return $this->hasMany(ProductionLog::class, 'production_order_item_uuid', 'uuid');
     }
 
-    public function productionStep(): BelongsTo
+    public function productionSteps(): BelongsToMany
     {
-        return $this->belongsTo(ProductionStep::class, 'production_step_uuid', 'uuid');
+        return $this->belongsToMany(ProductionStep::class, 'production_order_item_steps', 'production_order_item_uuid', 'production_step_uuid')
+            ->using(ProductionOrderItemStep::class)
+            ->withTimestamps();
     }
-
-    // --- FIM RELAÇÕES ---
-
-    // --- MÉTODO BOOTED ---
-    /**
-     * The "booted" method of the model.
-     */
-    protected static function booted(): void // <-- ADICIONAR/COMPLETAR ESTE MÉTODO
+    protected static function booted(): void
     {
-        // 1. Aplica o TenantScope globalmente para FILTRAR queries
         static::addGlobalScope(new TenantScope);
 
-        // 2. Adiciona o listener 'creating' para DEFINIR company_id automaticamente
         static::creating(function (Model $model) {
-            // Define company_id APENAS se ele ainda não estiver definido
             if (empty($model->company_id)) {
-                // Tenta pegar da ordem pai primeiro (mais seguro)
                 if ($model->productionOrder && $model->productionOrder->company_id) {
                     $model->company_id = $model->productionOrder->company_id;
-                } // Se não conseguiu pela ordem, tenta pelo usuário logado
+                }
                 elseif (Auth::check() && Auth::user()->company_id) {
                     $model->company_id = Auth::user()->company_id;
                 }
-                // Adicione lógica 'else' aqui se precisar lidar com outros cenários
             }
         });
     }

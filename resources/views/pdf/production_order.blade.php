@@ -208,55 +208,44 @@
     {{-- Loop através de cada item da ordem --}}
     @forelse ($order->items as $item)
         @php
-            // *** BUSCA A ETAPA ESPECÍFICA LIGADA DIRETAMENTE A ESTE ITEM ***
-            // Certifique-se que o relacionamento 'productionStep' existe no Model ProductionOrderItem
-            // e foi carregado via Eager Loading no Controller: $order->load('items.product', 'items.productionStep')
-            $specificStep = $item->productionStep; // Assume relacionamento BelongsTo chamado 'productionStep'
+            // A relação agora é 'productionSteps' (plural) e é uma coleção
         @endphp
 
         {{-- Mostra o nome do produto como um subtítulo --}}
         <h3 class="product-steps-title">Produto: {{ $item->product->name ?? 'Produto não encontrado' }} (Item #{{ $loop->iteration }})</h3>
 
-        {{-- Tabela para exibir a etapa específica deste item --}}
-        <table class="steps-table">
-            <thead>
-            <tr>
-                <th class="qr-code-header">QR Code</th>
-                <th class="order-header">Item #</th>
-                <th style="width: 30%;">Produto</th>
-                <th class="step-header">Etapa Específica</th>
-                <th class="description-header">Descrição</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td class="qr-code-cell">
-                    @if ($specificStep)
-                        @php
-                            $qrData = $item->uuid . ':' . $specificStep->uuid;
-                        @endphp
-                        {!! DNS2D::getBarcodeHTML($qrData, 'QRCODE', 1.8, 1.8) !!}
-                    @else
-                        N/A
-                    @endif
-                </td>
-                <td class="order-cell">{{ $loop->iteration }}</td>
-                <td>{{ $item->product->name ?? 'N/A' }}</td>
-                <td class="step-cell">
-                    {{ $specificStep->name ?? 'Etapa não definida para este item' }}
-                </td>
-                <td class="description-cell">
-                    {{ $specificStep->description ?? '-' }}
-                </td>
-            </tr>
-            {{-- Mensagem se não houver etapa específica --}}
-            @if (!$specificStep)
+        {{-- Verifica se o item tem etapas de produção associadas --}}
+        @if($item->productionSteps->isNotEmpty())
+            {{-- Tabela para exibir as VÁRIAS etapas deste item --}}
+            <table class="steps-table">
+                <thead>
                 <tr>
-                    <td colspan="5" style="text-align: center; font-style: italic;">Nenhuma etapa de produção diretamente associada a este item da ordem no banco de dados.</td>
+                    <th class="qr-code-header">QR Code</th>
+                    <th class="order-header">Seq.</th>
+                    <th class="step-header">Etapa de Produção</th>
+                    <th class="description-header">Descrição da Etapa</th>
                 </tr>
-            @endif
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {{-- Loop através de cada etapa do item --}}
+                @foreach($item->productionSteps()->orderBy('name')->get() as $step)
+                    <tr>
+                        <td class="qr-code-cell">
+                            @php
+                                $qrData = $item->uuid . ':' . $step->uuid;
+                            @endphp
+                            {!! DNS2D::getBarcodeHTML($qrData, 'QRCODE', 1.8, 1.8) !!}
+                        </td>
+                        <td class="order-cell">{{ $loop->parent->iteration }}.{{$loop->iteration}}</td>
+                        <td class="step-cell">{{ $step->name ?? 'N/A' }}</td>
+                        <td class="description-cell">{{ $step->description ?? '-' }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @else
+            <div style="text-align: center; font-style: italic; padding: 5px; border: 1px dashed #ccc; margin-bottom: 10px;">Nenhuma etapa de produção definida para este item.</div>
+        @endif
 
     @empty
         <p style="font-size: 9px; text-align: center;">Nenhum item na ordem para listar etapas.</p>

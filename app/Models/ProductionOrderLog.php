@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductionOrderLog extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids;
 
     protected $primaryKey = 'uuid';
     public $incrementing = false;
@@ -24,66 +24,41 @@ class ProductionOrderLog extends Model
      */
     protected $fillable = [
         'company_id',
+        'production_order_uuid',
         'production_order_item_uuid',
         'production_step_uuid',
-        'work_slot_uuid',
         'user_uuid',
         'quantity',
-        'log_time',
+        'ellapsed_time',
         'notes',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'quantity' => 'decimal:4', // Manter casts existentes
-        'log_time' => 'datetime',
+        'quantity' => 'decimal:4',
+        'ellapsed_time' => 'datetime',
     ];
 
-    // --- RELAÇÕES ---
-
-    /**
-     * Get the company that owns this log entry (indirectly, but good for consistency).
-     * ESTE É O MÉTODO QUE PRECISAMOS ADICIONAR!
-     */
-    public function company(): BelongsTo // <-- Adicionar este método
+    public function company(): BelongsTo
     {
-        // Chave estrangeira nesta tabela ('production_logs'), chave primária na tabela pai ('companies')
         return $this->belongsTo(Company::class, 'company_id', 'uuid');
     }
 
-    /**
-     * Get the production order item associated with this log.
-     */
-    public function productionOrderItem(): BelongsTo // <-- Relação com ProductionOrderItem
+    public function productionOrder(): BelongsTo
+    {
+        return $this->belongsTo(ProductionOrder::class, 'production_order_uuid', 'uuid');
+    }
+
+    public function productionOrderItem(): BelongsTo
     {
         return $this->belongsTo(ProductionOrderItem::class, 'production_order_item_uuid', 'uuid');
     }
 
-    /**
-     * Get the production step associated with this log.
-     */
-    public function productionStep(): BelongsTo // <-- Relação com ProductionStep
+    public function productionStep(): BelongsTo
     {
         return $this->belongsTo(ProductionStep::class, 'production_step_uuid', 'uuid');
     }
 
-    /**
-     * Get the work slot where this log occurred (if applicable).
-     */
-    public function workSlot(): BelongsTo // <-- Relação com WorkSlot
-    {
-        // Note que work_slot_uuid pode ser nulo na migration, então esta relação pode retornar null
-        return $this->belongsTo(WorkSlot::class, 'work_slot_uuid', 'uuid');
-    }
-
-    /**
-     * Get the user who created this log entry.
-     */
-    public function user(): BelongsTo // <-- Relação com User
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }

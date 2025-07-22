@@ -27,6 +27,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->foreignUuid('production_step_uuid')
+                ->nullable()
                 ->constrained('production_steps', 'uuid')
                 ->restrictOnDelete();
 
@@ -35,8 +36,8 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             // Dados do registro
-            $table->decimal('quantity', 15, 4);
-            $table->dateTime('ellapsed_time')->useCurrent();
+            $table->decimal('quantity', 15, 4)->nullable();
+            $table->integer('ellapsed_time')->nullable();
             $table->text('notes')->nullable();
 
             $table->timestamps();

@@ -74,7 +74,7 @@ class ProductionOrder extends Model
 
     public function productionOrderLogs(): HasMany
     {
-        return $this->hasMany(ProductionOrderItem::class, 'production_order_uuid', 'uuid');
+        return $this->hasMany(ProductionOrderLog::class, 'production_order_uuid', 'uuid');
     }
 
     // --- END RELATIONSHIPS ---

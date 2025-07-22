@@ -31,9 +31,12 @@ class ProductionOrderLogsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->recordTitleAttribute('Registros de produção')
             ->columns([
-                Tables\Columns\TextColumn::make('Registros de produção'),
+                Tables\Columns\TextColumn::make('created_at')->label('Data')->width(1),
+                Tables\Columns\TextColumn::make('user.name')->label('Responsável')->width(1),
+                Tables\Columns\TextColumn::make('notes')->label('Registro'),
             ])
             ->filters([
                 //

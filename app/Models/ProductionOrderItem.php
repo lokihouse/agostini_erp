@@ -92,13 +92,35 @@ class ProductionOrderItem extends Model
         });
 
         static::created(function (Model $model) {
-            $stepUuids = Product::find($model->product_uuid)->first()->productionSteps()->pluck('production_steps.uuid')->all();
+            $produto = Product::find($model->product_uuid)->first();
+
+            ProductionOrderLog::create([
+                'company_id' => $model->company_id,
+                'production_order_uuid' => $model->production_order_uuid,
+                'production_order_item_uuid' => $model->uuid,
+                'user_uuid' => auth()->user()->uuid,
+                'notes' => "Produto " . $produto->nome . " adicionado (" . $model->quantity_produced . "/" . $model->quantity_planned . ")",
+            ]);
+
+            $stepUuids = $produto->productionSteps()->pluck('production_steps.uuid')->all();
             foreach ($stepUuids as $stepUuid) {
                 ProductionOrderItemStep::create([
                     'production_order_item_uuid' => $model->uuid,
                     'production_step_uuid' => $stepUuid,
                 ]);
             }
+        });
+
+        static::deleting(function (Model $model) {
+            $produto = Product::find($model->product_uuid)->first();
+
+            ProductionOrderLog::create([
+                'company_id' => $model->company_id,
+                'production_order_uuid' => $model->production_order_uuid,
+                'production_order_item_uuid' => $model->uuid,
+                'user_uuid' => auth()->user()->uuid,
+                'notes' => "Produto " . $produto->nome . " removido (" . $model->quantity_produced . "/" . $model->quantity_planned . ")",
+            ]);
         });
     }
 }

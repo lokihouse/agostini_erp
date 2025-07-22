@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\ProductionLog; // Mantenha se ainda usar para outros logs
+use App\Models\ProductionOrderLog; // Mantenha se ainda usar para outros logs
 use App\Models\ProductionOrderItem;
 use App\Models\ProductionStep;
 use App\Models\UserCurrentTask;
@@ -10,6 +10,7 @@ use App\Models\PauseReason;
 use App\Models\TaskPauseLog;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Illuminate\Contracts\View\View;
@@ -38,6 +39,8 @@ class UserTaskControl extends Component
     public string $pauseNotes = '';
     public ?float $finishQuantityProduced = null;
     public string $finishNotes = '';
+
+    public string $debugScannedQrCode = '';
 
     protected $listeners = ['qrCodeScanned' => 'handleQrCodeScan'];
 
@@ -126,10 +129,11 @@ class UserTaskControl extends Component
             return '0s';
         }
         $totalSeconds = $this->currentTask->total_active_seconds ?? 0;
+
         if ($this->currentTask->status === 'active' && $this->currentTask->last_resumed_at) {
             try {
                 $lastResumed = Carbon::parse($this->currentTask->last_resumed_at);
-                $totalSeconds += Carbon::now()->diffInSeconds($lastResumed);
+                $totalSeconds += $lastResumed->diffInSeconds(Carbon::now());
             } catch (\Exception $e) {
                 Log::error('UserTaskControl: Erro ao parsear last_resumed_at para cálculo de tempo', [
                     'taskId' => $this->currentTask->uuid,
@@ -175,10 +179,17 @@ class UserTaskControl extends Component
         $this->processScanResult($scannedData);
     }
 
+    public function debugQrCode()
+    {
+        $qrCode = $this->debugScannedQrCode;
+        $qrCode = \Illuminate\Support\Facades\Crypt::decryptString($qrCode);
+        $this->processScanResult($qrCode);
+    }
+
     public function processScanResult(string $scannedData): void
     {
         Log::info('UserTaskControl: QR Code Data Recebido para Processamento:', ['data' => $scannedData]);
-        DB::beginTransaction();
+        //DB::beginTransaction();
         try {
             $uuidPattern = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
             if (!preg_match("/^({$uuidPattern}):({$uuidPattern})$/", $scannedData, $matches)) {
@@ -195,7 +206,7 @@ class UserTaskControl extends Component
             $orderItem = ProductionOrderItem::where('uuid', $orderItemUuid)->first();
             $step = ProductionStep::where('uuid', $stepUuid)->first();
 
-            if (!$orderItem || !$step || $orderItem->production_step_uuid !== $step->uuid) {
+            if (!$orderItem || !$step || !$orderItem->productionSteps->contains(function (ProductionStep $st) use ($step) { return $st->uuid == $step->uuid; })) {
                 Log::error('UserTaskControl: Combinação Item/Etapa não encontrada ou inválida.', [
                     'orderItemUuid' => $orderItemUuid, 'stepUuid' => $stepUuid,
                     'orderItemFound' => !is_null($orderItem), 'stepFound' => !is_null($step),
@@ -222,19 +233,19 @@ class UserTaskControl extends Component
                 'total_active_seconds' => 0,
             ]);
 
-            DB::commit();
+            //DB::commit();
             Log::info('UserTaskControl: Nova tarefa iniciada com sucesso.', ['taskId' => $newTask->uuid]);
             $this->loadCurrentTask();
             Notification::make()->success()->title('Tarefa Iniciada!')->body('Você iniciou a tarefa ' . $this->orderNumber . ' - ' . $this->stepName)->send();
             $this->dispatch('scan-success');
             $this->dispatch('close-pause-modal');
         } catch (ValidationException $e) {
-            DB::rollBack();
+            //DB::rollBack();
             Log::error('UserTaskControl: Erro de validação ao processar QR Code:', ['error' => $e->getMessage(), 'errors_detail' => $e->errors()]);
             Notification::make()->danger()->title('Erro no QR Code')->body($e->getMessage())->send();
             $this->dispatch('scan-error', message: $e->getMessage());
         } catch (\Exception $e) {
-            DB::rollBack();
+            //DB::rollBack();
             Log::error('UserTaskControl: Erro inesperado ao processar QR Code:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             Notification::make()->danger()->title('Erro Inesperado')->body('Ocorreu um erro ao iniciar a tarefa. Tente novamente.')->send();
             $this->dispatch('scan-error', message: 'Erro inesperado no servidor.');

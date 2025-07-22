@@ -111,14 +111,12 @@ class SalesOrder extends Model
                 throw ValidationException::withMessages(['status' => 'Um pedido cancelado não pode ter seu status alterado.']);
             }
 
-            // Regra 2: Não pode voltar a ser pendente, a menos que esteja sendo criado (o que não é o caso aqui no updating)
             if ($newStatus === self::STATUS_PENDING) {
                 if (!in_array($originalStatus, [self::STATUS_DRAFT, self::STATUS_PENDING])) {
                     throw ValidationException::withMessages(['status' => 'O pedido não pode voltar ao status Pendente a partir do status atual.']);
                 }
             }
 
-            // Regra 3: Se 'Aprovada', cria Ordem de Produção. Não pode voltar de 'Processando' para 'Aprovada'.
             if ($newStatus === self::STATUS_APPROVED) {
                 if (!in_array($originalStatus, [self::STATUS_PENDING])) {
                     throw ValidationException::withMessages(['status' => 'O pedido só pode ser Aprovado a partir do status Pendente.']);
@@ -203,7 +201,7 @@ class SalesOrder extends Model
                 if($product){
                     $stepUuids = $product->productionSteps()->pluck('production_steps.uuid')->all();
                     if (!empty($stepUuids)) {
-                        $productionOrderItem->productionSteps()->sync($stepUuids);
+                        //$productionOrderItem->productionSteps()->sync($stepUuids);
                     }
                 }
             }

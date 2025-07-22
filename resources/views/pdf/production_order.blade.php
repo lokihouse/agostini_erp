@@ -99,17 +99,19 @@
         }
 
         td.qr-code-cell {
-            padding: 6px 6px; /* Sua definição */
-            /* display: flex; -> dompdf pode não suportar bem flex, usar text-align */
+            padding: 6px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             vertical-align: middle;
         }
 
-        td.qr-code-cell img {
-            width: 40px; /* Sua definição */
-            height: 40px; /* Sua definição */
-            display: block;
-            margin: 0 auto;
+        td.qr-code-cell div.debug_code {
+            font-size: 5px;
+            color: red;
+            padding-top: 6px;
         }
 
         /* Coluna Ordem - Alinhamento Central */
@@ -235,6 +237,12 @@
                                 $qrData = $item->uuid . ':' . $step->uuid;
                             @endphp
                             {!! DNS2D::getBarcodeHTML($qrData, 'QRCODE', 1.8, 1.8) !!}
+
+                            @if (env('APP_DEBUG', false))
+                                <div class="debug_code">
+                                    {{ \Illuminate\Support\Facades\Crypt::encryptString($qrData) }}
+                                </div>
+                            @endif
                         </td>
                         <td class="order-cell">{{ $loop->parent->iteration }}.{{$loop->iteration}}</td>
                         <td class="step-cell">{{ $step->name ?? 'N/A' }}</td>

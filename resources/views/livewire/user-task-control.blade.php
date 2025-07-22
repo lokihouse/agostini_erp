@@ -69,7 +69,6 @@
                         <div class="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:col-span-2">
                             <h4 class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Tempo na Tarefa</h4>
                             <div class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                {{-- A propriedade computada $this->calculateTimeOnTask é atualizada automaticamente --}}
                                 {{ $this->calculateTimeOnTask }}
                             </div>
                             @if($isPaused)
@@ -174,6 +173,33 @@
 
             {{-- Exibição de Erro do Scanner --}}
             <div id="qr-reader-results" class="mt-2 text-center text-sm text-red-600 dark:text-red-400" x-text="scanErrorMessage" x-show="scanErrorMessage"></div>
+
+            @if (env('APP_DEBUG', false))
+                <div style="padding-top: 16px">
+                    <x-filament::fieldset>
+                        <x-slot name="label">
+                            QrCode Key - Debug
+                        </x-slot>
+
+                        <x-filament::input.wrapper>
+                            <x-filament::input
+                                type="text"
+                                wire:model="debugScannedQrCode"
+                            />
+
+                            <x-slot name="suffix">
+                                <x-filament::icon-button
+                                    icon="heroicon-m-magnifying-glass"
+                                    wire:click="debugQrCode"
+                                    label="New label"
+                                />
+                            </x-slot>
+
+                        </x-filament::input.wrapper>
+
+                    </x-filament::fieldset>
+                </div>
+            @endif
 
             {{-- Botão Fechar --}}
             <div class="mt-6 text-center">
@@ -287,7 +313,7 @@
                     <div>
                         <label for="finish_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantidade Produzida (Nesta Sessão)</label>
                         <x-filament::input.wrapper :valid="!$errors->has('finishQuantityProduced')">
-                            <x-filament::input type="number" wire:model="finishQuantityProduced" id="finish_quantity" min="0" step="any" required />
+                            <x-filament::input type="number" wire:model="finishQuantityProduced" id="finish_quantity" min="0" step="any"/>
                         </x-filament::input.wrapper>
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Informe quantas unidades você finalizou DURANTE esta sessão de trabalho.</p>
                         @error('finishQuantityProduced') <p class="mt-1 text-sm text-danger-600 dark:text-danger-400">{{ $message }}</p> @enderror
@@ -339,7 +365,7 @@
         <script>
             let html5QrCode = null; // Variável global para a instância do scanner
             let debounceTimer = null; // Timer para o debounce
-            const DEBOUNCE_DELAY = 1000; // Atraso em milissegundos (1 segundo) - ajuste conforme necessário
+            const DEBOUNCE_DELAY = 200; // Atraso em milissegundos (1 segundo) - ajuste conforme necessário
             let isProcessingScan = false;
 
             function onScanSuccess(decodedText, decodedResult) {
@@ -359,7 +385,7 @@
                     stopScanner();
                     setTimeout(() => {
                         isProcessingScan = false;
-                    }, 500); // Pequeno delay para evitar re-scans imediatos se o modal não fechar rápido
+                    }, 1000); // Pequeno delay para evitar re-scans imediatos se o modal não fechar rápido
                 }, DEBOUNCE_DELAY);
             }
 
@@ -380,7 +406,7 @@
                 try {
                     html5QrCode = new Html5Qrcode("qr-reader");
                     const config = {
-                        fps: 10,
+                        fps: 5,
                         qrbox: (viewfinderWidth, viewfinderHeight) => {
                             let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
                             let qrboxSize = Math.floor(minEdge * 0.7);

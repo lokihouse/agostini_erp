@@ -132,29 +132,7 @@ class ProductionOrderItemsRelationManager extends RelationManager
                 // Ação para CRIAR um novo ProductionOrderItem associado a esta ProductionOrder
                 Tables\Actions\CreateAction::make()
                     ->label('Adicionar Item')
-                    ->modalHeading('Adicionar Item à Ordem de Produção')
-                    /*->using(function (array $data, RelationManager $livewire) {
-                        $parent = $livewire->getOwnerRecord();
-                        $item = $parent->items()
-                            ->withTrashed() // Inclui soft-deletados
-                            ->where('product_uuid', $data['product_uuid'])
-                            ->first();
-
-                        if ($item) {
-                            if ($item->trashed()) {
-                                $item->restore();
-                                $item->quantity_planned = $data['quantity_planned'];
-                            } else {
-                                $item->quantity_planned += $data['quantity_planned'];
-                            }
-                            $item->notes = $data['notes'] ?? $item->notes;
-                            $item->save();
-                            return $item;
-                        }
-
-                        // Cria novo se não existir
-                        return $parent->items()->create($data);
-                    })*/,
+                    ->modalHeading('Adicionar Item à Ordem de Produção'),
             ])
             ->actions([
                 // Ação para EDITAR um ProductionOrderItem existente
@@ -170,12 +148,4 @@ class ProductionOrderItemsRelationManager extends RelationManager
             ])
             ->defaultSort('product.name', 'asc'); // Ordenar por nome do produto
     }
-
-    // Removido pois não há sub-relações definidas aqui
-    // public function getRelations(): array
-    // {
-    //     return [
-    //         ProductionLogsRelationManager::class,
-    //     ];
-    // }
 }

@@ -70,14 +70,6 @@ class ProductionOrderItem extends Model
         return $this->belongsTo(Product::class, 'product_uuid', 'uuid');
     }
 
-    /**
-     * Get the production logs for this specific order item.
-     */
-    public function productionLogs(): HasMany
-    {
-        return $this->hasMany(ProductionLog::class, 'production_order_item_uuid', 'uuid');
-    }
-
     public function productionSteps(): BelongsToMany
     {
         return $this->belongsToMany(ProductionStep::class, 'production_order_item_steps', 'production_order_item_uuid', 'production_step_uuid')
@@ -96,6 +88,16 @@ class ProductionOrderItem extends Model
                 elseif (Auth::check() && Auth::user()->company_id) {
                     $model->company_id = Auth::user()->company_id;
                 }
+            }
+        });
+
+        static::created(function (Model $model) {
+            $stepUuids = Product::find($model->product_uuid)->first()->productionSteps()->pluck('production_steps.uuid')->all();
+            foreach ($stepUuids as $stepUuid) {
+                ProductionOrderItemStep::create([
+                    'production_order_item_uuid' => $model->uuid,
+                    'production_step_uuid' => $stepUuid,
+                ]);
             }
         });
     }

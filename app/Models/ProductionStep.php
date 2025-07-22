@@ -38,11 +38,6 @@ class ProductionStep extends Model
         return $this->belongsTo(Company::class, 'company_id', 'uuid');
     }
 
-    public function productionLogs(): HasMany
-    {
-        return $this->hasMany(ProductionLog::class, 'production_step_uuid', 'uuid');
-    }
-
     public function workSlots(): BelongsToMany
     {
         return $this->belongsToMany(

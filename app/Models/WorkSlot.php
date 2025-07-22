@@ -53,14 +53,6 @@ class WorkSlot extends Model
     }
 
     /**
-     * Get the production logs associated with this work slot.
-     */
-    public function productionLogs(): HasMany // Renomear se houver conflito
-    {
-        return $this->hasMany(ProductionLog::class, 'work_slot_uuid', 'uuid');
-    }
-
-    /**
      * The production steps that can be performed at this work slot.
      */
     public function productionSteps(): BelongsToMany

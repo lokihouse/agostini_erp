@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\ProductionLog; // Verifique o namespace
+use App\Models\ProductionOrderLog; // Verifique o namespace
 use App\Models\ProductionOrderItem;
 use App\Models\ProductionStep;
 use App\Models\WorkSlot;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductionLog>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductionOrderLog>
  */
 class ProductionLogFactory extends Factory
 {
@@ -20,7 +20,7 @@ class ProductionLogFactory extends Factory
      *
      * @var string
      */
-    protected $model = ProductionLog::class;
+    protected $model = ProductionOrderLog::class;
 
     /**
      * Define the model's default state.

@@ -264,8 +264,6 @@ class SalesOrderResource extends Resource
             ->requiresConfirmation()
             ->modalHeading('Aprovar Pedido de Venda')
             ->modalDescription('Tem certeza que deseja aprovar este pedido? Uma Ordem de Produção será gerada.')
-            // A visibilidade será controlada na Page agora, usando o registro da página
-            // ->visible(fn (SalesOrder $record): bool => $record->status === SalesOrder::STATUS_PENDING)
             ->action(function (SalesOrder $record): void { // $record será passado pela Page
                 try {
                     $record->status = SalesOrder::STATUS_APPROVED;

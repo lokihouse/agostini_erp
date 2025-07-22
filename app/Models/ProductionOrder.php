@@ -72,40 +72,24 @@ class ProductionOrder extends Model
         return $this->hasMany(ProductionOrderItem::class, 'production_order_uuid', 'uuid');
     }
 
+    public function productionOrderLogs(): HasMany
+    {
+        return $this->hasMany(ProductionOrderItem::class, 'production_order_uuid', 'uuid');
+    }
+
     // --- END RELATIONSHIPS ---
 
 
-    /**
-     * The "booted" method of the model.
-     * Applies global scopes and registers model event listeners.
-     */
     protected static function booted(): void
     {
-        // 1. Apply the TenantScope globally to FILTER queries
         static::addGlobalScope(new TenantScope());
 
-        // 2. Add the 'creating' listener to automatically SET company_id
-        static::creating(function (Model $model) {
-            // Only set company_id if it's not already set (e.g., by a seeder/factory)
-            if (empty($model->company_id)) {
-                // Check if a user is authenticated and has a company_id
+        static::creating(function (ProductionOrder $productionOrder) {
+            if (empty($productionOrder->company_id)) {
                 if (Auth::check() && Auth::user()->company_id) {
-                    $model->company_id = Auth::user()->company_id;
+                    $productionOrder->company_id = Auth::user()->company_id;
                 }
-                // Optional: Add error handling or default logic if company_id
-                // cannot be determined in a specific context (e.g., console commands
-                // without explicit company context). For web requests, this
-                // usually implies an unauthenticated user trying to create data.
             }
         });
-
-        // Optional: Prevent changing the company_id after creation
-        // static::updating(function (Model $model) {
-        //     if ($model->isDirty('company_id') && $model->getOriginal('company_id') !== null) {
-        //         // Revert the change or throw an exception
-        //         $model->company_id = $model->getOriginal('company_id');
-        //         // or: throw new \LogicException("Changing the company_id is forbidden.");
-        //     }
-        // });
     }
 }

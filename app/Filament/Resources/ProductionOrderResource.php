@@ -49,6 +49,7 @@ class ProductionOrderResource extends Resource
 
                         Forms\Components\Select::make('status')
                             ->label('Status')
+                            ->hiddenOn('create')
                             ->options([
                                 'Pendente' => 'Pendente',
                                 'Planejada' => 'Planejada',
@@ -70,11 +71,13 @@ class ProductionOrderResource extends Resource
 
                         Forms\Components\DateTimePicker::make('start_date')
                             ->label('Data Início Real')
+                            ->readOnly()
                             ->native(false)
                             ->columnSpan(1),
 
                         Forms\Components\DateTimePicker::make('completion_date')
                             ->label('Data Conclusão Real')
+                            ->readOnly()
                             ->native(false)
                             ->columnSpan(1),
 
@@ -197,6 +200,7 @@ class ProductionOrderResource extends Resource
     {
         return [
             RelationManagers\ProductionOrderItemsRelationManager::class,
+            RelationManagers\ProductionOrderLogsRelationManager::class
         ];
     }
 

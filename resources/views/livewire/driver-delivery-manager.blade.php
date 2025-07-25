@@ -289,12 +289,13 @@
                 }
                 console.log(`DriverDelivery: Code matched = ${decodedText}`, decodedResult);
 
+                @this.set('scannedQrCodeData', decodedText, false);
+                @this.call('processQrCodeScan');
+
                 clearTimeout(driverDeliveryDebounceTimer);
 
                 driverDeliveryDebounceTimer = setTimeout(() => {
                     driverDeliveryIsProcessingScan = true;
-                    @this.set('scannedQrCodeData', decodedText, false);
-                    @this.call('processQrCodeScan');
                     setTimeout(() => {
                         driverDeliveryIsProcessingScan = false;
                     }, 1000);

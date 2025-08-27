@@ -6,6 +6,7 @@
     <title>Relatório Financeiro</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #374151; }
+        img{width: 150px;}
         .header { text-align: center; margin-bottom: 20px; }
         .header h1 { font-size: 24px; margin: 0; }
         .header p { font-size: 12px; margin: 0; }
@@ -31,6 +32,11 @@
     </style>
 </head>
 <body>
+     <header>
+        <div>
+            <img src="images/logo-agostini-full_color-1-horizontal.png" alt="Agostini Tecnologia de Gestão">
+        </div>
+    </header>
 <div class="header">
     <h1>Relatório de Contas Financeiras</h1>
     <p>Gerado em: {{ \Carbon\Carbon::now()->translatedFormat('d/m/y H:i') }}</p>

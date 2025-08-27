@@ -15,6 +15,9 @@
             line-height: 1.25; /* AJUSTE: Altura da linha um pouco menor */
             color: #333;
         }
+        img{
+            width: 150px;
+        }
         .container {
             width: 100%;
             margin: 0 auto;
@@ -128,6 +131,11 @@
     </style>
 </head>
 <body>
+     <header>
+        <div>
+            <img src="images/logo-agostini-full_color-1-horizontal.png" alt="Agostini Tecnologia de Gestão">
+        </div>
+    </header>
 <div class="footer">
     <span class="pagenum"></span>
 </div>

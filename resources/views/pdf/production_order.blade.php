@@ -18,6 +18,9 @@
             line-height: 1.2; /* Espaçamento entre linhas reduzido */
             color: #333;
         }
+        img{
+            width: 150px;
+        }
         .container {
             width: 100%;
             margin: 0 auto;
@@ -139,6 +142,11 @@
     </style>
 </head>
 <body>
+     <header>
+        <div>
+            <img src="images/logo-agostini-full_color-1-horizontal.png" alt="Agostini Tecnologia de Gestão">
+        </div>
+    </header>
 <div class="container">
     <h1>Ordem de Produção: {{ $order->order_number }}</h1>
 
@@ -238,11 +246,11 @@
                             @endphp
                             {!! DNS2D::getBarcodeHTML($qrData, 'QRCODE', 1.8, 1.8) !!}
 
-                            @if (env('APP_DEBUG', false))
+                            {{-- @if (env('APP_DEBUG', false))
                                 <div class="debug_code">
                                     {{ \Illuminate\Support\Facades\Crypt::encryptString($qrData) }}
                                 </div>
-                            @endif
+                            @endif --}}
                         </td>
                         <td class="order-cell">{{ $loop->parent->iteration }}.{{$loop->iteration}}</td>
                         <td class="step-cell">{{ $step->name ?? 'N/A' }}</td>

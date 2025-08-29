@@ -47,6 +47,11 @@ class ProductResource extends Resource
                                     ->label('SKU')
                                     ->maxLength(255)
                                     ->columnSpan(1),
+                                Forms\Components\TextInput::make('stock')
+                                    ->label('Estoque')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->columnSpan(1),
                                 Forms\Components\Select::make('unit_of_measure')
                                     ->label('Unidade de Medida')
                                     ->options([
@@ -107,6 +112,11 @@ class ProductResource extends Resource
                     ->label('SKU')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('stock')
+                    ->label('Estoque')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('unit_of_measure')
                     ->label('Un. Medida')
                     ->searchable()

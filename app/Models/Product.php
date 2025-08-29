@@ -36,7 +36,8 @@ class Product extends Model
         'unit_of_measure',
         'standard_cost',
         'sale_price',
-        'minimum_sale_price'
+        'minimum_sale_price',
+        'stock'
     ];
 
     /**

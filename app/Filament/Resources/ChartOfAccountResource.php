@@ -146,5 +146,6 @@ class ChartOfAccountResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+    
 }
 

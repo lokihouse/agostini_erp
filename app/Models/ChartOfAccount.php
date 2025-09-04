@@ -103,16 +103,29 @@ class ChartOfAccount extends Model
      * within a given period.
      * Income is positive, Expense is negative.
      */
-    public function getValuesForPeriod(Carbon $startDate, Carbon $endDate): float
+   public function getValuesForPeriod(Carbon $startDate, Carbon $endDate, ?string $tipo = null): float
     {
-        $accountUuids = $this->getAllDescendantUuidsIncludingSelf();
+    $accountUuids = $this->getAllDescendantUuidsIncludingSelf();
+    $query = FinancialTransaction::query()
+        ->whereIn('chart_of_account_uuid', $accountUuids)
+        ->whereBetween('transaction_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
-        $total = FinancialTransaction::query()
-            ->whereIn('chart_of_account_uuid', $accountUuids)
-            // TenantScope on FinancialTransaction handles company_id filtering
-            ->whereBetween('transaction_date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->sum(DB::raw("CASE WHEN type = '" . FinancialTransaction::TYPE_INCOME . "' THEN amount ELSE -amount END"));
-
-        return (float) ($total / 100);
+    if ($tipo === 'entrada') {
+        $query->where('type', FinancialTransaction::TYPE_INCOME);
+        $total = $query->sum('amount');
+    } elseif ($tipo === 'saida') {
+        $query->where('type', FinancialTransaction::TYPE_EXPENSE);
+        $total = $query->sum('amount');
+    } else {
+        // saldo líquido: entradas positivas, saídas negativas
+        $total = $query->sum(DB::raw("
+            CASE 
+                WHEN type = '" . FinancialTransaction::TYPE_INCOME . "' THEN amount 
+                ELSE -amount 
+            END
+        "));
     }
+    // como os valores estão em centavos, normalizamos para reais
+    return (float) ($total / 100);
+}  
 }

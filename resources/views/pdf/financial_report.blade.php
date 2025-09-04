@@ -133,6 +133,25 @@
             @endforeach
         @endforeach
     @endforeach
+    <tr class="root" style="background:#f9fafb; font-weight:bold;">
+    <td colspan="4">Total</td>
+        @foreach($monthHeaders as $monthDate)
+            @php
+                $entrada = $reportData->sum(fn($item) => $item->getValuesForPeriod($monthDate->copy()->startOfMonth(), $monthDate->copy()->endOfMonth(), 'entrada'));
+                $saida   = $reportData->sum(fn($item) => $item->getValuesForPeriod($monthDate->copy()->startOfMonth(), $monthDate->copy()->endOfMonth(), 'saida'));
+                $diferenca = $entrada - $saida;
+            @endphp
+            <td class="text-right">
+                @if($diferenca < 0)
+                    <span class="text-red">({{ number_format(abs($diferenca), 2, ',', '.') }})</span>
+                    @elseif($diferenca > 0)
+                        {{ number_format($diferenca, 2, ',', '.') }}
+                    @else
+                        <span class="text-muted">-</span>
+                @endif
+            </td>
+        @endforeach
+    </tr>
     </tbody>
 </table>
 </body>

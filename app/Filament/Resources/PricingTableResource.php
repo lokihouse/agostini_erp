@@ -27,6 +27,16 @@ class PricingTableResource extends Resource
     protected static ?int $navigationSort = 100; // Esse número define a ordem no menu principal 
     protected static ?int $navigationGroupSort = 5; // Opcional, se quiser forçar a ordem do grupo
 
+    public static function getPluralLabel(): string
+        {
+            return 'Tabelas de preços';
+        }
+
+        public static function getLabel(): string
+        {
+            return 'Tabela de preços';
+        }
+
     public static function form(Form $form): Form
         {
           return $form

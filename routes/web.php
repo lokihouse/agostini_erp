@@ -5,6 +5,7 @@ use App\Http\Controllers\FinancialReportPdfController;
 use App\Http\Controllers\ProductionOrderPdfController;
 use App\Http\Controllers\TimeClockController;
 use App\Http\Controllers\VisitWithoutOrderPdfController;
+use App\Http\Controllers\PricingTablePdfController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/app');
@@ -31,4 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/visits-without-order/pdf', VisitWithoutOrderPdfController::class)->name('visits.without.order.pdf');
 
     Route::get('/financial-report/pdf', FinancialReportPdfController::class)->name('financial.report.pdf');
+
+    Route::get('/pricing-table/pdf', [PricingTablePdfController::class, 'generatePdf'])
+    ->name('pricing-table.pdf');
 });

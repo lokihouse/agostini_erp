@@ -109,10 +109,13 @@ class SalesGoalResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
+             ->filters([
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label('Vendedor')
-                    ->relationship('user', 'name', modifyQueryUsing: fn (Builder $query) => $query->whereHas('roles', fn(Builder $q) => $q->whereIn('name', ['Vendedor', 'Administrador'])))
+                    ->relationship('user', 'name', modifyQueryUsing: fn (Builder $query) =>
+                        $query->where('company_id', auth()->user()->company_id) // 🔑 filtro pela empresa
+                         ->whereHas('roles', fn(Builder $q) => 
+                         $q->whereIn('name', ['Vendedor', 'Administrador'])))
                     ->searchable()
                     ->preload(),
                 // TODO: Adicionar filtro por período (mês/ano) se necessário

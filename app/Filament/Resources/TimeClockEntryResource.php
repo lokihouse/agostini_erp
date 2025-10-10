@@ -179,7 +179,10 @@ class TimeClockEntryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('user_id')
-                    ->relationship('user', 'name')
+                    ->relationship('user', 'name', modifyQueryUsing: fn (Builder $query) =>
+                        $query->where('company_id', auth()->user()->company_id) // 🔑 filtro pela empresa
+                        ->whereHas('roles', fn(Builder $q) => 
+                        $q->whereIn('name', ['Vendedor', 'Administrador'])))
                     ->label('Usuário')
                     ->searchable()
                     ->preload(),

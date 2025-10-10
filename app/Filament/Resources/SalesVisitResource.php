@@ -211,7 +211,10 @@ class SalesVisitResource extends Resource
                     ->preload(),
                 Tables\Filters\SelectFilter::make('assigned_to_user_id')
                     ->label('Vendedor')
-                    ->relationship('assignedTo', 'name')
+                    ->relationship('assignedTo', 'name', modifyQueryUsing: fn (Builder $query) =>
+                        $query->where('company_id', auth()->user()->company_id) // 🔑 filtro pela empresa
+                         ->whereHas('roles', fn(Builder $q) => 
+                         $q->whereIn('name', ['Vendedor', 'Administrador'])))
                     ->searchable()
                     ->preload(),
                 Tables\Filters\SelectFilter::make('status')

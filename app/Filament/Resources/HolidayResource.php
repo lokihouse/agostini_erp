@@ -104,11 +104,11 @@ class HolidayResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('company_id')
-                    ->relationship('company', 'name')
-                    ->label('Empresa')
-                    ->searchable()
-                    ->preload(),
+                #Tables\Filters\SelectFilter::make('company_id')
+                    #->relationship('company', 'name')
+                    #->label('Empresa')
+                    #->searchable()
+                    #->preload(),
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Tipo')
                     ->options(self::getHolidayTypeOptions()),

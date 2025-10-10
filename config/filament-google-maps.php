@@ -6,6 +6,11 @@ return [
      */
 
     'key' => env('GOOGLE_MAPS_API_KEY'),
+ 
+    /*
+     | Optional Map ID for Cloud-based styling and advanced markers
+     */
+    'map_id' => env('FILAMENT_GOOGLE_MAPS_MAP_ID', null),
 
     /*
      | If you need to use both a browser key (restricted by HTTP Referrer) for use in the Javascript API on the

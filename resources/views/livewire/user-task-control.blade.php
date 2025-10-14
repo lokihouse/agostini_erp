@@ -3,22 +3,24 @@
         showScannerModal: false,
         showPauseModal: false, // Esta variável controlará o modal de pausa
         showFinishModal: false,
-        scanErrorMessage: '' // Para exibir erros do scanner no modal
+        scanErrorMessage: '', // Para exibir erros do scanner no modal
+        isFinalizing: false // Controla se o scan é para finalizar tarefa
      }"
-     x-on:scan-success.window="showScannerModal = false; stopScanner(); scanErrorMessage = '';" {{-- Fecha modal no sucesso --}}
+     x-on:scan-success.window="showScannerModal = false; stopScanner(); scanErrorMessage = ''; if (isFinalizing) { showFinishModal = true; isFinalizing = false; }" {{-- Fecha modal no sucesso e abre finish se estiver finalizando --}}
      x-on:scan-error.window="scanErrorMessage = $event.detail.message;" {{-- Mostra erro no modal --}}
-     x-on:qr-code-scanned.window="$wire.call('processScanResult', $event.detail.decodedText); scanErrorMessage = '';" {{-- Chama Livewire no evento --}}
+     x-on:qr-code-scanned.window="if (!isFinalizing) { $wire.call('processScanResult', $event.detail.decodedText); } scanErrorMessage = '';" {{-- Chama Livewire no evento apenas se não estiver finalizando --}}
      x-on:close-pause-modal.window="showPauseModal = false; $wire.resetModalFields();" {{-- Adicionado para fechar via evento Livewire --}}
-     class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
+     x-on:close-finish-modal.window="showFinishModal = false; $wire.resetModalFields();" {{-- Adicionado para fechar modal de finalização via evento Livewire --}}
+     class="bg-white shadow-sm fi-section rounded-xl ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
 >
     {{-- Cabeçalho --}}
-    <div class="fi-section-header-ctn border-b border-gray-200 px-6 py-4 dark:border-white/10">
-        <div class="fi-section-header flex flex-col gap-y-2 sm:flex-row sm:items-center">
+    <div class="px-6 py-4 border-b border-gray-200 fi-section-header-ctn dark:border-white/10">
+        <div class="flex flex-col fi-section-header gap-y-2 sm:flex-row sm:items-center">
             <div class="grid flex-1 gap-y-1">
-                <h3 class="fi-section-header-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+                <h3 class="text-base font-semibold leading-6 fi-section-header-heading text-gray-950 dark:text-white">
                     Minha Produção
                 </h3>
-                <p class="fi-section-header-description text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-gray-500 fi-section-header-description dark:text-gray-400">
                     Gerencie sua atividade de produção atual.
                 </p>
             </div>
@@ -27,7 +29,7 @@
 
     {{-- Conteúdo Principal --}}
     <div class="fi-section-content-ctn">
-        <div class="fi-section-content p-2">
+        <div class="p-2 fi-section-content">
 
             @if ($currentTask)
                 {{-- ============================================= --}}
@@ -35,9 +37,9 @@
                 {{-- ============================================= --}}
                 <div class="space-y-2">
                     {{-- Detalhes da Tarefa --}}
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div class="text-sm space-y-2">
+                    <div class="p-2 border border-gray-200 rounded-lg shadow-sm bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <div class="space-y-2 text-sm">
                                 <div class="sm:col-span-1">
                                     <dt class="font-medium text-gray-500 dark:text-gray-400">Ordem:</dt>
                                     <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $orderNumber }}</dd>
@@ -51,8 +53,8 @@
                                     <dd class="text-xs font-semibold text-gray-900 dark:text-white">{{ $stepName }}</dd>
                                 </div>
                             </div>
-                            <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                                <h4 class="mb-2 text-center text-sm font-medium text-gray-500 dark:text-gray-400">Progresso</h4>
+                            <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                                <h4 class="mb-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400">Progresso</h4>
                                 <div class="flex items-baseline justify-center gap-x-2">
                                     <span class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ number_format($quantityProduced, 0, ',', '.') }}</span>
                                     <span class="text-sm text-gray-500 dark:text-gray-400">/ {{ number_format($quantityPlanned, 0, ',', '.') }}</span>
@@ -66,21 +68,21 @@
 
                     {{-- Progresso e Tempo --}}
                     <div class="">
-                        <div class="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:col-span-2">
+                        <div class="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:col-span-2">
                             <h4 class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Tempo na Tarefa</h4>
                             <div class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
                                 {{ $this->calculateTimeOnTask }}
                             </div>
                             @if($isPaused)
-                                <span class="mt-1 inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20">
+                                <span class="inline-flex items-center px-2 py-1 mt-1 text-xs font-medium text-yellow-800 rounded-md bg-yellow-50 ring-1 ring-inset ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20">
                                      <x-heroicon-s-pause class="-ml-0.5 mr-1.5 h-4 w-4"/>
                                      Pausado
                                      @if($currentTask && $currentTask->lastPauseReasonDetail)
-                                        <span class="ml-1 hidden sm:inline"> - {{ $currentTask->lastPauseReasonDetail->name }}</span>
+                                        <span class="hidden ml-1 sm:inline"> - {{ $currentTask->lastPauseReasonDetail->name }}</span>
                                     @endif
                                  </span>
                             @else
-                                <span class="mt-1 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
+                                <span class="inline-flex items-center px-2 py-1 mt-1 text-xs font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
                                      <x-heroicon-s-play class="-ml-0.5 mr-1.5 h-4 w-4"/>
                                      Em Andamento
                                  </span>
@@ -89,37 +91,38 @@
                     </div>
 
                     {{-- Botões de Ação --}}
-                    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 border-t border-gray-200 pt-6 dark:border-white/10">
-                        @if($isPaused)
-                            {{-- Botão Retomar --}}
+                    <div class="flex flex-wrap items-center justify-center gap-3 py-2 border-t border-gray-200 dark:border-white/10">
+                        {{-- @if($isPaused)
                             <x-filament::button
                                 wire:click="resumeTask"
                                 icon="heroicon-m-play-circle"
                                 color="success"
                                 wire:loading.attr="disabled"
                                 wire:target="resumeTask"
+                                class="w-full sm:w-auto"
                             >
                                 Retomar Tarefa
-                                <x-filament::loading-indicator wire:loading wire:target="resumeTask" class="h-5 w-5"/>
-                            </x-filament::button>
-                        @else
-                            {{-- Botão Pausar (Abre modal Alpine) --}}
-                            <x-filament::button
-                                x-on:click="showPauseModal = true"
-                                icon="heroicon-m-pause-circle"
-                                color="warning"
-                            >
-                                Pausar Tarefa
-                            </x-filament::button>
+                                <x-filament::loading-indicator wire:loading wire:target="resumeTask" class="w-5 h-5"/>
+                            </x-filament::button> --}}
+                        @if(!$isPaused)
+                            <div class="grid grid-cols-2 gap-2">
+                                <x-filament::button
+                                    x-on:click="showPauseModal = true"
+                                    icon="heroicon-m-pause-circle"
+                                    color="warning"
+                                >
+                                    Pausar Tarefa
+                                </x-filament::button>
 
-                            {{-- Botão Finalizar (Abre modal Alpine) --}}
-                            <x-filament::button
-                                x-on:click="showFinishModal = true"
-                                icon="heroicon-m-check-circle"
-                                color="success"
-                            >
-                                Finalizar Tarefa
-                            </x-filament::button>
+                                <x-filament::button
+                                    x-on:click="isFinalizing = true; showScannerModal = true; scanErrorMessage = ''; $nextTick(() => startScanner());"
+                                    icon="heroicon-m-camera"
+                                    color="primary"
+                                    class="w-full sm:w-auto"
+                                >
+                                    Finalizar Tarefa
+                                </x-filament::button>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -128,8 +131,8 @@
                 {{-- ============================================= --}}
                 {{--    EXIBIÇÃO QUANDO NÃO HÁ TAREFA ATIVA      --}}
                 {{-- ============================================= --}}
-                <div class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center dark:border-gray-600">
-                    <x-heroicon-m-qr-code class="mx-auto h-12 w-12 text-gray-400"/>
+                <div class="flex flex-col items-center justify-center p-12 text-center border-2 border-gray-300 border-dashed rounded-lg dark:border-gray-600">
+                    <x-heroicon-m-qr-code class="w-12 h-12 mx-auto text-gray-400"/>
                     <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">Nenhuma tarefa ativa</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Escaneie o QR Code de uma ordem/etapa para iniciar.</p>
                     <div class="mt-6">
@@ -137,6 +140,7 @@
                         <x-filament::button
                             x-on:click="showScannerModal = true; scanErrorMessage = ''; $nextTick(() => startScanner());"
                             icon="heroicon-m-camera"
+                            class="w-full sm:w-auto"
                         >
                             Escanear QR Code
                         </x-filament::button>
@@ -160,7 +164,7 @@
          x-on:keydown.escape.window="showScannerModal = false; stopScanner();"
          aria-labelledby="scanner-modal-title" role="dialog" aria-modal="true"
     >
-        <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
+        <div class="relative w-full max-w-md p-6 bg-white rounded-lg shadow-xl dark:bg-gray-800"
              x-on:click.outside="showScannerModal = false; stopScanner();"
         >
             <h3 id="scanner-modal-title" class="mb-4 text-lg font-medium text-center text-gray-900 dark:text-white">Escanear QR Code</h3>
@@ -172,38 +176,11 @@
             </div>
 
             {{-- Exibição de Erro do Scanner --}}
-            <div id="qr-reader-results" class="mt-2 text-center text-sm text-red-600 dark:text-red-400" x-text="scanErrorMessage" x-show="scanErrorMessage"></div>
-
-            @if (env('APP_DEBUG', false))
-                <div style="padding-top: 16px">
-                    <x-filament::fieldset>
-                        <x-slot name="label">
-                            QrCode Key - Debug
-                        </x-slot>
-
-                        <x-filament::input.wrapper>
-                            <x-filament::input
-                                type="text"
-                                wire:model="debugScannedQrCode"
-                            />
-
-                            <x-slot name="suffix">
-                                <x-filament::icon-button
-                                    icon="heroicon-m-magnifying-glass"
-                                    wire:click="debugQrCode"
-                                    label="New label"
-                                />
-                            </x-slot>
-
-                        </x-filament::input.wrapper>
-
-                    </x-filament::fieldset>
-                </div>
-            @endif
+            <div id="qr-reader-results" class="mt-2 text-sm text-center text-red-600 dark:text-red-400" x-text="scanErrorMessage" x-show="scanErrorMessage"></div>
 
             {{-- Botão Fechar --}}
             <div class="mt-6 text-center">
-                <x-filament::button color="gray" x-on:click="showScannerModal = false; stopScanner();">
+                <x-filament::button id="close-scanner-modal" color="gray" x-on:click="showScannerModal = false; stopScanner();">
                     Fechar
                 </x-filament::button>
             </div>
@@ -281,7 +258,7 @@
                         <button type="submit"
                                 wire:loading.attr="disabled"
                                 wire:target="pauseTask"
-                                class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white border border-transparent rounded-md shadow-sm bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:col-start-2 sm:text-sm dark:focus:ring-offset-gray-800">
+                                class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-yellow-600 border border-transparent rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:col-start-2 sm:text-sm dark:focus:ring-offset-gray-800">
                         <span wire:loading wire:target="pauseTask" class="mr-2">
                             <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -304,7 +281,7 @@
     <div x-show="showFinishModal" x-transition
          class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75" style="display: none;"
          aria-labelledby="finish-modal-title" role="dialog" aria-modal="true">
-        <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
+        <div class="relative w-full max-w-md p-6 bg-white rounded-lg shadow-xl dark:bg-gray-800"
              x-on:click.outside="showFinishModal = false; $wire.resetModalFields()">
             <h3 id="finish-modal-title" class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Finalizar Tarefa</h3>
             <form wire:submit.prevent="finishTask">
@@ -335,7 +312,7 @@
                 </div>
 
                 {{-- Botões do formulário de finalizar --}}
-                <div class="mt-6 flex justify-end gap-3">
+                <div class="flex justify-end gap-3 mt-6">
                     <x-filament::button type="button" color="gray" x-on:click="showFinishModal = false; $wire.resetModalFields()">
                         Cancelar
                     </x-filament::button>
@@ -347,7 +324,7 @@
                         x-bind:disabled="$wire.finishQuantityProduced === null || $wire.finishQuantityProduced < 0"
                     >
                         Confirmar Finalização
-                        <x-filament::loading-indicator wire:loading wire:target="finishTask" class="h-5 w-5"/>
+                        <x-filament::loading-indicator wire:loading wire:target="finishTask" class="w-5 h-5"/>
                     </x-filament::button>
                 </div>
             </form>
@@ -365,7 +342,7 @@
         <script>
             let html5QrCode = null; // Variável global para a instância do scanner
             let debounceTimer = null; // Timer para o debounce
-            const DEBOUNCE_DELAY = 200; // Atraso em milissegundos (1 segundo) - ajuste conforme necessário
+            const DEBOUNCE_DELAY = 200; // Atraso em milissegundos (200ms) - ajuste conforme necessário
             let isProcessingScan = false;
 
             function onScanSuccess(decodedText, decodedResult) {
@@ -381,11 +358,14 @@
                 debounceTimer = setTimeout(() => {
                     console.log(`Debounced: Processando QR Code = ${decodedText}`);
                     isProcessingScan = true;
+                    
+                    // Disparamos ambos os eventos e deixamos o Alpine.js decidir o que fazer
                     window.dispatchEvent(new CustomEvent('qr-code-scanned', { detail: { decodedText: decodedText } }));
-                    stopScanner();
+                    window.dispatchEvent(new CustomEvent('scan-success', { detail: { decodedText: decodedText } }));
+                    
                     setTimeout(() => {
                         isProcessingScan = false;
-                    }, 1000); // Pequeno delay para evitar re-scans imediatos se o modal não fechar rápido
+                    }, 1000); // Pequeno delay para evitar re-scans imediatos
                 }, DEBOUNCE_DELAY);
             }
 

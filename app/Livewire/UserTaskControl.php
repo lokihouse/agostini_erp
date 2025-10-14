@@ -220,6 +220,20 @@ class UserTaskControl extends Component
                 ->whereIn('status', ['active', 'paused'])
                 ->first();
             if ($existingTask) {
+                if($existingTask->status === 'paused' && $userId === $existingTask->user_uuid) {
+                    $this->resumeTask();
+                    $this->dispatch('scan-success');
+                    $this->dispatch('close-pause-modal');
+                    return;
+                }
+
+                if($existingTask->status === 'active' && $userId === $existingTask->user_uuid) {
+                    $this->resumeTask();
+                    $this->dispatch('scan-success');
+                    $this->dispatch('close-pause-modal');
+                    return;
+                }
+
                 throw ValidationException::withMessages(['scan' => 'Você já possui uma tarefa ativa ou pausada. Finalize-a antes de iniciar outra.']);
             }
 

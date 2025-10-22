@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CashFlowExport;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ProjectedCashFlow extends Page
 {
@@ -103,34 +104,20 @@ class ProjectedCashFlow extends Page
         return $this->cashFlowsMap[$accountUuid][$month] ?? null;
     }
 
-    public function downloadPreviousYearReport()
-    {
-        $year = now()->year-1;
-
-        return Excel::download(
-            new CashFlowExport($year, Auth::user()->company_id),
-            "Fluxo-caixa-$year.xlsx"
-        );
-    }
-
    public function downloadReport()
-    {
-        $year = now()->year;
+{
+    $year = now()->year;
+    $export = new \App\Exports\CashFlowExport($year, Auth::user()->company_id);
+    return $export->download();
+}
 
-        return Excel::download(
-            new CashFlowExport($year, Auth::user()->company_id),
-            "Fluxo-caixa-$year.xlsx"
-        );
+public function downloadPreviousYearReport()
+{
+    $year = now()->year - 1;
+    $export = new \App\Exports\CashFlowExport($year, Auth::user()->company_id);
+    return $export->download();
+}
 
-        return Excel::download(
-            new CashFlowExport(
-                $this->monthStrings,
-                $this->cashFlowsMap,
-                fn ($uuid, $month) => $this->calculateShortfall($uuid, $month)
-            ),
-            'Fluxo_Caixa_' . now()->format('Y') . '.xlsx'
-        );
-    }
 
     public function updateCell(string $accountUuid, string $month, $rawValue): void
     {

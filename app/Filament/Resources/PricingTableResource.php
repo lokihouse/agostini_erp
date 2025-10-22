@@ -29,7 +29,7 @@ class PricingTableResource extends Resource
 
     public static function getPluralLabel(): string
         {
-            return 'Tabelas de preços';
+            return 'Tabela de preços';
         }
 
         public static function getLabel(): string
@@ -245,7 +245,5 @@ class PricingTableResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['product.name'];
-    }  
-
-         
+    }      
 }

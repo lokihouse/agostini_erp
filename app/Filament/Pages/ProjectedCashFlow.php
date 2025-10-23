@@ -26,7 +26,7 @@ class ProjectedCashFlow extends Page
     protected static ?string $navigationGroup = 'Financeiro';
     protected static ?int $navigationSort = 60;
     protected static string $view = 'filament.pages.projected-cash-flow';
-
+    
     // Config
     public $monthsCount = 12; // alteração fácil para 6/12/24 meses
     public $monthHeaders = []; // Carbon objects
@@ -37,6 +37,10 @@ class ProjectedCashFlow extends Page
     public $metaAccountUuid = null;
     public $investmentAccountUuid = null;
     public ?CashFlow $record = null;
+    public function getTitle(): string
+        {
+            return 'Fluxo de Caixa Projetado';
+        }
 
     public function mount(Request $request): void
     {

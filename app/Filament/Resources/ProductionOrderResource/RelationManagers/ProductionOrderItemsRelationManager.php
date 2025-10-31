@@ -34,37 +34,33 @@ class ProductionOrderItemsRelationManager extends RelationManager
                     ->afterStateUpdated(function (callable $set, $state) {
                         // Se nenhum produto for selecionado, limpa as etapas
                         if (blank($state)) {
-                            $set('productionSteps', []);
+                            $set('production_steps_info', []);
                             return;
                         }
 
                         // Busca o produto selecionado
                         $product = Product::find($state);
 
-                        // Obtém os UUIDs de todas as etapas de produção associadas ao produto
-                        $stepUuids = $product?->productionSteps()->pluck('production_steps.uuid')->toArray() ?? [];
+                        // Obtém os nomes das etapas para exibição
+                        $stepNames = $product?->productionSteps()->pluck('name')->toArray() ?? [];
 
-                        // Define o estado do campo 'productionSteps' com todos os UUIDs encontrados
-                        $set('productionSteps', $stepUuids);
+                        // Define o estado para exibição informativa
+                        $set('production_steps_info', $stepNames);
                     })
                     ->columnSpanFull(),
 
-                Forms\Components\CheckboxList::make('productionSteps')
+                // CAMPO INFORMATIVO: Mostra as etapas que serão criadas automaticamente
+                Forms\Components\Placeholder::make('production_steps_info')
                     ->label('Etapas de Produção (Geradas Automaticamente)')
-                    ->relationship(
-                        name: 'productionSteps',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query, callable $get) {
-                            $product = Product::find($get('product_uuid'));
-                            if (!$product) {
-                                return $query->whereRaw('false'); // Retorna nenhuma etapa se o produto não for selecionado
-                            }
-                            return $query->whereHas('products', fn (Builder $q) => $q->where('products.uuid', $product->uuid));
+                    ->content(function (callable $get) {
+                        $stepNames = $get('production_steps_info') ?? [];
+                        
+                        if (empty($stepNames)) {
+                            return 'Selecione um produto para ver as etapas.';
                         }
-                    )
-                    ->disabled() // <-- Torna o campo apenas informativo
-                    ->required()
-                    ->columns(3) // Organiza a lista em 3 colunas para melhor visualização
+                        
+                        return implode(', ', $stepNames);
+                    })
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('quantity_planned')

@@ -92,7 +92,7 @@ class ProductionOrderItem extends Model
         });
 
         static::created(function (Model $model) {
-            $produto = Product::find($model->product_uuid)->first();
+            $produto = Product::find($model->product_uuid);
 
             ProductionOrderLog::create([
                 'company_id' => $model->company_id,
@@ -112,7 +112,7 @@ class ProductionOrderItem extends Model
         });
 
         static::deleting(function (Model $model) {
-            $produto = Product::find($model->product_uuid)->first();
+            $produto = Product::find($model->product_uuid);
 
             ProductionOrderLog::create([
                 'company_id' => $model->company_id,

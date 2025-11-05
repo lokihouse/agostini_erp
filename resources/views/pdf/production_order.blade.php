@@ -246,7 +246,7 @@
                             @endphp
                             {!! DNS2D::getBarcodeHTML($qrData, 'QRCODE', 1.8, 1.8) !!}
 
-                            {{-- @if (env('APP_DEBUG', false))
+                        {{--@if (env('APP_DEBUG', false))
                                 <div class="debug_code">
                                     {{ \Illuminate\Support\Facades\Crypt::encryptString($qrData) }}
                                 </div>

@@ -81,6 +81,13 @@
                                         <span class="hidden ml-1 sm:inline"> - {{ $currentTask->lastPauseReasonDetail->name }}</span>
                                     @endif
                                  </span>
+                                <x-filament::button 
+                                    wire:click="resumeTask" 
+                                    class="bg-green-600 hover:bg-green-700 text-black text-sm px-4 py-2 rounded-lg shadow-md transition-all"
+                                    color="warning"
+                                >
+                                    Retomar Produção
+                                </x-filament::button>
                             @else
                                 <span class="inline-flex items-center px-2 py-1 mt-1 text-xs font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
                                      <x-heroicon-s-play class="-ml-0.5 mr-1.5 h-4 w-4"/>
@@ -174,6 +181,28 @@
             <div id="qr-reader" style="width: 100%; max-width: 400px; margin: auto; border: 1px solid #ccc; min-height: 250px;">
                 {{-- O JS do html5-qrcode vai renderizar aqui --}}
             </div>
+
+                {{-- Opção manual de colar código --}}
+            {{-- <div class="p-4 bg-gray-100 rounded-lg mt-4">
+                    <h3 class="text-sm font-semibold mb-2 text-gray-700">Inserir QR Code manualmente</h3>
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            wire:model.defer="debugScannedQrCode" 
+                            placeholder="Cole aqui o código criptografado do QR Code..." 
+                            class="flex-1 border rounded px-3 py-2 text-sm"
+                        >
+                        <button 
+                            wire:click="debugQrCode" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded"
+                        >
+                            📋 Colar / Processar
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Use esta opção caso não tenha câmera disponível. Cole o conteúdo exato do código.
+                    </p>
+                </div>--}}
 
             {{-- Exibição de Erro do Scanner --}}
             <div id="qr-reader-results" class="mt-2 text-sm text-center text-red-600 dark:text-red-400" x-text="scanErrorMessage" x-show="scanErrorMessage"></div>

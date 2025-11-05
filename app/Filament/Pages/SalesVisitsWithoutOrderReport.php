@@ -70,12 +70,7 @@ class SalesVisitsWithoutOrderReport extends Page implements HasForms
                 ->maxDate(now()),
             FormSelect::make('salesperson_id')
                 ->label('Vendedor (Opcional)')
-                ->options(
-                    User::whereHas('roles', fn(Builder $q) => $q->whereIn('name', ['Vendedor', 'Administrador'])) // Ajuste as roles
-                    ->orderBy('name')
-                        ->pluck('name', 'uuid')
-                        ->all()
-                )
+                ->options(User::where('company_id', auth()->user()->company_id)->whereHas('roles', fn($q) => $q->where('name', 'Vendedor'))->pluck('name', 'uuid'))
                 ->searchable()
                 ->preload()
                 ->nullable()

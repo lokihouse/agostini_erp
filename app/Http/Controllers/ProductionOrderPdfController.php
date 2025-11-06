@@ -17,7 +17,7 @@ class ProductionOrderPdfController extends Controller
     public function generatePdf(string $uuid)
     {
         // Aumenta o limite de memória e tempo de execução para evitar erro 500 em PDFs longos
-        ini_set("memory_limit", "512M"); 
+        ini_set("memory_limit", "1024M"); 
         set_time_limit(300); // 5 minutos (ajuste conforme a necessidade)
         // 1. Encontra a ordem ou falha (404)
         //    Carrega relacionamentos necessários para evitar N+1 queries na view

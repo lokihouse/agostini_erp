@@ -147,7 +147,7 @@ class ProductionOrderResource extends Resource
                     ->label('Responsável')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Criado em')

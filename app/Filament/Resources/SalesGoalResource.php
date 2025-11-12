@@ -82,10 +82,11 @@ class SalesGoalResource extends Resource
 	                Forms\Components\Select::make('commission_type')
 	                    ->label('Tipo de Comissão')
 	                    ->options([
+                            'none' => 'Sem comissão',
 	                        'goal' => 'Comissão por Meta Alcançada',
 	                        'sale' => 'Comissão por Venda',
 	                    ])
-	                    ->default('goal')
+	                    ->default('none')
 	                    ->required()
 	                    ->live()
 	                    ->afterStateUpdated(fn (Forms\Set $set) => $set('commission_percentage', 0)), // Zera a porcentagem ao mudar o tipo
@@ -94,6 +95,8 @@ class SalesGoalResource extends Resource
 	                    ->label('Porcentagem da Comissão (%)')
 	                    ->numeric()
 	                    ->suffix('%')
+                        ->visible(fn ($get) => in_array($get('commission_type'), ['sale', 'goal'])) // Só mostra quando necessário
+                        ->required(fn ($get) => in_array($get('commission_type'), ['sale', 'goal'])) // Só obriga se for aplicável
 	                    ->required()
 	                    ->minValue(0)
 	                    ->maxValue(100)
@@ -120,6 +123,7 @@ class SalesGoalResource extends Resource
 	            Tables\Columns\TextColumn::make('commission_type')
 	                ->label('Tipo Comissão')
 	                ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'none' => 'Sem comissão',
 	                    'goal' => 'Por Meta',
 	                    'sale' => 'Por Venda',
 	                    default => $state,

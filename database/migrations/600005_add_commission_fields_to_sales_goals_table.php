@@ -12,20 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sales_goals', function (Blueprint $table) {
-            // Tipo de comissão: 'goal' (por meta) ou 'sale' (por venda)
-            $table->enum('commission_type', ['goal', 'sale'])
-                ->default('goal')
-                ->after('goal_amount')
-                ->comment('Tipo de comissão: goal (por meta) ou sale (por venda)')
-                ->nullable();
+            // Altera a coluna existente em vez de recriar
+            $table->enum('commission_type', ['none', 'goal', 'sale'])
+                ->default('none')
+                ->nullable()
+                ->comment('Tipo de comissão: none (sem), goal (por meta) ou sale (por venda)')
+                ->change();
 
-            // Porcentagem da comissão
+            // Altera a porcentagem de comissão (se já existir)
             $table->decimal('commission_percentage', 5, 2)
                 ->default(0.00)
-                ->after('commission_type')
+                ->nullable()
                 ->comment('Porcentagem da comissão')
-                ->nullable();
-            });
+                ->change();
+        });
     }
 
     /**
@@ -34,8 +34,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sales_goals', function (Blueprint $table) {
-            $table->dropColumn('commission_percentage');
-            $table->dropColumn('commission_type');
+            // Volta para os valores anteriores, se desejar
+            $table->enum('commission_type', ['goal', 'sale'])->nullable()->change();
+            $table->decimal('commission_percentage', 5, 2)->nullable()->default(null)->change();
         });
     }
 };

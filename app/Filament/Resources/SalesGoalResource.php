@@ -116,23 +116,21 @@ class SalesGoalResource extends Resource
                 Tables\Columns\TextColumn::make('goal_amount')
                     ->label('Valor da Meta')
 	                    ->money('BRL')
-	                    ->sortable()
-	                    ->alignEnd(),
-	
-	                Tables\Columns\TextColumn::make('commission_type')
-	                    ->label('Tipo Comissão')
-	                    ->formatStateUsing(fn (string $state): string => match ($state) {
-	                        'goal' => 'Por Meta',
-	                        'sale' => 'Por Venda',
-	                        default => $state,
-	                    })
 	                    ->sortable(),
-	
-	                Tables\Columns\TextColumn::make('commission_percentage')
-	                    ->label('% Comissão')
-	                    ->suffix('%')
-	                    ->sortable()
-	                    ->alignEnd(),
+	            Tables\Columns\TextColumn::make('commission_type')
+	                ->label('Tipo Comissão')
+	                ->formatStateUsing(fn (string $state): string => match ($state) {
+	                    'goal' => 'Por Meta',
+	                    'sale' => 'Por Venda',
+	                    default => $state,
+	                })
+	                ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+	            Tables\Columns\TextColumn::make('commission_percentage')
+	                ->label('% Comissão')
+	                ->suffix('%')
+	                ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('company.name')
                     ->label('Empresa')
                     ->searchable()

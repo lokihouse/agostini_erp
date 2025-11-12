@@ -125,8 +125,8 @@ class SalesPerformanceReport extends Page implements HasForms
             $salespersonData = [
                 'name' => $salesperson->name,
                 'uuid' => $salesperson->uuid,
-                'months' => [],
-                'totals' => ['sales' => 0, 'goal' => 0]
+	                'months' => [],
+	                'totals' => ['sales' => 0, 'goal' => 0, 'commission' => 0]
             ];
 
             foreach ($this->monthHeaders as $monthDate) {
@@ -134,50 +134,72 @@ class SalesPerformanceReport extends Page implements HasForms
                 $monthStart = $monthDate->copy()->startOfMonth();
                 $monthEnd = $monthDate->copy()->endOfMonth();
 
-                // MODIFICAÇÃO PRINCIPAL AQUI: Buscar a meta ativa para o período
-                $activeGoal = SalesGoal::where('user_id', $salesperson->uuid)
-                    // ->where('company_id', $salesperson->company_id) // O TenantScope já deve cuidar disso
-                    ->where('period', '<=', $monthStart->toDateString()) // A meta deve ter iniciado em ou antes deste mês
-                    ->orderBy('period', 'desc') // Pega a mais recente que se aplica
-                    ->first(); // Pega o registro completo da meta
+	                // MODIFICAÇÃO PRINCIPAL AQUI: Buscar a meta ativa para o período
+	                $activeGoal = SalesGoal::where('user_id', $salesperson->uuid)
+	                    // ->where('company_id', $salesperson->company_id) // O TenantScope já deve cuidar disso
+	                    ->where('period', $monthStart->toDateString()) // Busca a meta exata para o mês
+	                    ->first(); // Pega o registro completo da meta
+	
+	                $goalAmount = $activeGoal ? (float)$activeGoal->goal_amount : 0;
+	                $commissionType = $activeGoal ? $activeGoal->commission_type : 'none';
+	                $commissionPercentage = $activeGoal ? (float)$activeGoal->commission_percentage : 0;
+	                // FIM DA MODIFICAÇÃO PRINCIPAL
 
-                $goalAmount = $activeGoal ? (float)$activeGoal->goal_amount : 0;
-                // FIM DA MODIFICAÇÃO PRINCIPAL
+                    // Buscar Vendas Realizadas (lógica existente)
+                    $salesOrders = SalesOrder::where('user_id', $salesperson->uuid)
+                        ->whereIn('status', $validSaleStatuses)
+                        ->whereBetween('order_date', [$monthStart, $monthEnd])
+                        ->get();
 
-                // Buscar Vendas Realizadas (lógica existente)
-                $salesAmount = SalesOrder::where('user_id', $salesperson->uuid)
-                    // ->where('company_id', $salesperson->company_id) // TenantScope
-                    ->whereIn('status', $validSaleStatuses)
-                    ->whereBetween('order_date', [$monthStart, $monthEnd])
-                    ->sum('total_amount');
-                $salesAmount = (float)$salesAmount;
+                    $salesAmount = (float)$salesOrders->sum('total_amount');
+                    $commissionAmount = 0.00;
 
-                $performance = ($goalAmount > 0) ? ($salesAmount / $goalAmount) * 100 : null;
-                if ($goalAmount == 0 && $salesAmount > 0) {
-                    $performance = 100; // Ou outra lógica para meta não definida mas com vendas
-                }
+                    // Se a comissão for por venda, somar as comissões dos pedidos
+                    if ($commissionType === 'sale') {
+                        $commissionAmount = (float)$salesOrders->sum('commission_amount');
+                    }
+	
+	                // Se a comissão for por meta, calcular o valor real
+	                if ($commissionType === 'goal' && $commissionPercentage > 0) {
+	                    // A comissão só é paga se a meta for atingida (performance >= 100)
+	                    if ($salesAmount >= $goalAmount && $goalAmount > 0) {
+	                        // O valor da comissão por meta é a porcentagem sobre o valor total das vendas
+	                        $commissionAmount = $salesAmount * ($commissionPercentage / 100);
+	                    } else {
+	                        $commissionAmount = 0.00; // Meta não alcançada
+	                    }
+	                }
 
-                $salespersonData['months'][$monthKey] = [
-                    'sales' => $salesAmount,
-                    'goal' => $goalAmount,
-                    'performance' => $performance,
-                    'difference' => $salesAmount - $goalAmount,
-                ];
+	                $performance = ($goalAmount > 0) ? ($salesAmount / $goalAmount) * 100 : null;
+	                if ($goalAmount == 0 && $salesAmount > 0) {
+	                    $performance = 100; // Ou outra lógica para meta não definida mas com vendas
+	                }
 
-                $salespersonData['totals']['sales'] += $salesAmount;
-                $salespersonData['totals']['goal'] += $goalAmount;
-            }
-            // Calcular performance total
-            $salespersonData['totals']['performance'] = ($salespersonData['totals']['goal'] > 0)
-                ? ($salespersonData['totals']['sales'] / $salespersonData['totals']['goal']) * 100
-                : ($salespersonData['totals']['sales'] > 0 ? 100 : null);
+	                $salespersonData['months'][$monthKey] = [
+	                    'sales' => $salesAmount,
+	                    'goal' => $goalAmount,
+	                    'performance' => $performance,
+	                    'difference' => $salesAmount - $goalAmount,
+	                    'commission_type' => $commissionType,
+	                    'commission_percentage' => $commissionPercentage,
+	                    'commission_amount' => $commissionAmount,
+	                ];
 
-            $salespersonData['totals']['difference'] = $salespersonData['totals']['sales'] - $salespersonData['totals']['goal'];
-
-            $report[] = $salespersonData;
-        }
-        $this->reportData = $report;
-    }
+	                $salespersonData['totals']['sales'] += $salesAmount;
+	                $salespersonData['totals']['goal'] += $goalAmount;
+	                $salespersonData['totals']['commission'] += $commissionAmount; // Adiciona o total de comissão
+	            }
+	            // Calcular performance total
+	            $salespersonData['totals']['performance'] = ($salespersonData['totals']['goal'] > 0)
+	                ? ($salespersonData['totals']['sales'] / $salespersonData['totals']['goal']) * 100
+	                : ($salespersonData['totals']['sales'] > 0 ? 100 : null);
+	
+	            $salespersonData['totals']['difference'] = $salespersonData['totals']['sales'] - $salespersonData['totals']['goal'];
+	
+	            $report[] = $salespersonData;
+	        }
+	        $this->reportData = $report;
+	    }
 
     protected function getHeaderActions(): array
     {

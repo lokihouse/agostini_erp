@@ -80,7 +80,7 @@ class AverageProductionTimes extends BaseWidget
             ->whereHas('items', function (Builder $query) use ($productRecord) {
                 $query->where('product_uuid', $productRecord->uuid);
             })
-            ->where('status', 'Concluída')
+            ->where('status', ProductionOrder::STATUS_COMPLETED) //Correção aplicada
             ->whereNotNull('start_date')
             ->whereNotNull('completion_date')
             ->with('items:uuid,production_order_uuid')

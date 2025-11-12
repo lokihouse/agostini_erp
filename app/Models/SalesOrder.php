@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\TenantScope;
-use Carbon\Carbon;
+
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +11,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\Models\SalesGoal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class SalesOrder extends Model
 {
@@ -32,6 +34,7 @@ class SalesOrder extends Model
         'delivery_deadline',
         'status',
         'total_amount',
+        'commission_amount',
         'notes',
         'cancellation_reason',
         'cancellation_details',
@@ -39,6 +42,7 @@ class SalesOrder extends Model
     ];
 
     protected $casts = [
+        'commission_amount' => 'decimal:2',
         'order_date' => 'date',
         'delivery_deadline' => 'date',
         'total_amount' => 'decimal:2',
@@ -100,6 +104,10 @@ class SalesOrder extends Model
         });
 
         static::updating(function (SalesOrder $salesOrder) {
+            // Recalcula a comissão se o total_amount mudar ou se for um pedido 'sale'
+            if ($salesOrder->isDirty('total_amount')) {
+                $salesOrder->calculateAndSaveCommission();
+            }
             $originalStatus = $salesOrder->getOriginal('status');
             $newStatus = $salesOrder->status;
 
@@ -228,6 +236,36 @@ class SalesOrder extends Model
         return $this->belongsTo(User::class, 'user_id', 'uuid');
     }
 
+    public function salesGoal(): BelongsTo
+    {
+        // Busca a meta de venda do vendedor para o mês do pedido
+        return $this->belongsTo(SalesGoal::class, 'user_id', 'user_id')
+            ->whereRaw('DATE_FORMAT(period, "%Y-%m") = DATE_FORMAT(order_date, "%Y-%m")');
+    }
+
+    // Método para calcular e salvar a comissão
+    public function calculateAndSaveCommission(): void
+    {
+        // 1. Buscar a meta de venda do vendedor para o mês do pedido
+        $goal = SalesGoal::where('user_id', $this->user_id)
+            ->whereRaw('DATE_FORMAT(period, "%Y-%m") = ?', [Carbon::parse($this->order_date)->format('Y-m')])
+            ->first();
+
+        $commissionAmount = 0.00;
+
+        if ($goal && $goal->commission_type === 'sale' && $goal->commission_percentage > 0) {
+            // 2. Se o tipo de comissão for 'sale' (por venda)
+            // 3. Calcular comissão: total_amount * (commission_percentage / 100)
+            $commissionAmount = $this->total_amount * ($goal->commission_percentage / 100);
+        }
+
+        // 4. Armazenar o valor da comissão
+        $this->commission_amount = $commissionAmount;
+        $this->saveQuietly(); // Salva sem disparar eventos para evitar loops
+    }
+
+
+
     public function items(): HasMany
     {
         return $this->hasMany(SalesOrderItem::class, 'sales_order_id', 'uuid');
@@ -237,6 +275,7 @@ class SalesOrder extends Model
     public function updateTotalAmount(): void
     {
         $this->total_amount = $this->items()->sum(DB::raw('quantity * final_price'));
+        $this->calculateAndSaveCommission(); // Recalcula a comissão após atualizar o total
         $this->saveQuietly(); // Salva sem disparar eventos para evitar loops
     }
 }

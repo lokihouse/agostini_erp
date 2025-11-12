@@ -15,6 +15,7 @@ class ProductionOrder extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
+    const STATUS_COMPLETED = 'Concluída';
     protected $primaryKey = 'uuid';
     public $incrementing = false;
     protected $keyType = 'string';

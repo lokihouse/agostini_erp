@@ -23,9 +23,12 @@ class SalesGoal extends Model
         'user_id',
         'period',
         'goal_amount',
+        'commission_type',
+        'commission_percentage',
     ];
 
     protected $casts = [
+        'commission_percentage' => 'decimal:2',
         'period' => 'date',
         'goal_amount' => 'decimal:2',
     ];

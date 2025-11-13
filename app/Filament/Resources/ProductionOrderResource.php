@@ -142,6 +142,11 @@ class ProductionOrderResource extends Resource
                     ->label('Data Limite')
                     ->date('d/m/Y')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('notes')
+                    ->label('Observações gerais')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Responsável')
